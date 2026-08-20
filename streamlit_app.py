@@ -7,67 +7,100 @@ from docx.shared import Inches, Pt, RGBColor
 from dotenv import load_dotenv
 st.set_page_config(page_title="Pitch to Project", layout="wide")
 
-# Inject CSS cleanly using triple quotes
-css_code = """
+# Inject CSS cleanly using triple quotescss_code = """
 <style>
-/* 1. Fix Visibility: Make all field labels, toggle text, and captions dark & bold */
+/* 1. Page Background & Font Baseline */
+.stApp {
+    background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%) !important;
+}
+
+/* 2. Rich Top Navigation / Header Styling */
+h1, h2, h3 {
+    color: #0f172a !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.025em !important;
+}
+
+/* 3. High-Contrast Labels & Text Visibility Fix */
 div[data-testid="stMarkdownContainer"] p, 
 label[data-testid="stWidgetLabel"] p,
 div[data-testid="stToggle"] span {
-    color: #0f172a !important; /* High-contrast dark navy */
-    font-weight: 700 !important; /* Bold text */
+    color: #0f172a !important;
+    font-weight: 700 !important;
     font-size: 0.95rem !important;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
 }
 
-/* 2. Demo Mode Toggle Styling & Soft Glow Background */
+/* 4. Glassmorphism Card Wrapper for Demo Mode Toggle */
 div[data-testid="stToggle"] {
-    background-color: #f1f5f9;
-    padding: 8px 16px;
-    border-radius: 8px;
-    border: 1px solid #cbd5e1;
-    display: inline-block;
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(8px) !important;
+    padding: 10px 18px !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(203, 213, 225, 0.6) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* 3. File Uploaders & Input Area Card Styling with Shadows & Transitions */
+/* 5. Rich Input Cards (File Uploaders & Text Areas) */
 div[data-testid="stFileUploader"], 
 div[data-testid="stTextArea"] textarea {
-    background-color: #ffffff !important;
-    border: 2px solid #3b82f6 !important;
-    border-radius: 12px !important;
-    padding: 12px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    background: #ffffff !important;
+    border: 2px solid #6366f1 !important; /* Soft Indigo border */
+    border-radius: 14px !important;
+    padding: 14px !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02) !important;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-/* 4. Hover Animations for File Upload & Text Areas */
+/* Dropzone Interior Styling */
+div[data-testid="stFileUploaderDropzone"] {
+    background: #f8fafc !important;
+    border: 1px dashed #cbd5e1 !important;
+    border-radius: 10px !important;
+}
+
+/* 6. Glowing Hover & Focus Micro-Animations */
 div[data-testid="stFileUploader"]:hover, 
 div[data-testid="stTextArea"] textarea:focus {
-    border-color: #1d4ed8 !important;
-    box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.2) !important;
-    transform: translateY(-2px); /* Slight lift effect */
+    border-color: #4f46e5 !important;
+    box-shadow: 0 12px 20px -5px rgba(99, 102, 241, 0.25), 0 0 0 4px rgba(99, 102, 241, 0.15) !important;
+    transform: translateY(-3px) scale(1.005) !important;
 }
 
-/* 5. Make the Dropzone Inner Box Background Crisp & High-Contrast */
-div[data-testid="stFileUploaderDropzone"] {
-    background-color: #f8fafc !important;
-    border-radius: 8px !important;
-}
-
-/* 6. High-Contrast Styling for Primary Action Buttons */
+/* 7. Gradient Primary Action Button with Pulse Hover */
 div.stButton > button {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+    background: linear-gradient(135deg, #4f46e5 0%, #2563eb 100%) !important;
     color: #ffffff !important;
     font-weight: 700 !important;
-    border-radius: 8px !important;
+    font-size: 1rem !important;
+    border-radius: 10px !important;
     border: none !important;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
+    padding: 12px 24px !important;
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4) !important;
     transition: all 0.3s ease !important;
 }
 
 div.stButton > button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45) !important;
-    background: linear-gradient(135deg, #1d4ed8, #1e40af) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.55) !important;
+    background: linear-gradient(135deg, #4338ca 0%, #1d4ed8 100%) !important;
+}
+
+/* 8. Container Cards for Extracted Output Sections */
+div[data-testid="stVerticalBlockBorderWrapper"] > div {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-left: 5px solid #6366f1 !important; /* Left highlight bar */
+    border-radius: 12px !important;
+    padding: 20px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
+    margin-bottom: 16px !important;
+    transition: all 0.3s ease !important;
+}
+
+div[data-testid="stVerticalBlockBorderWrapper"] > div:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+    transform: translateY(-2px) !important;
 }
 </style>
 """

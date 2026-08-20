@@ -106,7 +106,7 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div:hover {
 </style>
 st.markdown(
     """
-    <div style="
+<div style="
         background: linear-gradient(90deg, #1e1b4b 0%, #312e81 100%);
         color: #ffffff;
         padding: 10px 0px;
@@ -116,11 +116,11 @@ st.markdown(
         letter-spacing: 0.5px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         margin-bottom: 20px;
-    ">
+">
         <marquee behavior="scroll" direction="left" scrollamount="8">
             ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer
         </marquee>
-    </div>
+</div>
     """,
     unsafe_allow_html=True,
 )

@@ -7,7 +7,8 @@ from docx.shared import Inches, Pt, RGBColor
 from dotenv import load_dotenv
 st.set_page_config(page_title="Pitch to Project", layout="wide")
 
-# Inject CSS cleanly using triple quotescss_code = """
+# Inject CSS cleanly using triple quotes
+css_code = """
 <style>
 /* 1. Page Background & Font Baseline */
 .stApp {

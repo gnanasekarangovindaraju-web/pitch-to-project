@@ -31,6 +31,12 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div {
     padding: 16px;
     margin-bottom: 12px;
 }
+div[data-testid="stDownloadButton"] > button:hover {
+    background-color: #22c55e !important; /* Green background on hover */
+    color: #ffffff !important;            /* White text color on hover */
+    border-color: #16a34a !important;        /* Darker green border */
+    transition: all 0.3s ease;            /* Smooth color transition */
+}
 </style>
 """
 

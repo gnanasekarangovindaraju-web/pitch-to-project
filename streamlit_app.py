@@ -24,6 +24,13 @@ div[data-testid="stTextArea"] textarea {
     border: 2px solid #3b82f6;
     border-radius: 10px;
 }
+div[data-testid="stVerticalBlockBorderWrapper"] > div {
+    background-color: #f8f9fa; /* Light background color */
+    border: 1px solid #d1d5db; /* Border color */
+    border-radius: 10px;        /* Corner rounding */
+    padding: 16px;
+    margin-bottom: 12px;
+}
 </style>
 """
 

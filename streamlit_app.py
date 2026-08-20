@@ -10,36 +10,67 @@ st.set_page_config(page_title="Pitch to Project", layout="wide")
 # Inject CSS cleanly using triple quotes
 css_code = """
 <style>
-/* File Uploader styling */
-div[data-testid="stFileUploader"] {
-    background-color: #f8f9fa;
-    border: 2px solid #3b82f6;
-    border-radius: 10px;
-    padding: 12px;
+/* 1. Fix Visibility: Make all field labels, toggle text, and captions dark & bold */
+div[data-testid="stMarkdownContainer"] p, 
+label[data-testid="stWidgetLabel"] p,
+div[data-testid="stToggle"] span {
+    color: #0f172a !important; /* High-contrast dark navy */
+    font-weight: 700 !important; /* Bold text */
+    font-size: 0.95rem !important;
 }
 
-/* Text Area styling */
+/* 2. Demo Mode Toggle Styling & Soft Glow Background */
+div[data-testid="stToggle"] {
+    background-color: #f1f5f9;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    display: inline-block;
+}
+
+/* 3. File Uploaders & Input Area Card Styling with Shadows & Transitions */
+div[data-testid="stFileUploader"], 
 div[data-testid="stTextArea"] textarea {
-    background-color: #f8f9fa;
-    border: 2px solid #3b82f6;
-    border-radius: 10px;
+    background-color: #ffffff !important;
+    border: 2px solid #3b82f6 !important;
+    border-radius: 12px !important;
+    padding: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
-div[data-testid="stVerticalBlockBorderWrapper"] > div {
-    background-color: #f8f9fa; /* Light background color */
-    border: 1px solid #d1d5db; /* Border color */
-    border-radius: 10px;        /* Corner rounding */
-    padding: 16px;
-    margin-bottom: 12px;
+
+/* 4. Hover Animations for File Upload & Text Areas */
+div[data-testid="stFileUploader"]:hover, 
+div[data-testid="stTextArea"] textarea:focus {
+    border-color: #1d4ed8 !important;
+    box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.2) !important;
+    transform: translateY(-2px); /* Slight lift effect */
 }
-div[data-testid="stDownloadButton"] > button:hover {
-    background-color: #22c55e !important; /* Green background on hover */
-    color: #ffffff !important;            /* White text color on hover */
-    border-color: #16a34a !important;        /* Darker green border */
-    transition: all 0.3s ease;            /* Smooth color transition */
+
+/* 5. Make the Dropzone Inner Box Background Crisp & High-Contrast */
+div[data-testid="stFileUploaderDropzone"] {
+    background-color: #f8fafc !important;
+    border-radius: 8px !important;
+}
+
+/* 6. High-Contrast Styling for Primary Action Buttons */
+div.stButton > button {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    border-radius: 8px !important;
+    border: none !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
+    transition: all 0.3s ease !important;
+}
+
+div.stButton > button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45) !important;
+    background: linear-gradient(135deg, #1d4ed8, #1e40af) !important;
 }
 </style>
 """
-
 st.markdown(css_code, unsafe_allow_html=True)
 # Load environment variables
 load_dotenv()

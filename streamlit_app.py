@@ -5,7 +5,33 @@ import streamlit as st
 import docx
 from docx.shared import Inches, Pt, RGBColor
 from dotenv import load_dotenv
+# Custom CSS to style file uploaders, text area, and containers
+st.markdown(
+   <style>
+    /* Style file uploader boxes */
+    div[data-testid="stFileUploader"] {
+        background-color: #f8f9fa; /* Change background color */
+        border: 2px solid #3b82f6; /* Change border width & color */
+        border-radius: 10px;        /* Rounded corners */
+        padding: 12px;
+        margin-bottom: 15px;
+    }
 
+    /* Style the text area box */
+    div[data-testid="stTextArea"] textarea {
+        background-color: #f8f9fa;
+        border: 2px solid #3b82f6;
+        border-radius: 10px;
+    }
+
+    /* Optional: Add hover effect to uploader boxes */
+    div[data-testid="stFileUploader"]:hover {
+        border-color: #1d4ed8;
+        background-color: #f0fdf4;
+    }
+    </style>
+    unsafe_allow_html=True,
+)
 # Load environment variables
 load_dotenv()
 

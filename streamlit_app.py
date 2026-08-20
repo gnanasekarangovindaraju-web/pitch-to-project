@@ -10,21 +10,6 @@ st.set_page_config(page_title="Pitch to Project", layout="wide")
 # Inject CSS cleanly using triple quotes
 css_code = """
 <style>
-<div style="
-        background: linear-gradient(90deg, #1e1b4b 0%, #312e81 100%);
-        color: #ffffff;
-        padding: 10px 0px;
-        border-radius: 8px;
-        font-weight: 700;
-        font-size: 1.05rem;
-        letter-spacing: 0.5px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
-    ">
-        <marquee behavior="scroll" direction="left" scrollamount="8">
-            ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer
-        </marquee>
-    </div>
 /* 1. Page Background & Font Baseline */
 .stApp {
     background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%) !important;
@@ -119,6 +104,26 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div:hover {
     transform: translateY(-2px) !important;
 }
 </style>
+st.markdown(
+    """
+    <div style="
+        background: linear-gradient(90deg, #1e1b4b 0%, #312e81 100%);
+        color: #ffffff;
+        padding: 10px 0px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 1.05rem;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    ">
+        <marquee behavior="scroll" direction="left" scrollamount="8">
+            ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer
+        </marquee>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 """
 st.markdown(css_code, unsafe_allow_html=True)
 # Load environment variables

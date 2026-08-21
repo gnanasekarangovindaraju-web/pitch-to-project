@@ -96,10 +96,22 @@ def analyze_with_gemini(raw_text):
     INTAKE MATERIALS:
     {raw_text}
     """
-
     try:
         response = client.models.generate_content(
             model="gemini-3.6-flash",
             contents=prompt,
         )
-        cleaned_json = response.text.strip().replace("json", "").replace("
+        # Safely clean Markdown fence formatting
+        raw_response = response.text.strip()
+        if raw_response.startswith("```"):
+            lines = raw_response.splitlines()
+            if lines[0].startswith("```"):
+                lines = lines[1:]
+            if lines and lines[-1].startswith("```"):
+                lines = lines[:-1]
+            raw_response = "\n".join(lines).strip()
+            
+        return json.loads(raw_response)
+    except Exception as e:
+        st.error(f"Gemini API Error: {str(e)}")
+        return None

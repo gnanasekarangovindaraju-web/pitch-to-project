@@ -102,4 +102,4 @@ def analyze_with_gemini(raw_text):
             model="gemini-3.6-flash",
             contents=prompt,
         )
-        cleaned_json = response.text.strip().replace("```json", "").replace("
+        cleaned_json = response.text.strip().replace("json", "").replace("

@@ -256,7 +256,7 @@ div[data-testid="stFileUploaderFileData"] button svg {
 
 /* 7. Separate Window Processing Box (st.status Styling) */
 div[data-testid="stStatusWidget"] {
-    background: rgba(15, 23, 42, 0.95) !important;
+    background: #1e1b4b !important;
     border: 2px solid #38bdf8 !important;
     border-radius: 12px !important;
     box-shadow: 0 0 25px rgba(56, 189, 248, 0.4) !important;
@@ -264,7 +264,17 @@ div[data-testid="stStatusWidget"] {
     margin-bottom: 20px !important;
 }
 
-div[data-testid="stStatusWidget"] * {
+/* Fix Status Header Container Bar Background & Text */
+div[data-testid="stStatusWidget"] summary,
+div[data-testid="stStatusWidget"] [data-testid="stStatusWidgetHeader"] {
+    background: #10172a !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+}
+
+div[data-testid="stStatusWidget"] *,
+div[data-testid="stStatusWidget"] span,
+div[data-testid="stStatusWidget"] div {
     color: #f8fafc !important;
     font-size: 1rem !important;
     font-weight: 700 !important;

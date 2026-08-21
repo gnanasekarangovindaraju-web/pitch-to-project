@@ -137,7 +137,7 @@ def build_docx_report(data):
         return file.read()
 
 # -----------------------------------------------------------------------------
-# 3. Comprehensive High-Contrast Custom CSS
+# 3. Comprehensive Custom CSS (Glows, Neon Contrast, Custom Process Box)
 # -----------------------------------------------------------------------------
 css_code = """
 <style>
@@ -246,53 +246,19 @@ div[data-testid="stFileUploaderFileData"] button svg {
     fill: #f43f5e !important;
 }
 
-/* 7. COMPLETE OVERRIDE FOR ST.STATUS HEADER BAR & ST.PROGRESS */
-div[data-testid="stStatusWidget"],
-div[data-testid="stStatusWidget"] details,
-div[data-testid="stStatusWidget"] summary,
-div[data-testid="stStatusWidget"] [data-testid="stStatusWidgetHeader"],
-div[data-testid="stStatusWidget"] > div {
-    background-color: #1e1b4b !important;
-    background: #1e1b4b !important;
-    border-color: #38bdf8 !important;
-}
-
-div[data-testid="stStatusWidget"] {
-    border: 2px solid #38bdf8 !important;
-    border-radius: 12px !important;
-    box-shadow: 0 0 25px rgba(56, 189, 248, 0.4) !important;
-    padding: 12px !important;
-    margin-bottom: 20px !important;
-}
-
-div[data-testid="stStatusWidget"] summary {
-    border-radius: 8px !important;
-    padding: 10px 14px !important;
-    border: 1px solid rgba(168, 85, 247, 0.5) !important;
-}
-
-div[data-testid="stStatusWidget"] *,
-div[data-testid="stStatusWidget"] span,
-div[data-testid="stStatusWidget"] div,
-div[data-testid="stStatusWidget"] p,
-div[data-testid="stStatusWidget"] label {
-    color: #f8fafc !important;
-    font-size: 1rem !important;
-    font-weight: 800 !important;
-}
-
-/* FORCE HIGH VISIBILITY FOR PROGRESS BAR CONTAINERS */
+/* 7. DEDICATED PROGRESS BAR STYLING */
 div[data-testid="stProgress"] > div {
     background-color: #0f172a !important;
     border-radius: 10px !important;
-    border: 1px solid #a855f7 !important;
-    height: 16px !important;
+    border: 1.5px solid #38bdf8 !important;
+    height: 18px !important;
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.3) !important;
 }
 
 div[data-testid="stProgress"] > div > div {
-    background: linear-gradient(90deg, #ec4899 0%, #38bdf8 100%) !important;
+    background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #38bdf8 100%) !important;
     border-radius: 10px !important;
-    box-shadow: 0 0 15px rgba(56, 189, 248, 0.8) !important;
+    box-shadow: 0 0 18px rgba(56, 189, 248, 0.8) !important;
 }
 
 /* Text Area Input */
@@ -521,16 +487,21 @@ with left_col:
 with right_col:
     st.header("2. AI Scope & Handover Analysis")
 
-    # Processing Box using st.status containing a high-visibility animated st.progress bar
+    # Dedicated Isolated Container Box for Process Output (Eliminates st.status white headers)
     if generate_btn:
+        progress_card = st.empty()
+        
         if demo_mode:
-            with st.status("⚡ Running Demo Processing Engine...", expanded=True) as status:
-                bar = st.progress(0, text="Loading pre-configured pitch scenarios...")
+            with progress_card.container(border=True):
+                st.markdown("### 🧠 Running Scope Analysis")
+                bar = st.progress(0, text="Loading pitch mock scenarios...")
                 for i in range(100):
                     time.sleep(0.01)
-                    bar.progress(i + 1, text=f"Processing Demo Scope... {i+1}%")
-                status.update(label="✅ Demo Analysis Complete!", state="complete", expanded=False)
+                    bar.progress(i + 1, text=f"Analyzing Intake Materials... {i+1}%")
+                st.success("✅ Demo Analysis Complete!")
+                time.sleep(0.5)
             
+            progress_card.empty()
             st.session_state["analysis_data"] = MOCK_ANALYSIS
             st.toast("⚡ Demo Analysis Loaded!", icon="✅")
         else:
@@ -538,7 +509,8 @@ with right_col:
             if not raw_text.strip():
                 st.warning("Please upload at least one document or paste text before analyzing.")
             else:
-                with st.status("🧠 Processing Intake Documents...", expanded=True) as status:
+                with progress_card.container(border=True):
+                    st.markdown("### 🧠 Live Gemini Processing")
                     p_bar = st.progress(15, text="📄 Extracting raw text from documents...")
                     time.sleep(0.3)
                     
@@ -551,12 +523,14 @@ with right_col:
                     
                     if result:
                         p_bar.progress(100, text="✅ Smart Scope Handover Complete!")
-                        time.sleep(0.3)
-                        status.update(label="✅ Smart Scope Handover Complete!", state="complete", expanded=False)
+                        st.success("✅ Analysis Successfully Generated!")
+                        time.sleep(0.5)
                         st.session_state["analysis_data"] = result
                         st.toast("⚡ Live Gemini Extraction Complete!", icon="✅")
                     else:
-                        status.update(label="❌ Extraction Failed", state="error", expanded=True)
+                        st.error("❌ Extraction Failed")
+                
+                progress_card.empty()
 
     # State fallback
     if "analysis_data" not in st.session_state:

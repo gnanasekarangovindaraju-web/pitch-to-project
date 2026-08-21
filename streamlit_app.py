@@ -148,7 +148,7 @@ css_code = """
 /* 1. Dynamic Mesh Gradient Background Baseline */
 .stApp {
     background: linear-gradient(125deg, #0f172a 0%, #1e1b4b 35%, #311042 70%, #0284c7 100%) !important;
-    background_attachment: fixed;
+    background-attachment: fixed;
 }
 
 /* 2. Neon Titles & Headings */
@@ -176,7 +176,7 @@ div[data-testid="stToggle"] span {
     font-size: 0.95rem !important;
 }
 
-/* Fix App Subtitle / Caption Visibility */
+/* Subtitle / Caption Visibility */
 div[data-testid="stCaptionContainer"] p {
     color: #38bdf8 !important;
     font-size: 1.05rem !important;
@@ -194,7 +194,7 @@ div[data-testid="stToggle"] {
     box-shadow: 0 8px 32px 0 rgba(168, 85, 247, 0.2) !important;
 }
 
-/* 5. Target Fix for Streamlit File Uploaders & Dropzone */
+/* 5. Streamlit File Uploaders & Dropzone */
 div[data-testid="stFileUploader"] {
     background: rgba(15, 23, 42, 0.85) !important;
     border: 2px solid #a855f7 !important;
@@ -209,7 +209,6 @@ div[data-testid="stFileUploaderDropzone"] {
     border-radius: 10px !important;
 }
 
-/* Fix Dropzone Helper Messages Visibility */
 div[data-testid="stFileUploaderDropzone"] *,
 div[data-testid="stFileUploaderDropzone"] span,
 div[data-testid="stFileUploaderDropzone"] small {
@@ -217,7 +216,6 @@ div[data-testid="stFileUploaderDropzone"] small {
     font-weight: 700 !important;
 }
 
-/* Dropzone Browse Button Styling */
 div[data-testid="stFileUploaderDropzone"] button {
     background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 100%) !important;
     border: 1px solid #f43f5e !important;
@@ -230,7 +228,7 @@ div[data-testid="stFileUploaderDropzone"] button * {
     font-weight: 800 !important;
 }
 
-/* 6. Fix for Uploaded File Pills / Badges Visibility */
+/* 6. Uploaded File Badges / Pills */
 div[data-testid="stFileUploaderFile"],
 div[data-testid="stFileUploaderFileData"] {
     background: rgba(30, 27, 75, 0.95) !important;
@@ -240,7 +238,6 @@ div[data-testid="stFileUploaderFileData"] {
     box-shadow: 0 0 12px rgba(168, 85, 247, 0.5) !important;
 }
 
-/* Force Text Contrast Inside File Badges */
 div[data-testid="stFileUploaderFile"] *,
 div[data-testid="stFileUploaderFileData"] * {
     background: transparent !important;
@@ -249,46 +246,55 @@ div[data-testid="stFileUploaderFileData"] * {
     font-size: 0.9rem !important;
 }
 
-/* Delete / Remove Icon Styling */
-div[data-testid="stFileUploaderFile"] button,
-div[data-testid="stFileUploaderFileData"] button {
-    background: transparent !important;
-    border: none !important;
-}
-
 div[data-testid="stFileUploaderFile"] button svg,
 div[data-testid="stFileUploaderFileData"] button svg {
     fill: #f43f5e !important;
 }
 
-/* 7. st.status Styling - Window Processing Box & Header Fix */
-div[data-testid="stStatusWidget"] {
+/* 7. COMPLETE OVERRIDE FOR ST.STATUS HEADER BAR */
+div[data-testid="stStatusWidget"],
+div[data-testid="stStatusWidget"] details,
+div[data-testid="stStatusWidget"] summary,
+div[data-testid="stStatusWidget"] [data-testid="stStatusWidgetHeader"],
+div[data-testid="stStatusWidget"] > div {
+    background-color: #1e1b4b !important;
     background: #1e1b4b !important;
+    border-color: #38bdf8 !important;
+}
+
+/* Enforce Status Header Container Border and Dark Fill */
+div[data-testid="stStatusWidget"] {
     border: 2px solid #38bdf8 !important;
     border-radius: 12px !important;
     box-shadow: 0 0 25px rgba(56, 189, 248, 0.4) !important;
-    padding: 16px !important;
+    padding: 12px !important;
     margin-bottom: 20px !important;
 }
 
-/* Complete Fix for Status Header Container Bar Background (Previously Washed Out) */
-div[data-testid="stStatusWidget"] summary,
-div[data-testid="stStatusWidget"] [data-testid="stStatusWidgetHeader"] {
-    background: #10172a !important;
+div[data-testid="stStatusWidget"] summary {
     border-radius: 8px !important;
-    padding: 8px 12px !important;
+    padding: 10px 14px !important;
+    border: 1px solid rgba(168, 85, 247, 0.5) !important;
 }
 
-/* Force Text Contrast inside Status Box */
+/* Force Text Visibility Inside Status Box and Title Bar */
 div[data-testid="stStatusWidget"] *,
 div[data-testid="stStatusWidget"] span,
-div[data-testid="stStatusWidget"] div {
+div[data-testid="stStatusWidget"] div,
+div[data-testid="stStatusWidget"] p,
+div[data-testid="stStatusWidget"] label {
     color: #f8fafc !important;
     font-size: 1rem !important;
-    font-weight: 700 !important;
+    font-weight: 800 !important;
 }
 
-/* Text Area Input Styling */
+/* Spinner Icon Glow */
+div[data-testid="stStatusWidget"] svg {
+    fill: #38bdf8 !important;
+    stroke: #38bdf8 !important;
+}
+
+/* Text Area Input */
 div[data-testid="stTextArea"] textarea {
     background: rgba(15, 23, 42, 0.85) !important;
     border: 2px solid #a855f7 !important;
@@ -297,7 +303,6 @@ div[data-testid="stTextArea"] textarea {
     box-shadow: 0 4px 20px rgba(168, 85, 247, 0.15) !important;
 }
 
-/* Focus and Hover Animations */
 div[data-testid="stFileUploader"]:hover, 
 div[data-testid="stTextArea"] textarea:focus {
     border-color: #f43f5e !important;
@@ -305,7 +310,7 @@ div[data-testid="stTextArea"] textarea:focus {
     transform: translateY(-2px) !important;
 }
 
-/* 8. Multi-Glow Primary Action Button Styling */
+/* 8. Multi-Glow Primary Action Button */
 div.stButton > button {
     background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #3b82f6 100%) !important;
     color: #ffffff !important;
@@ -341,7 +346,7 @@ button[aria-selected="true"] {
     box-shadow: 0 0 15px rgba(236, 72, 153, 0.4) !important;
 }
 
-/* 10. Vibrant Content Cards & Code Badges Styling */
+/* 10. Vibrant Content Cards & Code Badges */
 div[data-testid="stVerticalBlockBorderWrapper"] > div {
     background: rgba(15, 23, 42, 0.8) !important;
     backdrop-filter: blur(10px) !important;
@@ -354,14 +359,12 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div {
     transition: all 0.3s ease !important;
 }
 
-/* card text visibility */
 div[data-testid="stVerticalBlockBorderWrapper"] p,
 div[data-testid="stVerticalBlockBorderWrapper"] span {
     color: #f8fafc !important;
     font-weight: 600 !important;
 }
 
-/* High-Contrast Code Badges Fix ( Acceptance Criteria & Roles) */
 code {
     background-color: rgba(30, 27, 75, 0.95) !important;
     color: #38bdf8 !important;
@@ -372,7 +375,6 @@ code {
     box-shadow: 0 0 8px rgba(168, 85, 247, 0.3) !important;
 }
 
-/* Card Hover States */
 div[data-testid="stVerticalBlockBorderWrapper"] > div:hover {
     border-left: 6px solid #f43f5e !important;
     box-shadow: 0 0 20px rgba(244, 63, 94, 0.25) !important;
@@ -518,7 +520,7 @@ with left_col:
 with right_col:
     st.header("2. AI Scope & Handover Analysis")
 
-    # Persistent Processing Box using st.status with Header Fix applied via CSS
+    # Persistent Processing Box using st.status
     if generate_btn:
         if demo_mode:
             with st.status("⚡ Running Demo Processing Engine...", expanded=True) as status:
@@ -544,7 +546,6 @@ with right_col:
                     
                     st.write("🔍 Auditing missing SLAs, risks, and functional modules...")
                     
-                    # Execute live Gemini API call
                     result = analyze_with_gemini(raw_text)
                     
                     if result:
@@ -590,7 +591,7 @@ with right_col:
                 for ac in story.get("acceptance_criteria", []):
                     st.markdown(f"- `{ac}`")
 
-    # Docx Export Button
+    # Export DOCX Report Button
     st.divider()
     docx_bytes = build_docx_report(data)
     st.download_button(

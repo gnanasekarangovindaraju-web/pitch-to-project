@@ -346,7 +346,7 @@ st.markdown(
         padding: 10px 0px;
         border-radius: 10px;
         font-weight: 800;
-        font-size: 1.05rem;
+        font-size: 2.05rem;
         letter-spacing: 0.8px;
         box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
         margin-bottom: 24px;

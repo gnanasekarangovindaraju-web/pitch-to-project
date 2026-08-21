@@ -32,6 +32,7 @@ def extract_text_from_uploads(sow_files, notes_files, loose_notes):
     """Extracts raw text content from uploaded files and text area."""
     combined_text = ""
     
+    # Process DOCX files
     if sow_files:
         for file in sow_files:
             doc = docx.Document(file)
@@ -40,11 +41,13 @@ def extract_text_from_uploads(sow_files, notes_files, loose_notes):
                 if para.text.strip():
                     combined_text += para.text + "\n"
                     
+    # Process TXT files
     if notes_files:
         for file in notes_files:
             combined_text += f"\n--- FILE: {file.name} ---\n"
             combined_text += file.read().decode("utf-8") + "\n"
             
+    # Process text area
     if loose_notes and loose_notes.strip():
         combined_text += f"\n--- LOOSE NOTES / EMAILS ---\n{loose_notes}\n"
         
@@ -108,6 +111,7 @@ def analyze_with_gemini(raw_text):
         st.error(f"Gemini API Error: {str(e)}")
         return None
 
+# Helper to generate downloadable DOCX report
 def build_docx_report(data):
     doc = docx.Document()
     doc.add_heading("Pitch to Project - Handover Scope Analysis", 0)
@@ -137,14 +141,14 @@ def build_docx_report(data):
         return file.read()
 
 # -----------------------------------------------------------------------------
-# 3. High-Energy Colorful Custom CSS
+# 3. Comprehensive High-Contrast Custom CSS
 # -----------------------------------------------------------------------------
 css_code = """
 <style>
-/* 1. Dynamic Mesh Gradient Background */
+/* 1. Dynamic Mesh Gradient Background Baseline */
 .stApp {
     background: linear-gradient(125deg, #0f172a 0%, #1e1b4b 35%, #311042 70%, #0284c7 100%) !important;
-    background-attachment: fixed;
+    background_attachment: fixed;
 }
 
 /* 2. Neon Titles & Headings */
@@ -163,7 +167,7 @@ h2, h3 {
     text-shadow: 0 0 10px rgba(168, 85, 247, 0.3) !important;
 }
 
-/* 3. High-Contrast Text Labels & Captions */
+/* 3. High-Contrast Text Labels */
 div[data-testid="stMarkdownContainer"] p, 
 label[data-testid="stWidgetLabel"] p,
 div[data-testid="stToggle"] span {
@@ -172,6 +176,7 @@ div[data-testid="stToggle"] span {
     font-size: 0.95rem !important;
 }
 
+/* Fix App Subtitle / Caption Visibility */
 div[data-testid="stCaptionContainer"] p {
     color: #38bdf8 !important;
     font-size: 1.05rem !important;
@@ -189,7 +194,7 @@ div[data-testid="stToggle"] {
     box-shadow: 0 8px 32px 0 rgba(168, 85, 247, 0.2) !important;
 }
 
-/* 5. Complete Target Fix for File Uploaders & Dropzone */
+/* 5. Target Fix for Streamlit File Uploaders & Dropzone */
 div[data-testid="stFileUploader"] {
     background: rgba(15, 23, 42, 0.85) !important;
     border: 2px solid #a855f7 !important;
@@ -204,7 +209,7 @@ div[data-testid="stFileUploaderDropzone"] {
     border-radius: 10px !important;
 }
 
-/* Fix Dropzone Helper Messages */
+/* Fix Dropzone Helper Messages Visibility */
 div[data-testid="stFileUploaderDropzone"] *,
 div[data-testid="stFileUploaderDropzone"] span,
 div[data-testid="stFileUploaderDropzone"] small {
@@ -212,7 +217,7 @@ div[data-testid="stFileUploaderDropzone"] small {
     font-weight: 700 !important;
 }
 
-/* Dropzone Browse Button */
+/* Dropzone Browse Button Styling */
 div[data-testid="stFileUploaderDropzone"] button {
     background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 100%) !important;
     border: 1px solid #f43f5e !important;
@@ -225,7 +230,7 @@ div[data-testid="stFileUploaderDropzone"] button * {
     font-weight: 800 !important;
 }
 
-/* 6. FIX: Target Uploaded File Pill / Badge Text & Background */
+/* 6. Fix for Uploaded File Pills / Badges Visibility */
 div[data-testid="stFileUploaderFile"],
 div[data-testid="stFileUploaderFileData"] {
     background: rgba(30, 27, 75, 0.95) !important;
@@ -235,6 +240,7 @@ div[data-testid="stFileUploaderFileData"] {
     box-shadow: 0 0 12px rgba(168, 85, 247, 0.5) !important;
 }
 
+/* Force Text Contrast Inside File Badges */
 div[data-testid="stFileUploaderFile"] *,
 div[data-testid="stFileUploaderFileData"] * {
     background: transparent !important;
@@ -243,6 +249,7 @@ div[data-testid="stFileUploaderFileData"] * {
     font-size: 0.9rem !important;
 }
 
+/* Delete / Remove Icon Styling */
 div[data-testid="stFileUploaderFile"] button,
 div[data-testid="stFileUploaderFileData"] button {
     background: transparent !important;
@@ -254,7 +261,7 @@ div[data-testid="stFileUploaderFileData"] button svg {
     fill: #f43f5e !important;
 }
 
-/* 7. Separate Window Processing Box (st.status Styling) */
+/* 7. st.status Styling - Window Processing Box & Header Fix */
 div[data-testid="stStatusWidget"] {
     background: #1e1b4b !important;
     border: 2px solid #38bdf8 !important;
@@ -264,7 +271,7 @@ div[data-testid="stStatusWidget"] {
     margin-bottom: 20px !important;
 }
 
-/* Fix Status Header Container Bar Background & Text */
+/* Complete Fix for Status Header Container Bar Background (Previously Washed Out) */
 div[data-testid="stStatusWidget"] summary,
 div[data-testid="stStatusWidget"] [data-testid="stStatusWidgetHeader"] {
     background: #10172a !important;
@@ -272,6 +279,7 @@ div[data-testid="stStatusWidget"] [data-testid="stStatusWidgetHeader"] {
     padding: 8px 12px !important;
 }
 
+/* Force Text Contrast inside Status Box */
 div[data-testid="stStatusWidget"] *,
 div[data-testid="stStatusWidget"] span,
 div[data-testid="stStatusWidget"] div {
@@ -280,7 +288,7 @@ div[data-testid="stStatusWidget"] div {
     font-weight: 700 !important;
 }
 
-/* Text Area Input */
+/* Text Area Input Styling */
 div[data-testid="stTextArea"] textarea {
     background: rgba(15, 23, 42, 0.85) !important;
     border: 2px solid #a855f7 !important;
@@ -289,6 +297,7 @@ div[data-testid="stTextArea"] textarea {
     box-shadow: 0 4px 20px rgba(168, 85, 247, 0.15) !important;
 }
 
+/* Focus and Hover Animations */
 div[data-testid="stFileUploader"]:hover, 
 div[data-testid="stTextArea"] textarea:focus {
     border-color: #f43f5e !important;
@@ -296,7 +305,7 @@ div[data-testid="stTextArea"] textarea:focus {
     transform: translateY(-2px) !important;
 }
 
-/* 8. Multi-Glow Primary Action Button */
+/* 8. Multi-Glow Primary Action Button Styling */
 div.stButton > button {
     background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #3b82f6 100%) !important;
     color: #ffffff !important;
@@ -332,7 +341,7 @@ button[aria-selected="true"] {
     box-shadow: 0 0 15px rgba(236, 72, 153, 0.4) !important;
 }
 
-/* 10. Vibrant Content Cards & Code Badges */
+/* 10. Vibrant Content Cards & Code Badges Styling */
 div[data-testid="stVerticalBlockBorderWrapper"] > div {
     background: rgba(15, 23, 42, 0.8) !important;
     backdrop-filter: blur(10px) !important;
@@ -345,12 +354,14 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div {
     transition: all 0.3s ease !important;
 }
 
+/* card text visibility */
 div[data-testid="stVerticalBlockBorderWrapper"] p,
 div[data-testid="stVerticalBlockBorderWrapper"] span {
     color: #f8fafc !important;
     font-weight: 600 !important;
 }
 
+/* High-Contrast Code Badges Fix ( Acceptance Criteria & Roles) */
 code {
     background-color: rgba(30, 27, 75, 0.95) !important;
     color: #38bdf8 !important;
@@ -361,13 +372,14 @@ code {
     box-shadow: 0 0 8px rgba(168, 85, 247, 0.3) !important;
 }
 
+/* Card Hover States */
 div[data-testid="stVerticalBlockBorderWrapper"] > div:hover {
     border-left: 6px solid #f43f5e !important;
     box-shadow: 0 0 20px rgba(244, 63, 94, 0.25) !important;
     transform: translateY(-2px) !important;
 }
 
-/* 11. Glowing Export Button */
+/* 11. Glowing Export Button Styling */
 div[data-testid="stDownloadButton"] > button {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
     color: #ffffff !important;
@@ -397,13 +409,13 @@ st.markdown(
         padding: 10px 0px;
         border-radius: 10px;
         font-weight: 800;
-        font-size: 2.05rem;
+        font-size: 1.05rem;
         letter-spacing: 0.8px;
         box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
         margin-bottom: 24px;
     ">
         <marquee behavior="scroll" direction="left" scrollamount="8">
-            ⚡ Hurix Digital - Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer
+            ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer
         </marquee>
     </div>
     """,
@@ -422,6 +434,7 @@ with col_title:
 with col_toggle:
     demo_mode = st.toggle("Demo Mode (Safe Pitch)", value=True)
 
+# Static Mock Data for Demo Mode
 MOCK_ANALYSIS = {
     "extracted_scope": [
         {
@@ -505,7 +518,7 @@ with left_col:
 with right_col:
     st.header("2. AI Scope & Handover Analysis")
 
-    # Dynamic Isolated Processing Box using st.status
+    # Persistent Processing Box using st.status with Header Fix applied via CSS
     if generate_btn:
         if demo_mode:
             with st.status("⚡ Running Demo Processing Engine...", expanded=True) as status:
@@ -530,6 +543,8 @@ with right_col:
                     time.sleep(0.3)
                     
                     st.write("🔍 Auditing missing SLAs, risks, and functional modules...")
+                    
+                    # Execute live Gemini API call
                     result = analyze_with_gemini(raw_text)
                     
                     if result:
@@ -539,11 +554,13 @@ with right_col:
                     else:
                         status.update(label="❌ Extraction Failed", state="error", expanded=True)
 
+    # State fallback
     if "analysis_data" not in st.session_state:
         st.session_state["analysis_data"] = MOCK_ANALYSIS
 
     data = st.session_state["analysis_data"]
 
+    # Navigation Tabs
     tab_scope, tab_risks, tab_jira = st.tabs(
         ["📌 Extracted Scope", "🚨 Missing Items & Risks", "🚀 Jira User Stories"]
     )
@@ -573,6 +590,7 @@ with right_col:
                 for ac in story.get("acceptance_criteria", []):
                     st.markdown(f"- `{ac}`")
 
+    # Docx Export Button
     st.divider()
     docx_bytes = build_docx_report(data)
     st.download_button(

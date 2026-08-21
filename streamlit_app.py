@@ -32,7 +32,6 @@ def extract_text_from_uploads(sow_files, notes_files, loose_notes):
     """Extracts raw text content from uploaded files and text area."""
     combined_text = ""
     
-    # Process DOCX files
     if sow_files:
         for file in sow_files:
             doc = docx.Document(file)
@@ -41,13 +40,11 @@ def extract_text_from_uploads(sow_files, notes_files, loose_notes):
                 if para.text.strip():
                     combined_text += para.text + "\n"
                     
-    # Process TXT files
     if notes_files:
         for file in notes_files:
             combined_text += f"\n--- FILE: {file.name} ---\n"
             combined_text += file.read().decode("utf-8") + "\n"
             
-    # Process text area
     if loose_notes and loose_notes.strip():
         combined_text += f"\n--- LOOSE NOTES / EMAILS ---\n{loose_notes}\n"
         
@@ -111,7 +108,6 @@ def analyze_with_gemini(raw_text):
         st.error(f"Gemini API Error: {str(e)}")
         return None
 
-# Helper to generate downloadable DOCX report
 def build_docx_report(data):
     doc = docx.Document()
     doc.add_heading("Pitch to Project - Handover Scope Analysis", 0)
@@ -176,7 +172,6 @@ div[data-testid="stToggle"] span {
     font-size: 0.95rem !important;
 }
 
-/* Subtitle / Caption Visibility */
 div[data-testid="stCaptionContainer"] p {
     color: #38bdf8 !important;
     font-size: 1.05rem !important;
@@ -251,7 +246,7 @@ div[data-testid="stFileUploaderFileData"] button svg {
     fill: #f43f5e !important;
 }
 
-/* 7. COMPLETE OVERRIDE FOR ST.STATUS HEADER BAR */
+/* 7. COMPLETE OVERRIDE FOR ST.STATUS HEADER BAR & ST.PROGRESS */
 div[data-testid="stStatusWidget"],
 div[data-testid="stStatusWidget"] details,
 div[data-testid="stStatusWidget"] summary,
@@ -262,7 +257,6 @@ div[data-testid="stStatusWidget"] > div {
     border-color: #38bdf8 !important;
 }
 
-/* Enforce Status Header Container Border and Dark Fill */
 div[data-testid="stStatusWidget"] {
     border: 2px solid #38bdf8 !important;
     border-radius: 12px !important;
@@ -277,7 +271,6 @@ div[data-testid="stStatusWidget"] summary {
     border: 1px solid rgba(168, 85, 247, 0.5) !important;
 }
 
-/* Force Text Visibility Inside Status Box and Title Bar */
 div[data-testid="stStatusWidget"] *,
 div[data-testid="stStatusWidget"] span,
 div[data-testid="stStatusWidget"] div,
@@ -288,10 +281,18 @@ div[data-testid="stStatusWidget"] label {
     font-weight: 800 !important;
 }
 
-/* Spinner Icon Glow */
-div[data-testid="stStatusWidget"] svg {
-    fill: #38bdf8 !important;
-    stroke: #38bdf8 !important;
+/* FORCE HIGH VISIBILITY FOR PROGRESS BAR CONTAINERS */
+div[data-testid="stProgress"] > div {
+    background-color: #0f172a !important;
+    border-radius: 10px !important;
+    border: 1px solid #a855f7 !important;
+    height: 16px !important;
+}
+
+div[data-testid="stProgress"] > div > div {
+    background: linear-gradient(90deg, #ec4899 0%, #38bdf8 100%) !important;
+    border-radius: 10px !important;
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.8) !important;
 }
 
 /* Text Area Input */
@@ -520,14 +521,14 @@ with left_col:
 with right_col:
     st.header("2. AI Scope & Handover Analysis")
 
-    # Persistent Processing Box using st.status
+    # Processing Box using st.status containing a high-visibility animated st.progress bar
     if generate_btn:
         if demo_mode:
             with st.status("⚡ Running Demo Processing Engine...", expanded=True) as status:
-                st.write("📄 Loading pre-configured pitch mock scenarios...")
-                time.sleep(0.4)
-                st.write("🧠 Formatting JSON outputs & Jira board stories...")
-                time.sleep(0.4)
+                bar = st.progress(0, text="Loading pre-configured pitch scenarios...")
+                for i in range(100):
+                    time.sleep(0.01)
+                    bar.progress(i + 1, text=f"Processing Demo Scope... {i+1}%")
                 status.update(label="✅ Demo Analysis Complete!", state="complete", expanded=False)
             
             st.session_state["analysis_data"] = MOCK_ANALYSIS
@@ -538,17 +539,19 @@ with right_col:
                 st.warning("Please upload at least one document or paste text before analyzing.")
             else:
                 with st.status("🧠 Processing Intake Documents...", expanded=True) as status:
-                    st.write("📄 Extracting document text and metadata...")
+                    p_bar = st.progress(15, text="📄 Extracting raw text from documents...")
                     time.sleep(0.3)
                     
-                    st.write("⚡ Transmitting intake payload to Gemini 3.6 API...")
+                    p_bar.progress(45, text="⚡ Transmitting payload to Gemini 3.6 API...")
                     time.sleep(0.3)
                     
-                    st.write("🔍 Auditing missing SLAs, risks, and functional modules...")
+                    p_bar.progress(75, text="🔍 Auditing missing SLAs, risks, and functional modules...")
                     
                     result = analyze_with_gemini(raw_text)
                     
                     if result:
+                        p_bar.progress(100, text="✅ Smart Scope Handover Complete!")
+                        time.sleep(0.3)
                         status.update(label="✅ Smart Scope Handover Complete!", state="complete", expanded=False)
                         st.session_state["analysis_data"] = result
                         st.toast("⚡ Live Gemini Extraction Complete!", icon="✅")

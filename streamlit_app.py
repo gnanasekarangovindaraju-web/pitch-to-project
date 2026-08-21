@@ -324,7 +324,7 @@ st.markdown(
         margin-bottom: 24px;
     ">
         <marquee behavior="scroll" direction="left" scrollamount="8">
-            ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer
+            ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; roject Intelligence Layer &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer
         </marquee>
     </div>
     """,

@@ -9,7 +9,7 @@ from google.genai import types
 # 1. Page Configuration
 # -----------------------------------------------------------------------------
 st.set_page_config(
-    page_title="Pitch to Project | Vibrant Scope Engine",
+    page_title="Pitch to Project | Smart Scope Engine",
     page_icon="⚡",
     layout="wide",
 )
@@ -144,7 +144,7 @@ css_code = """
 /* 1. Dynamic Mesh Gradient Background */
 .stApp {
     background: linear-gradient(125deg, #0f172a 0%, #1e1b4b 35%, #311042 70%, #0284c7 100%) !important;
-    background_attachment: fixed;
+    background-attachment: fixed;
 }
 
 /* 2. Neon Titles & Headings */
@@ -172,7 +172,7 @@ div[data-testid="stToggle"] span {
     font-size: 0.95rem !important;
 }
 
-/* 4. Glassmorphic Color-Shift Toggle Card */
+/* 4. Glassmorphic Toggle Card */
 div[data-testid="stToggle"] {
     background: rgba(30, 27, 75, 0.75) !important;
     backdrop-filter: blur(12px) !important;
@@ -182,21 +182,48 @@ div[data-testid="stToggle"] {
     box-shadow: 0 8px 32px 0 rgba(168, 85, 247, 0.2) !important;
 }
 
-/* 5. Vibrant Gradient Input Containers */
-div[data-testid="stFileUploader"], 
+/* 5. High-Contrast File Uploaders & Buttons */
+div[data-testid="stFileUploader"] {
+    background: rgba(15, 23, 42, 0.85) !important;
+    border: 2px solid #a855f7 !important;
+    border-radius: 14px !important;
+    padding: 12px !important;
+    box-shadow: 0 4px 20px rgba(168, 85, 247, 0.15) !important;
+    transition: all 0.35s ease !important;
+}
+
+/* Dropzone Inner Container */
+div[data-testid="stFileUploaderDropzone"] {
+    background: rgba(30, 27, 75, 0.9) !important;
+    border: 2px dashed #38bdf8 !important;
+    border-radius: 10px !important;
+}
+
+/* Fix Uploader Text Visibility (Drag and drop text & file size info) */
+div[data-testid="stFileUploaderDropzone"] span,
+div[data-testid="stFileUploaderDropzone"] small,
+div[data-testid="stFileUploaderDropzone"] p {
+    color: #f8fafc !important;
+    font-weight: 600 !important;
+}
+
+/* Fix "Browse files" Button Inside Uploader */
+div[data-testid="stFileUploaderDropzone"] button {
+    background: linear-gradient(90deg, #8b5cf6 0%, #3b82f6 100%) !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    border: none !important;
+    border-radius: 8px !important;
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.5) !important;
+}
+
+/* Text Area Input */
 div[data-testid="stTextArea"] textarea {
     background: rgba(15, 23, 42, 0.85) !important;
     border: 2px solid #a855f7 !important;
     border-radius: 14px !important;
     color: #ffffff !important;
     box-shadow: 0 4px 20px rgba(168, 85, 247, 0.15) !important;
-    transition: all 0.35s ease !important;
-}
-
-div[data-testid="stFileUploaderDropzone"] {
-    background: rgba(30, 27, 75, 0.5) !important;
-    border: 2px dashed #38bdf8 !important;
-    border-radius: 10px !important;
 }
 
 div[data-testid="stFileUploader"]:hover, 
@@ -206,7 +233,7 @@ div[data-testid="stTextArea"] textarea:focus {
     transform: translateY(-2px) !important;
 }
 
-/* 6. Multi-Glow Primary Button */
+/* 6. Multi-Glow Primary Action Button */
 div.stButton > button {
     background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #3b82f6 100%) !important;
     color: #ffffff !important;

@@ -163,7 +163,7 @@ h2, h3 {
     text-shadow: 0 0 10px rgba(168, 85, 247, 0.3) !important;
 }
 
-/* 3. High-Contrast Text Labels & Sub-Captions */
+/* 3. High-Contrast Text Labels & Captions */
 div[data-testid="stMarkdownContainer"] p, 
 label[data-testid="stWidgetLabel"] p,
 div[data-testid="stToggle"] span {
@@ -189,7 +189,7 @@ div[data-testid="stToggle"] {
     box-shadow: 0 8px 32px 0 rgba(168, 85, 247, 0.2) !important;
 }
 
-/* 5. Complete Target Fix for Streamlit File Uploaders */
+/* 5. Complete Target Fix for File Uploaders & Dropzone */
 div[data-testid="stFileUploader"] {
     background: rgba(15, 23, 42, 0.85) !important;
     border: 2px solid #a855f7 !important;
@@ -204,16 +204,15 @@ div[data-testid="stFileUploaderDropzone"] {
     border-radius: 10px !important;
 }
 
-div[data-testid="stFileUploader"] *,
+/* Fix Dropzone Helper Messages */
 div[data-testid="stFileUploaderDropzone"] *,
-div[data-testid="stFileUploader"] small,
-div[data-testid="stFileUploader"] span,
-div[data-testid="stFileUploader"] div {
+div[data-testid="stFileUploaderDropzone"] span,
+div[data-testid="stFileUploaderDropzone"] small {
     color: #ffffff !important;
     font-weight: 700 !important;
 }
 
-div[data-testid="stFileUploader"] button,
+/* Dropzone Browse Button */
 div[data-testid="stFileUploaderDropzone"] button {
     background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 100%) !important;
     border: 1px solid #f43f5e !important;
@@ -221,41 +220,54 @@ div[data-testid="stFileUploaderDropzone"] button {
     box-shadow: 0 0 12px rgba(236, 72, 153, 0.6) !important;
 }
 
-div[data-testid="stFileUploader"] button *,
 div[data-testid="stFileUploaderDropzone"] button * {
     color: #ffffff !important;
     font-weight: 800 !important;
 }
 
-/* FIX: Target Uploaded File Pills / Badges */
-div[data-testid="stFileUploaderFile"] {
+/* 6. FIX: Target Uploaded File Pill / Badge Text & Background */
+div[data-testid="stFileUploaderFile"],
+div[data-testid="stFileUploaderFileData"] {
     background: rgba(30, 27, 75, 0.95) !important;
-    border: 1px solid #a855f7 !important;
+    border: 1.5px solid #a855f7 !important;
     border-radius: 10px !important;
     padding: 6px 12px !important;
-    box-shadow: 0 0 10px rgba(168, 85, 247, 0.4) !important;
+    box-shadow: 0 0 12px rgba(168, 85, 247, 0.5) !important;
 }
 
 div[data-testid="stFileUploaderFile"] *,
-div[data-testid="stFileUploaderFile"] span,
-div[data-testid="stFileUploaderFile"] div {
+div[data-testid="stFileUploaderFileData"] * {
+    background: transparent !important;
     color: #38bdf8 !important;
-    font-weight: 700 !important;
+    font-weight: 800 !important;
     font-size: 0.9rem !important;
 }
 
-div[data-testid="stFileUploaderFile"] button {
+div[data-testid="stFileUploaderFile"] button,
+div[data-testid="stFileUploaderFileData"] button {
     background: transparent !important;
     border: none !important;
 }
 
-div[data-testid="stFileUploaderFile"] button:hover {
-    background: rgba(244, 63, 94, 0.2) !important;
-    border-radius: 50% !important;
+div[data-testid="stFileUploaderFile"] button svg,
+div[data-testid="stFileUploaderFileData"] button svg {
+    fill: #f43f5e !important;
 }
 
-div[data-testid="stFileUploaderFile"] button svg {
-    fill: #f43f5e !important;
+/* 7. Separate Window Processing Box (st.status Styling) */
+div[data-testid="stStatusWidget"] {
+    background: rgba(15, 23, 42, 0.95) !important;
+    border: 2px solid #38bdf8 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 0 25px rgba(56, 189, 248, 0.4) !important;
+    padding: 16px !important;
+    margin-bottom: 20px !important;
+}
+
+div[data-testid="stStatusWidget"] * {
+    color: #f8fafc !important;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
 }
 
 /* Text Area Input */
@@ -274,7 +286,7 @@ div[data-testid="stTextArea"] textarea:focus {
     transform: translateY(-2px) !important;
 }
 
-/* 6. Multi-Glow Primary Action Button */
+/* 8. Multi-Glow Primary Action Button */
 div.stButton > button {
     background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #3b82f6 100%) !important;
     color: #ffffff !important;
@@ -294,7 +306,7 @@ div.stButton > button:hover {
     background: linear-gradient(90deg, #f43f5e 0%, #a855f7 50%, #06b6d4 100%) !important;
 }
 
-/* 7. Neon Tab Navigation Styling */
+/* 9. Neon Tab Navigation Styling */
 button[data-baseweb="tab"] {
     background-color: rgba(15, 23, 42, 0.6) !important;
     border-radius: 8px 8px 0 0 !important;
@@ -310,7 +322,7 @@ button[aria-selected="true"] {
     box-shadow: 0 0 15px rgba(236, 72, 153, 0.4) !important;
 }
 
-/* 8. Vibrant Content Cards & Code Badges */
+/* 10. Vibrant Content Cards & Code Badges */
 div[data-testid="stVerticalBlockBorderWrapper"] > div {
     background: rgba(15, 23, 42, 0.8) !important;
     backdrop-filter: blur(10px) !important;
@@ -345,7 +357,7 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div:hover {
     transform: translateY(-2px) !important;
 }
 
-/* 9. Glowing Export Button */
+/* 11. Glowing Export Button */
 div[data-testid="stDownloadButton"] > button {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
     color: #ffffff !important;
@@ -375,7 +387,7 @@ st.markdown(
         padding: 10px 0px;
         border-radius: 10px;
         font-weight: 800;
-        font-size: 1.05rem;
+        font-size: 2.05rem;
         letter-spacing: 0.8px;
         box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
         margin-bottom: 24px;
@@ -483,43 +495,39 @@ with left_col:
 with right_col:
     st.header("2. AI Scope & Handover Analysis")
 
+    # Dynamic Isolated Processing Box using st.status
     if generate_btn:
         if demo_mode:
-            progress_container = st.empty()
-            with progress_container.container():
-                my_bar = st.progress(0, text="Running Demo Mode analysis...")
-                for percent in range(100):
-                    time.sleep(0.01)
-                    my_bar.progress(percent + 1, text="Running Demo Mode analysis...")
-            progress_container.empty()
+            with st.status("⚡ Running Demo Processing Engine...", expanded=True) as status:
+                st.write("📄 Loading pre-configured pitch mock scenarios...")
+                time.sleep(0.4)
+                st.write("🧠 Formatting JSON outputs & Jira board stories...")
+                time.sleep(0.4)
+                status.update(label="✅ Demo Analysis Complete!", state="complete", expanded=False)
             
             st.session_state["analysis_data"] = MOCK_ANALYSIS
-            st.toast("⚡ Demo Analysis Complete!", icon="✅")
+            st.toast("⚡ Demo Analysis Loaded!", icon="✅")
         else:
             raw_text = extract_text_from_uploads(sow_files, notes_files, loose_notes)
             if not raw_text.strip():
                 st.warning("Please upload at least one document or paste text before analyzing.")
             else:
-                progress_container = st.empty()
-                with progress_container.container():
-                    my_bar = st.progress(15, text="📄 Parsing intake materials...")
+                with st.status("🧠 Processing Intake Documents...", expanded=True) as status:
+                    st.write("📄 Extracting document text and metadata...")
                     time.sleep(0.3)
                     
-                    my_bar.progress(45, text="⚡ Sending data to Gemini API...")
+                    st.write("⚡ Transmitting intake payload to Gemini 3.6 API...")
                     time.sleep(0.3)
                     
-                    my_bar.progress(75, text="🧠 Analyzing requirements, risks, and user stories...")
-                    
+                    st.write("🔍 Auditing missing SLAs, risks, and functional modules...")
                     result = analyze_with_gemini(raw_text)
                     
-                    my_bar.progress(100, text="✅ Analysis complete!")
-                    time.sleep(0.4)
-                
-                progress_container.empty()
-
-                if result:
-                    st.session_state["analysis_data"] = result
-                    st.toast("⚡ Live Gemini Extraction Complete!", icon="✅")
+                    if result:
+                        status.update(label="✅ Smart Scope Handover Complete!", state="complete", expanded=False)
+                        st.session_state["analysis_data"] = result
+                        st.toast("⚡ Live Gemini Extraction Complete!", icon="✅")
+                    else:
+                        status.update(label="❌ Extraction Failed", state="error", expanded=True)
 
     if "analysis_data" not in st.session_state:
         st.session_state["analysis_data"] = MOCK_ANALYSIS

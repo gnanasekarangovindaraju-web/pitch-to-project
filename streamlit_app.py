@@ -1,6 +1,7 @@
 import json
-import streamlit as st
+import time
 import docx
+import streamlit as st
 
 # -----------------------------------------------------------------------------
 # 1. Page Configuration
@@ -74,7 +75,7 @@ div[data-testid="stTextArea"] textarea:focus {
     transform: translateY(-3px) scale(1.005) !important;
 }
 
-/* Action Buttons */
+/* Primary Action Buttons */
 div.stButton > button {
     background: linear-gradient(135deg, #4f46e5 0%, #2563eb 100%) !important;
     color: #ffffff !important;
@@ -273,14 +274,33 @@ with left_col:
 
 with right_col:
     st.header("2. AI Scope & Handover Analysis")
-    
-    # Store or trigger analysis state
-    if generate_btn or "analysis_data" not in st.session_state:
-        if demo_mode:
-            st.session_state["analysis_data"] = MOCK_ANALYSIS
-        else:
-            # Placeholder for live Gemini API invocation logic
-            st.session_state["analysis_data"] = MOCK_ANALYSIS
+
+    # Trigger analysis with a progress bar and spinner badge
+    if generate_btn:
+        progress_text = "Parsing intake materials and extracting functional scope..."
+        my_bar = st.progress(0, text=progress_text)
+
+        # Animated progress step sequence
+        for percent_complete in range(100):
+            time.sleep(0.012)
+            my_bar.progress(percent_complete + 1, text=progress_text)
+
+        # Clear progress bar when 100% complete
+        my_bar.empty()
+
+        # Processing spinner wrapper
+        with st.spinner("Finalizing Jira user stories and risk audit..."):
+            if demo_mode:
+                st.session_state["analysis_data"] = MOCK_ANALYSIS
+            else:
+                # Place live Gemini API call logic here when ready
+                st.session_state["analysis_data"] = MOCK_ANALYSIS
+
+            st.toast("⚡ Analysis Complete!", icon="✅")
+
+    # Default fallback state
+    if "analysis_data" not in st.session_state:
+        st.session_state["analysis_data"] = MOCK_ANALYSIS
 
     data = st.session_state["analysis_data"]
 

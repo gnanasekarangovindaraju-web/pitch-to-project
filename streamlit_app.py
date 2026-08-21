@@ -137,7 +137,7 @@ def build_docx_report(data):
         return file.read()
 
 # -----------------------------------------------------------------------------
-# 3. Comprehensive Custom CSS (Glows, Neon Contrast, Custom Process Box)
+# 3. Comprehensive Custom CSS (Glows, Neon Contrast, Progress Bar Formatting)
 # -----------------------------------------------------------------------------
 css_code = """
 <style>
@@ -246,7 +246,7 @@ div[data-testid="stFileUploaderFileData"] button svg {
     fill: #f43f5e !important;
 }
 
-/* 7. DEDICATED PROGRESS BAR STYLING */
+/* 7. DEDICATED HIGH-CONTRAST PROGRESS BAR */
 div[data-testid="stProgress"] > div {
     background-color: #0f172a !important;
     border-radius: 10px !important;
@@ -487,17 +487,19 @@ with left_col:
 with right_col:
     st.header("2. AI Scope & Handover Analysis")
 
-    # Dedicated Isolated Container Box for Process Output (Eliminates st.status white headers)
+    # Dedicated Isolated Container Box for Process Output
     if generate_btn:
         progress_card = st.empty()
         
         if demo_mode:
             with progress_card.container(border=True):
                 st.markdown("### 🧠 Running Scope Analysis")
-                bar = st.progress(0, text="Loading pitch mock scenarios...")
+                lbl = st.empty()
+                p_bar = st.progress(0)
                 for i in range(100):
                     time.sleep(0.01)
-                    bar.progress(i + 1, text=f"Analyzing Intake Materials... {i+1}%")
+                    lbl.markdown(f"**Analyzing Intake Materials... ({i+1}%)**")
+                    p_bar.progress(i + 1)
                 st.success("✅ Demo Analysis Complete!")
                 time.sleep(0.5)
             
@@ -511,18 +513,24 @@ with right_col:
             else:
                 with progress_card.container(border=True):
                     st.markdown("### 🧠 Live Gemini Processing")
-                    p_bar = st.progress(15, text="📄 Extracting raw text from documents...")
+                    lbl = st.empty()
+                    p_bar = st.progress(15)
+                    
+                    lbl.markdown("**📄 Step 1/3: Extracting raw text from documents...**")
                     time.sleep(0.3)
                     
-                    p_bar.progress(45, text="⚡ Transmitting payload to Gemini 3.6 API...")
+                    p_bar.progress(45)
+                    lbl.markdown("**⚡ Step 2/3: Transmitting payload to Gemini 3.6 API...**")
                     time.sleep(0.3)
                     
-                    p_bar.progress(75, text="🔍 Auditing missing SLAs, risks, and functional modules...")
+                    p_bar.progress(75)
+                    lbl.markdown("**🔍 Step 3/3: Auditing missing SLAs, risks, and functional modules...**")
                     
                     result = analyze_with_gemini(raw_text)
                     
                     if result:
-                        p_bar.progress(100, text="✅ Smart Scope Handover Complete!")
+                        p_bar.progress(100)
+                        lbl.markdown("**✅ Smart Scope Handover Complete!**")
                         st.success("✅ Analysis Successfully Generated!")
                         time.sleep(0.5)
                         st.session_state["analysis_data"] = result

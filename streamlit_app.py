@@ -1,5 +1,5 @@
 import json
-import time
+impot time
 import docx
 import streamlit as st
 

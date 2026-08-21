@@ -9,7 +9,7 @@ from google.genai import types
 # 1. Page Configuration
 # -----------------------------------------------------------------------------
 st.set_page_config(
-    page_title="Pitch to Project | Smart Scope Engine",
+    page_title="Pitch to Project | Vibrant Scope Engine",
     page_icon="⚡",
     layout="wide",
 )
@@ -32,7 +32,6 @@ def extract_text_from_uploads(sow_files, notes_files, loose_notes):
     """Extracts raw text content from uploaded files and text area."""
     combined_text = ""
     
-    # Process DOCX files
     if sow_files:
         for file in sow_files:
             doc = docx.Document(file)
@@ -41,13 +40,11 @@ def extract_text_from_uploads(sow_files, notes_files, loose_notes):
                 if para.text.strip():
                     combined_text += para.text + "\n"
                     
-    # Process TXT files
     if notes_files:
         for file in notes_files:
             combined_text += f"\n--- FILE: {file.name} ---\n"
             combined_text += file.read().decode("utf-8") + "\n"
             
-    # Process text area
     if loose_notes and loose_notes.strip():
         combined_text += f"\n--- LOOSE NOTES / EMAILS ---\n{loose_notes}\n"
         
@@ -111,7 +108,6 @@ def analyze_with_gemini(raw_text):
         st.error(f"Gemini API Error: {str(e)}")
         return None
 
-# Helper to generate downloadable DOCX report
 def build_docx_report(data):
     doc = docx.Document()
     doc.add_heading("Pitch to Project - Handover Scope Analysis", 0)
@@ -141,110 +137,142 @@ def build_docx_report(data):
         return file.read()
 
 # -----------------------------------------------------------------------------
-# 3. Rich Custom CSS (Glassmorphism, High-Contrast Labels, Hover Animations)
+# 3. High-Energy Colorful Custom CSS
 # -----------------------------------------------------------------------------
 css_code = """
 <style>
-/* Page Background Baseline */
+/* 1. Dynamic Mesh Gradient Background */
 .stApp {
-    background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%) !important;
+    background: linear-gradient(125deg, #0f172a 0%, #1e1b4b 35%, #311042 70%, #0284c7 100%) !important;
+    background_attachment: fixed;
 }
 
-/* Typography & Headings */
-h1, h2, h3 {
-    color: #0f172a !important;
+/* 2. Neon Titles & Headings */
+h1 {
+    background: linear-gradient(90deg, #38bdf8, #a855f7, #f43f5e) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    font-weight: 900 !important;
+    font-size: 2.8rem !important;
+    letter-spacing: -0.03em !important;
+}
+
+h2, h3 {
+    color: #f8fafc !important;
     font-weight: 800 !important;
-    letter-spacing: -0.025em !important;
+    text-shadow: 0 0 10px rgba(168, 85, 247, 0.3) !important;
 }
 
-/* Fix Label & Text Visibility */
+/* 3. High-Contrast Text Labels */
 div[data-testid="stMarkdownContainer"] p, 
 label[data-testid="stWidgetLabel"] p,
 div[data-testid="stToggle"] span {
-    color: #0f172a !important;
+    color: #e2e8f0 !important;
     font-weight: 700 !important;
     font-size: 0.95rem !important;
-    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
 }
 
-/* Glassmorphism Wrapper for Demo Mode Toggle */
+/* 4. Glassmorphic Color-Shift Toggle Card */
 div[data-testid="stToggle"] {
-    background: rgba(255, 255, 255, 0.85) !important;
-    backdrop-filter: blur(8px) !important;
-    padding: 10px 18px !important;
-    border-radius: 12px !important;
-    border: 1px solid rgba(203, 213, 225, 0.6) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+    background: rgba(30, 27, 75, 0.75) !important;
+    backdrop-filter: blur(12px) !important;
+    padding: 12px 20px !important;
+    border-radius: 14px !important;
+    border: 1px solid rgba(168, 85, 247, 0.4) !important;
+    box-shadow: 0 8px 32px 0 rgba(168, 85, 247, 0.2) !important;
 }
 
-/* Input Cards (Uploaders & Text Area) */
+/* 5. Vibrant Gradient Input Containers */
 div[data-testid="stFileUploader"], 
 div[data-testid="stTextArea"] textarea {
-    background: #ffffff !important;
-    border: 2px solid #6366f1 !important;
+    background: rgba(15, 23, 42, 0.85) !important;
+    border: 2px solid #a855f7 !important;
     border-radius: 14px !important;
-    padding: 14px !important;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04) !important;
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 20px rgba(168, 85, 247, 0.15) !important;
+    transition: all 0.35s ease !important;
 }
 
-/* Dropzone Interior Styling */
 div[data-testid="stFileUploaderDropzone"] {
-    background: #f8fafc !important;
-    border: 1px dashed #cbd5e1 !important;
+    background: rgba(30, 27, 75, 0.5) !important;
+    border: 2px dashed #38bdf8 !important;
     border-radius: 10px !important;
 }
 
-/* Glowing Hover & Focus Animations */
 div[data-testid="stFileUploader"]:hover, 
 div[data-testid="stTextArea"] textarea:focus {
-    border-color: #4f46e5 !important;
-    box-shadow: 0 12px 20px -5px rgba(99, 102, 241, 0.25), 0 0 0 4px rgba(99, 102, 241, 0.15) !important;
-    transform: translateY(-3px) scale(1.005) !important;
+    border-color: #f43f5e !important;
+    box-shadow: 0 0 25px rgba(244, 63, 94, 0.4) !important;
+    transform: translateY(-2px) !important;
 }
 
-/* Primary Action Buttons */
+/* 6. Multi-Glow Primary Button */
 div.stButton > button {
-    background: linear-gradient(135deg, #4f46e5 0%, #2563eb 100%) !important;
+    background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #3b82f6 100%) !important;
     color: #ffffff !important;
-    font-weight: 700 !important;
-    font-size: 1rem !important;
-    border-radius: 10px !important;
+    font-weight: 800 !important;
+    font-size: 1.05rem !important;
+    border-radius: 12px !important;
     border: none !important;
-    padding: 12px 24px !important;
-    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4) !important;
+    padding: 14px 28px !important;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.5) !important;
     transition: all 0.3s ease !important;
     width: 100%;
 }
 
 div.stButton > button:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.55) !important;
-    background: linear-gradient(135deg, #4338ca 0%, #1d4ed8 100%) !important;
+    transform: translateY(-3px) scale(1.01) !important;
+    box-shadow: 0 0 30px rgba(236, 72, 153, 0.8) !important;
+    background: linear-gradient(90deg, #f43f5e 0%, #a855f7 50%, #06b6d4 100%) !important;
 }
 
-/* Export Download Button Hover State */
-div[data-testid="stDownloadButton"] > button:hover {
-    background: #16a34a !important;
+/* 7. Neon Tab Navigation Styling */
+button[data-baseweb="tab"] {
+    background-color: rgba(15, 23, 42, 0.6) !important;
+    border-radius: 8px 8px 0 0 !important;
+    color: #94a3b8 !important;
+    font-weight: 700 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+button[aria-selected="true"] {
+    background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%) !important;
     color: #ffffff !important;
-    border-color: #15803d !important;
-    transition: all 0.3s ease;
+    border: none !important;
+    box-shadow: 0 0 15px rgba(236, 72, 153, 0.4) !important;
 }
 
-/* Bordered Container Cards for Scope Content */
+/* 8. Vibrant Content Cards */
 div[data-testid="stVerticalBlockBorderWrapper"] > div {
-    background: #ffffff !important;
-    border: 1px solid #e2e8f0 !important;
-    border-left: 5px solid #6366f1 !important;
-    border-radius: 12px !important;
+    background: rgba(15, 23, 42, 0.8) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-left: 6px solid #06b6d4 !important;
+    border-radius: 14px !important;
     padding: 20px !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
     margin-bottom: 16px !important;
     transition: all 0.3s ease !important;
 }
 
 div[data-testid="stVerticalBlockBorderWrapper"] > div:hover {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+    border-left: 6px solid #f43f5e !important;
+    box-shadow: 0 0 20px rgba(244, 63, 94, 0.25) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* 9. Glowing Export Button */
+div[data-testid="stDownloadButton"] > button {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    border-radius: 12px !important;
+    border: none !important;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.4) !important;
+}
+
+div[data-testid="stDownloadButton"] > button:hover {
+    box-shadow: 0 0 25px rgba(16, 185, 129, 0.7) !important;
     transform: translateY(-2px) !important;
 }
 </style>
@@ -253,20 +281,20 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div:hover {
 st.markdown(css_code, unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# 4. Scrolling Ticker Banner
+# 4. Multi-Color Ticker Banner
 # -----------------------------------------------------------------------------
 st.markdown(
     """
     <div style="
-        background: linear-gradient(90deg, #1e1b4b 0%, #312e81 100%);
+        background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 33%, #06b6d4 66%, #10b981 100%);
         color: #ffffff;
         padding: 10px 0px;
-        border-radius: 8px;
-        font-weight: 700;
+        border-radius: 10px;
+        font-weight: 800;
         font-size: 1.05rem;
-        letter-spacing: 0.5px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
+        letter-spacing: 0.8px;
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+        margin-bottom: 24px;
     ">
         <marquee behavior="scroll" direction="left" scrollamount="8">
             ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer
@@ -283,12 +311,11 @@ col_title, col_toggle = st.columns([3, 1])
 
 with col_title:
     st.title("Pitch to Project")
-    st.caption("AI-Powered Scope Intelligence & Handover Engine")
+    st.caption("🚀 AI-Powered Scope Intelligence & Handover Engine")
 
 with col_toggle:
     demo_mode = st.toggle("Demo Mode (Safe Pitch)", value=True)
 
-# Static Mock Data for Demo Mode
 MOCK_ANALYSIS = {
     "extracted_scope": [
         {
@@ -372,7 +399,6 @@ with left_col:
 with right_col:
     st.header("2. AI Scope & Handover Analysis")
 
-    # Persistent progress bar container
     if generate_btn:
         if demo_mode:
             progress_container = st.empty()
@@ -392,7 +418,7 @@ with right_col:
             else:
                 progress_container = st.empty()
                 with progress_container.container():
-                    my_bar = st.progress(15, text="📄 Extracting raw text from documents...")
+                    my_bar = st.progress(15, text="📄 Parsing intake materials...")
                     time.sleep(0.3)
                     
                     my_bar.progress(45, text="⚡ Sending data to Gemini API...")
@@ -400,7 +426,6 @@ with right_col:
                     
                     my_bar.progress(75, text="🧠 Analyzing requirements, risks, and user stories...")
                     
-                    # Execute Gemini API call
                     result = analyze_with_gemini(raw_text)
                     
                     my_bar.progress(100, text="✅ Analysis complete!")
@@ -412,15 +437,13 @@ with right_col:
                     st.session_state["analysis_data"] = result
                     st.toast("⚡ Live Gemini Extraction Complete!", icon="✅")
 
-    # Fallback to initial state
     if "analysis_data" not in st.session_state:
         st.session_state["analysis_data"] = MOCK_ANALYSIS
 
     data = st.session_state["analysis_data"]
 
-    # Navigation Tabs
     tab_scope, tab_risks, tab_jira = st.tabs(
-        ["Extracted Scope", "Missing Items & Risks", "Jira User Stories"]
+        ["📌 Extracted Scope", "🚨 Missing Items & Risks", "🚀 Jira User Stories"]
     )
     
     with tab_scope:
@@ -434,19 +457,20 @@ with right_col:
     with tab_risks:
         for risk in data.get("gaps_and_risks", []):
             with st.container(border=True):
-                st.markdown(f"**[{risk.get('severity', 'INFO')}] {risk.get('type', 'Risk')}**")
+                severity = risk.get('severity', 'INFO').upper()
+                badge_color = "🔴" if severity == "HIGH" else "🟡" if severity == "MEDIUM" else "🔵"
+                st.markdown(f"### {badge_color} [{severity}] {risk.get('type', 'Risk')}")
                 st.write(risk.get("description", ""))
 
     with tab_jira:
         for story in data.get("jira_user_stories", []):
             with st.container(border=True):
                 st.markdown(f"### 🚀 {story.get('title', 'User Story')}")
-                st.markdown(f"**As a** {story.get('user_role', 'User')}, **I want to** {story.get('want_statement', '')} **so that** {story.get('so_that_statement', '')}.")
+                st.markdown(f"**As a** `{story.get('user_role', 'User')}`, **I want to** {story.get('want_statement', '')} **so that** {story.get('so_that_statement', '')}.")
                 st.markdown("**Acceptance Criteria:**")
                 for ac in story.get("acceptance_criteria", []):
                     st.markdown(f"- `{ac}`")
 
-    # Download DOCX Report Button
     st.divider()
     docx_bytes = build_docx_report(data)
     st.download_button(

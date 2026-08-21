@@ -137,7 +137,7 @@ def build_docx_report(data):
         return file.read()
 
 # -----------------------------------------------------------------------------
-# 3. Comprehensive Custom CSS (Glows, Neon Contrast, Progress Bar Formatting)
+# 3. Comprehensive Custom CSS (Glows, Neon Contrast, Single-Track Progress Bar)
 # -----------------------------------------------------------------------------
 css_code = """
 <style>
@@ -246,18 +246,25 @@ div[data-testid="stFileUploaderFileData"] button svg {
     fill: #f43f5e !important;
 }
 
-/* 7. DEDICATED HIGH-CONTRAST PROGRESS BAR */
-div[data-testid="stProgress"] > div {
+/* 7. DEDICATED SINGLE-TRACK PROGRESS BAR STYLING */
+div[data-testid="stProgress"] {
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+}
+
+div[data-testid="stProgress"] div[role="progressbar"] {
     background-color: #0f172a !important;
     border-radius: 10px !important;
     border: 1.5px solid #38bdf8 !important;
     height: 18px !important;
+    overflow: hidden !important;
     box-shadow: 0 0 12px rgba(56, 189, 248, 0.3) !important;
 }
 
-div[data-testid="stProgress"] > div > div {
+div[data-testid="stProgress"] div[role="progressbar"] > div {
     background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #38bdf8 100%) !important;
     border-radius: 10px !important;
+    height: 100% !important;
     box-shadow: 0 0 18px rgba(56, 189, 248, 0.8) !important;
 }
 
@@ -487,7 +494,7 @@ with left_col:
 with right_col:
     st.header("2. AI Scope & Handover Analysis")
 
-    # Dedicated Isolated Container Box for Process Output
+    # Dedicated Container Box for Single Progress Bar Processing
     if generate_btn:
         progress_card = st.empty()
         

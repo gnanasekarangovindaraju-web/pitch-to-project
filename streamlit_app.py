@@ -167,7 +167,7 @@ h2, h3 {
 div[data-testid="stMarkdownContainer"] p, 
 label[data-testid="stWidgetLabel"] p,
 div[data-testid="stToggle"] span {
-    color: #e2e8f0 !important;
+    color: #f8fafc !important;
     font-weight: 700 !important;
     font-size: 0.95rem !important;
 }
@@ -182,39 +182,45 @@ div[data-testid="stToggle"] {
     box-shadow: 0 8px 32px 0 rgba(168, 85, 247, 0.2) !important;
 }
 
-/* 5. High-Contrast File Uploaders & Buttons */
+/* 5. Complete Target Fix for Streamlit File Uploaders */
 div[data-testid="stFileUploader"] {
     background: rgba(15, 23, 42, 0.85) !important;
     border: 2px solid #a855f7 !important;
     border-radius: 14px !important;
     padding: 12px !important;
-    box-shadow: 0 4px 20px rgba(168, 85, 247, 0.15) !important;
-    transition: all 0.35s ease !important;
 }
 
-/* Dropzone Inner Container */
+/* Dropzone Background */
+div[data-testid="stFileUploader"] section,
 div[data-testid="stFileUploaderDropzone"] {
-    background: rgba(30, 27, 75, 0.9) !important;
+    background: #1e1b4b !important;
     border: 2px dashed #38bdf8 !important;
     border-radius: 10px !important;
 }
 
-/* Fix Uploader Text Visibility (Drag and drop text & file size info) */
-div[data-testid="stFileUploaderDropzone"] span,
-div[data-testid="stFileUploaderDropzone"] small,
-div[data-testid="stFileUploaderDropzone"] p {
-    color: #f8fafc !important;
-    font-weight: 600 !important;
-}
-
-/* Fix "Browse files" Button Inside Uploader */
-div[data-testid="stFileUploaderDropzone"] button {
-    background: linear-gradient(90deg, #8b5cf6 0%, #3b82f6 100%) !important;
+/* Force Text Contrast Inside File Uploaders */
+div[data-testid="stFileUploader"] *,
+div[data-testid="stFileUploaderDropzone"] *,
+div[data-testid="stFileUploader"] small,
+div[data-testid="stFileUploader"] span,
+div[data-testid="stFileUploader"] div {
     color: #ffffff !important;
     font-weight: 700 !important;
-    border: none !important;
+}
+
+/* Force High-Contrast Upload Button */
+div[data-testid="stFileUploader"] button,
+div[data-testid="stFileUploaderDropzone"] button {
+    background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 100%) !important;
+    border: 1px solid #f43f5e !important;
     border-radius: 8px !important;
-    box-shadow: 0 0 10px rgba(139, 92, 246, 0.5) !important;
+    box-shadow: 0 0 12px rgba(236, 72, 153, 0.6) !important;
+}
+
+div[data-testid="stFileUploader"] button *,
+div[data-testid="stFileUploaderDropzone"] button * {
+    color: #ffffff !important;
+    font-weight: 800 !important;
 }
 
 /* Text Area Input */
@@ -324,7 +330,7 @@ st.markdown(
         margin-bottom: 24px;
     ">
         <marquee behavior="scroll" direction="left" scrollamount="8">
-            ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; roject Intelligence Layer &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer
+            ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer
         </marquee>
     </div>
     """,

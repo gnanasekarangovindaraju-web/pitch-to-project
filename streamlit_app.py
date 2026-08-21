@@ -163,13 +163,21 @@ h2, h3 {
     text-shadow: 0 0 10px rgba(168, 85, 247, 0.3) !important;
 }
 
-/* 3. High-Contrast Text Labels */
+/* 3. High-Contrast Text Labels & Sub-Captions */
 div[data-testid="stMarkdownContainer"] p, 
 label[data-testid="stWidgetLabel"] p,
 div[data-testid="stToggle"] span {
     color: #f8fafc !important;
     font-weight: 700 !important;
     font-size: 0.95rem !important;
+}
+
+/* Fix App Subtitle / Caption Visibility */
+div[data-testid="stCaptionContainer"] p {
+    color: #38bdf8 !important;
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    text-shadow: 0 0 10px rgba(56, 189, 248, 0.4) !important;
 }
 
 /* 4. Glassmorphic Toggle Card */
@@ -190,7 +198,6 @@ div[data-testid="stFileUploader"] {
     padding: 12px !important;
 }
 
-/* Dropzone Background */
 div[data-testid="stFileUploader"] section,
 div[data-testid="stFileUploaderDropzone"] {
     background: #1e1b4b !important;
@@ -198,7 +205,6 @@ div[data-testid="stFileUploaderDropzone"] {
     border-radius: 10px !important;
 }
 
-/* Force Text Contrast Inside File Uploaders */
 div[data-testid="stFileUploader"] *,
 div[data-testid="stFileUploaderDropzone"] *,
 div[data-testid="stFileUploader"] small,
@@ -208,7 +214,6 @@ div[data-testid="stFileUploader"] div {
     font-weight: 700 !important;
 }
 
-/* Force High-Contrast Upload Button */
 div[data-testid="stFileUploader"] button,
 div[data-testid="stFileUploaderDropzone"] button {
     background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 100%) !important;
@@ -275,7 +280,7 @@ button[aria-selected="true"] {
     box-shadow: 0 0 15px rgba(236, 72, 153, 0.4) !important;
 }
 
-/* 8. Vibrant Content Cards */
+/* 8. Vibrant Content Cards & Code Badges */
 div[data-testid="stVerticalBlockBorderWrapper"] > div {
     background: rgba(15, 23, 42, 0.8) !important;
     backdrop-filter: blur(10px) !important;
@@ -286,6 +291,23 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div {
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
     margin-bottom: 16px !important;
     transition: all 0.3s ease !important;
+}
+
+div[data-testid="stVerticalBlockBorderWrapper"] p,
+div[data-testid="stVerticalBlockBorderWrapper"] span {
+    color: #f8fafc !important;
+    font-weight: 600 !important;
+}
+
+/* High-Contrast Code Badges (Jira Acceptance Criteria & User Roles) */
+code {
+    background-color: rgba(30, 27, 75, 0.95) !important;
+    color: #38bdf8 !important;
+    border: 1px solid #a855f7 !important;
+    border-radius: 6px !important;
+    padding: 3px 8px !important;
+    font-weight: 700 !important;
+    box-shadow: 0 0 8px rgba(168, 85, 247, 0.3) !important;
 }
 
 div[data-testid="stVerticalBlockBorderWrapper"] > div:hover {

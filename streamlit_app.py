@@ -172,7 +172,6 @@ div[data-testid="stToggle"] span {
     font-size: 0.95rem !important;
 }
 
-/* Fix App Subtitle / Caption Visibility */
 div[data-testid="stCaptionContainer"] p {
     color: #38bdf8 !important;
     font-size: 1.05rem !important;
@@ -226,6 +225,37 @@ div[data-testid="stFileUploader"] button *,
 div[data-testid="stFileUploaderDropzone"] button * {
     color: #ffffff !important;
     font-weight: 800 !important;
+}
+
+/* FIX: Target Uploaded File Pills / Badges */
+div[data-testid="stFileUploaderFile"] {
+    background: rgba(30, 27, 75, 0.95) !important;
+    border: 1px solid #a855f7 !important;
+    border-radius: 10px !important;
+    padding: 6px 12px !important;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.4) !important;
+}
+
+div[data-testid="stFileUploaderFile"] *,
+div[data-testid="stFileUploaderFile"] span,
+div[data-testid="stFileUploaderFile"] div {
+    color: #38bdf8 !important;
+    font-weight: 700 !important;
+    font-size: 0.9rem !important;
+}
+
+div[data-testid="stFileUploaderFile"] button {
+    background: transparent !important;
+    border: none !important;
+}
+
+div[data-testid="stFileUploaderFile"] button:hover {
+    background: rgba(244, 63, 94, 0.2) !important;
+    border-radius: 50% !important;
+}
+
+div[data-testid="stFileUploaderFile"] button svg {
+    fill: #f43f5e !important;
 }
 
 /* Text Area Input */
@@ -299,7 +329,6 @@ div[data-testid="stVerticalBlockBorderWrapper"] span {
     font-weight: 600 !important;
 }
 
-/* High-Contrast Code Badges (Jira Acceptance Criteria & User Roles) */
 code {
     background-color: rgba(30, 27, 75, 0.95) !important;
     color: #38bdf8 !important;
@@ -346,13 +375,13 @@ st.markdown(
         padding: 10px 0px;
         border-radius: 10px;
         font-weight: 800;
-        font-size: 2.05rem;
+        font-size: 1.05rem;
         letter-spacing: 0.8px;
         box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
         margin-bottom: 24px;
     ">
         <marquee behavior="scroll" direction="left" scrollamount="8">
-            ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer
+            ⚡ Hurix Digital - Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer
         </marquee>
     </div>
     """,

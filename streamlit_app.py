@@ -7,7 +7,7 @@ import streamlit as st
 # 1. Page Configuration
 # -----------------------------------------------------------------------------
 st.set_page_config(
-    page_title="Pitch to Project | Smart Scope Engine",
+    page_title="Pitch to Project | mart Scope Engine",
     page_icon="⚡",
     layout="wide",
 )

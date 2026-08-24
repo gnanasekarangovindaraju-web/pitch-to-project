@@ -1,5 +1,6 @@
 import json
 import time
+import io
 import docx
 import streamlit as st
 from google import genai
@@ -138,6 +139,7 @@ def analyze_with_gemini(raw_text):
         return None
 
 def build_docx_report(data):
+    """Generates Word document in-memory (Cross-platform compatible for Windows/Linux)."""
     doc = docx.Document()
     doc.add_heading("Pitch to Project - Handover Scope Analysis", 0)
     
@@ -160,23 +162,22 @@ def build_docx_report(data):
         for ac in story.get("acceptance_criteria", []):
             doc.add_paragraph(f"  - {ac}")
 
-    doc_path = "/tmp/Handover_Report.docx"
-    doc.save(doc_path)
-    with open(doc_path, "rb") as file:
-        return file.read()
+    target_stream = io.BytesIO()
+    doc.save(target_stream)
+    return target_stream.getvalue()
 
 # -----------------------------------------------------------------------------
-# 3. Custom CSS Theme
+# 3. Custom CSS Theme (Complete Contrast Overrides)
 # -----------------------------------------------------------------------------
 css_code = """
 <style>
-/* Background Baseline */
+/* 1. Background Baseline */
 .stApp {
     background: linear-gradient(125deg, #0f172a 0%, #1e1b4b 35%, #311042 70%, #0284c7 100%) !important;
     background-attachment: fixed;
 }
 
-/* Neon Titles & Headings */
+/* 2. Neon Titles & Headings */
 h1 {
     background: linear-gradient(90deg, #38bdf8, #a855f7, #f43f5e) !important;
     -webkit-background-clip: text !important;
@@ -191,7 +192,7 @@ h2, h3 {
     text-shadow: 0 0 10px rgba(168, 85, 247, 0.3) !important;
 }
 
-/* Text Labels & Captions */
+/* 3. Text Labels & Captions */
 div[data-testid="stMarkdownContainer"] p, 
 label[data-testid="stWidgetLabel"] p,
 div[data-testid="stToggle"] span {
@@ -205,42 +206,85 @@ div[data-testid="stCaptionContainer"] p {
     font-weight: 700 !important;
 }
 
-/* File Uploaders & Input Area */
+/* 4. Complete Fix for File Uploaders & Inner Dropzones */
 div[data-testid="stFileUploader"] {
-    background: rgba(15, 23, 42, 0.85) !important;
+    background: rgba(15, 23, 42, 0.95) !important;
     border: 2px solid #a855f7 !important;
     border-radius: 14px !important;
     padding: 12px !important;
 }
 
-div[data-testid="stFileUploaderDropzone"] {
+div[data-testid="stFileUploader"] section,
+div[data-testid="stFileUploaderDropzone"],
+div[data-testid="stFileUploader"] [data-testid="stFileUploaderDropzone"] {
     background: #1e1b4b !important;
     border: 2px dashed #38bdf8 !important;
     border-radius: 10px !important;
 }
 
-div[data-testid="stFileUploaderDropzone"] * {
+div[data-testid="stFileUploaderDropzone"] *,
+div[data-testid="stFileUploaderDropzone"] span,
+div[data-testid="stFileUploaderDropzone"] small,
+div[data-testid="stFileUploaderDropzone"] p {
     color: #ffffff !important;
     font-weight: 700 !important;
 }
 
 div[data-testid="stFileUploaderDropzone"] button {
     background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 100%) !important;
-    border: none !important;
+    border: 1px solid #f43f5e !important;
     border-radius: 8px !important;
+    box-shadow: 0 0 10px rgba(236, 72, 153, 0.5) !important;
 }
 
-div[data-testid="stFileUploaderFile"] {
-    background: rgba(30, 27, 75, 0.95) !important;
-    border: 1.5px solid #a855f7 !important;
-    border-radius: 10px !important;
-}
-
-div[data-testid="stFileUploaderFile"] * {
-    color: #38bdf8 !important;
+div[data-testid="stFileUploaderDropzone"] button * {
+    color: #ffffff !important;
     font-weight: 800 !important;
 }
 
+/* 5. Complete Target Fix for Toast Notifications (Previously White Washed) */
+div[data-testid="stToast"],
+div[data-testid="stToast"] > div {
+    background-color: #1e1b4b !important;
+    background: #1e1b4b !important;
+    border: 2px solid #38bdf8 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.5) !important;
+}
+
+div[data-testid="stToast"] *,
+div[data-testid="stToast"] span,
+div[data-testid="stToast"] p,
+div[data-testid="stToast"] div {
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    font-size: 0.95rem !important;
+}
+
+/* 6. Complete Target Fix for Download/Export Button */
+div[data-testid="stDownloadButton"],
+div[data-testid="stDownloadButton"] > button {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    border-radius: 12px !important;
+    border: none !important;
+    box-shadow: 0 0 18px rgba(16, 185, 129, 0.5) !important;
+    width: 100%;
+}
+
+div[data-testid="stDownloadButton"] > button *,
+div[data-testid="stDownloadButton"] > button p,
+div[data-testid="stDownloadButton"] > button span {
+    color: #ffffff !important;
+    font-weight: 900 !important;
+    font-size: 1.05rem !important;
+}
+
+div[data-testid="stDownloadButton"] > button:hover {
+    box-shadow: 0 0 28px rgba(16, 185, 129, 0.8) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Text Area Input */
 div[data-testid="stTextArea"] textarea {
     background: rgba(15, 23, 42, 0.85) !important;
     border: 2px solid #a855f7 !important;
@@ -388,7 +432,6 @@ with left_col:
 with right_col:
     st.header("2. AI Scope & Handover Analysis")
 
-    # Custom Stylish Progress Render Box
     if generate_btn:
         progress_card = st.empty()
         
@@ -444,7 +487,6 @@ with right_col:
 
     data = st.session_state["analysis_data"]
 
-    # Navigation Tabs
     tab_scope, tab_risks, tab_jira = st.tabs(
         ["📌 Extracted Scope", "🚨 Missing Items & Risks", "🚀 Jira User Stories"]
     )
@@ -474,7 +516,6 @@ with right_col:
                 for ac in story.get("acceptance_criteria", []):
                     st.markdown(f"- `{ac}`")
 
-    # Export DOCX Report Button
     st.divider()
     docx_bytes = build_docx_report(data)
     st.download_button(

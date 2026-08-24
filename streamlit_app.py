@@ -342,12 +342,12 @@ st.markdown(
         padding: 10px 0px;
         border-radius: 10px;
         font-weight: 800;
-        font-size: 1.05rem;
+        font-size: 2.05rem;
         box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
         margin-bottom: 24px;
     ">
         <marquee behavior="scroll" direction="left" scrollamount="8">
-            ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer
+            ⚡ Hurix - Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer
         </marquee>
     </div>
     """,

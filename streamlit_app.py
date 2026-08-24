@@ -26,8 +26,37 @@ def get_gemini_client():
 client = get_gemini_client()
 
 # -----------------------------------------------------------------------------
-# 2. Helper Functions for Live Parsing
+# 2. Helper Functions for Live Parsing & Custom Progress Bar
 # -----------------------------------------------------------------------------
+def render_stylish_progress(percentage, status_text):
+    """Renders a custom neon Emerald-Gold shimmering progress bar."""
+    return f"""
+    <div style="margin: 10px 0 18px 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="color: #06b6d4; font-weight: 800; font-size: 0.95rem;">{status_text}</span>
+            <span style="color: #f59e0b; font-weight: 900; font-size: 1.05rem; text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);">{percentage}%</span>
+        </div>
+        <div style="
+            background: rgba(15, 23, 42, 0.9);
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            padding: 3px;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+            position: relative;
+            overflow: hidden;
+        ">
+            <div style="
+                width: {percentage}%;
+                height: 18px;
+                background: linear-gradient(90deg, #10b981 0%, #3b82f6 50%, #f59e0b 100%);
+                border-radius: 8px;
+                box-shadow: 0 0 20px rgba(245, 158, 11, 0.8);
+                transition: width 0.2s ease-in-out;
+            "></div>
+        </div>
+    </div>
+    """
+
 def extract_text_from_uploads(sow_files, notes_files, loose_notes):
     """Extracts raw text content from uploaded files and text area."""
     combined_text = ""
@@ -137,24 +166,23 @@ def build_docx_report(data):
         return file.read()
 
 # -----------------------------------------------------------------------------
-# 3. Comprehensive Custom CSS (Glows, Neon Contrast, Single-Track Progress Bar)
+# 3. Custom CSS Theme
 # -----------------------------------------------------------------------------
 css_code = """
 <style>
-/* 1. Dynamic Mesh Gradient Background Baseline */
+/* Background Baseline */
 .stApp {
     background: linear-gradient(125deg, #0f172a 0%, #1e1b4b 35%, #311042 70%, #0284c7 100%) !important;
     background-attachment: fixed;
 }
 
-/* 2. Neon Titles & Headings */
+/* Neon Titles & Headings */
 h1 {
     background: linear-gradient(90deg, #38bdf8, #a855f7, #f43f5e) !important;
     -webkit-background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
     font-weight: 900 !important;
     font-size: 2.8rem !important;
-    letter-spacing: -0.03em !important;
 }
 
 h2, h3 {
@@ -163,33 +191,21 @@ h2, h3 {
     text-shadow: 0 0 10px rgba(168, 85, 247, 0.3) !important;
 }
 
-/* 3. High-Contrast Text Labels */
+/* Text Labels & Captions */
 div[data-testid="stMarkdownContainer"] p, 
 label[data-testid="stWidgetLabel"] p,
 div[data-testid="stToggle"] span {
     color: #f8fafc !important;
     font-weight: 700 !important;
-    font-size: 0.95rem !important;
 }
 
 div[data-testid="stCaptionContainer"] p {
     color: #38bdf8 !important;
     font-size: 1.05rem !important;
     font-weight: 700 !important;
-    text-shadow: 0 0 10px rgba(56, 189, 248, 0.4) !important;
 }
 
-/* 4. Glassmorphic Toggle Card */
-div[data-testid="stToggle"] {
-    background: rgba(30, 27, 75, 0.75) !important;
-    backdrop-filter: blur(12px) !important;
-    padding: 12px 20px !important;
-    border-radius: 14px !important;
-    border: 1px solid rgba(168, 85, 247, 0.4) !important;
-    box-shadow: 0 8px 32px 0 rgba(168, 85, 247, 0.2) !important;
-}
-
-/* 5. Streamlit File Uploaders & Dropzone */
+/* File Uploaders & Input Area */
 div[data-testid="stFileUploader"] {
     background: rgba(15, 23, 42, 0.85) !important;
     border: 2px solid #a855f7 !important;
@@ -197,94 +213,42 @@ div[data-testid="stFileUploader"] {
     padding: 12px !important;
 }
 
-div[data-testid="stFileUploader"] section,
 div[data-testid="stFileUploaderDropzone"] {
     background: #1e1b4b !important;
     border: 2px dashed #38bdf8 !important;
     border-radius: 10px !important;
 }
 
-div[data-testid="stFileUploaderDropzone"] *,
-div[data-testid="stFileUploaderDropzone"] span,
-div[data-testid="stFileUploaderDropzone"] small {
+div[data-testid="stFileUploaderDropzone"] * {
     color: #ffffff !important;
     font-weight: 700 !important;
 }
 
 div[data-testid="stFileUploaderDropzone"] button {
     background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 100%) !important;
-    border: 1px solid #f43f5e !important;
+    border: none !important;
     border-radius: 8px !important;
-    box-shadow: 0 0 12px rgba(236, 72, 153, 0.6) !important;
 }
 
-div[data-testid="stFileUploaderDropzone"] button * {
-    color: #ffffff !important;
-    font-weight: 800 !important;
-}
-
-/* 6. Uploaded File Badges / Pills */
-div[data-testid="stFileUploaderFile"],
-div[data-testid="stFileUploaderFileData"] {
+div[data-testid="stFileUploaderFile"] {
     background: rgba(30, 27, 75, 0.95) !important;
     border: 1.5px solid #a855f7 !important;
     border-radius: 10px !important;
-    padding: 6px 12px !important;
-    box-shadow: 0 0 12px rgba(168, 85, 247, 0.5) !important;
 }
 
-div[data-testid="stFileUploaderFile"] *,
-div[data-testid="stFileUploaderFileData"] * {
-    background: transparent !important;
+div[data-testid="stFileUploaderFile"] * {
     color: #38bdf8 !important;
     font-weight: 800 !important;
-    font-size: 0.9rem !important;
 }
 
-div[data-testid="stFileUploaderFile"] button svg,
-div[data-testid="stFileUploaderFileData"] button svg {
-    fill: #f43f5e !important;
-}
-
-/* 7. DEDICATED SINGLE-TRACK PROGRESS BAR STYLING */
-div[data-testid="stProgress"] {
-    padding-top: 6px !important;
-    padding-bottom: 6px !important;
-}
-
-div[data-testid="stProgress"] div[role="progressbar"] {
-    background-color: #0f172a !important;
-    border-radius: 10px !important;
-    border: 1.5px solid #38bdf8 !important;
-    height: 18px !important;
-    overflow: hidden !important;
-    box-shadow: 0 0 12px rgba(56, 189, 248, 0.3) !important;
-}
-
-div[data-testid="stProgress"] div[role="progressbar"] > div {
-    background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #38bdf8 100%) !important;
-    border-radius: 10px !important;
-    height: 100% !important;
-    box-shadow: 0 0 18px rgba(56, 189, 248, 0.8) !important;
-}
-
-/* Text Area Input */
 div[data-testid="stTextArea"] textarea {
     background: rgba(15, 23, 42, 0.85) !important;
     border: 2px solid #a855f7 !important;
     border-radius: 14px !important;
     color: #ffffff !important;
-    box-shadow: 0 4px 20px rgba(168, 85, 247, 0.15) !important;
 }
 
-div[data-testid="stFileUploader"]:hover, 
-div[data-testid="stTextArea"] textarea:focus {
-    border-color: #f43f5e !important;
-    box-shadow: 0 0 25px rgba(244, 63, 94, 0.4) !important;
-    transform: translateY(-2px) !important;
-}
-
-/* 8. Multi-Glow Primary Action Button */
+/* Primary Button */
 div.stButton > button {
     background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #3b82f6 100%) !important;
     color: #ffffff !important;
@@ -294,49 +258,21 @@ div.stButton > button {
     border: none !important;
     padding: 14px 28px !important;
     box-shadow: 0 0 20px rgba(139, 92, 246, 0.5) !important;
-    transition: all 0.3s ease !important;
     width: 100%;
 }
 
-div.stButton > button:hover {
-    transform: translateY(-3px) scale(1.01) !important;
-    box-shadow: 0 0 30px rgba(236, 72, 153, 0.8) !important;
-    background: linear-gradient(90deg, #f43f5e 0%, #a855f7 50%, #06b6d4 100%) !important;
-}
-
-/* 9. Neon Tab Navigation Styling */
-button[data-baseweb="tab"] {
-    background-color: rgba(15, 23, 42, 0.6) !important;
-    border-radius: 8px 8px 0 0 !important;
-    color: #94a3b8 !important;
-    font-weight: 700 !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-
+/* Tabs & Cards */
 button[aria-selected="true"] {
     background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%) !important;
     color: #ffffff !important;
-    border: none !important;
-    box-shadow: 0 0 15px rgba(236, 72, 153, 0.4) !important;
 }
 
-/* 10. Vibrant Content Cards & Code Badges */
 div[data-testid="stVerticalBlockBorderWrapper"] > div {
     background: rgba(15, 23, 42, 0.8) !important;
     backdrop-filter: blur(10px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
     border-left: 6px solid #06b6d4 !important;
     border-radius: 14px !important;
     padding: 20px !important;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
-    margin-bottom: 16px !important;
-    transition: all 0.3s ease !important;
-}
-
-div[data-testid="stVerticalBlockBorderWrapper"] p,
-div[data-testid="stVerticalBlockBorderWrapper"] span {
-    color: #f8fafc !important;
-    font-weight: 600 !important;
 }
 
 code {
@@ -345,29 +281,6 @@ code {
     border: 1px solid #a855f7 !important;
     border-radius: 6px !important;
     padding: 3px 8px !important;
-    font-weight: 700 !important;
-    box-shadow: 0 0 8px rgba(168, 85, 247, 0.3) !important;
-}
-
-div[data-testid="stVerticalBlockBorderWrapper"] > div:hover {
-    border-left: 6px solid #f43f5e !important;
-    box-shadow: 0 0 20px rgba(244, 63, 94, 0.25) !important;
-    transform: translateY(-2px) !important;
-}
-
-/* 11. Glowing Export Button Styling */
-div[data-testid="stDownloadButton"] > button {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-    color: #ffffff !important;
-    font-weight: 800 !important;
-    border-radius: 12px !important;
-    border: none !important;
-    box-shadow: 0 0 15px rgba(16, 185, 129, 0.4) !important;
-}
-
-div[data-testid="stDownloadButton"] > button:hover {
-    box-shadow: 0 0 25px rgba(16, 185, 129, 0.7) !important;
-    transform: translateY(-2px) !important;
 }
 </style>
 """
@@ -375,7 +288,7 @@ div[data-testid="stDownloadButton"] > button:hover {
 st.markdown(css_code, unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# 4. Multi-Color Ticker Banner
+# 4. Header Banner & Title
 # -----------------------------------------------------------------------------
 st.markdown(
     """
@@ -386,7 +299,6 @@ st.markdown(
         border-radius: 10px;
         font-weight: 800;
         font-size: 1.05rem;
-        letter-spacing: 0.8px;
         box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
         margin-bottom: 24px;
     ">
@@ -398,9 +310,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# -----------------------------------------------------------------------------
-# 5. App Header & Safe Mode Control
-# -----------------------------------------------------------------------------
 col_title, col_toggle = st.columns([3, 1])
 
 with col_title:
@@ -410,7 +319,6 @@ with col_title:
 with col_toggle:
     demo_mode = st.toggle("Demo Mode (Safe Pitch)", value=True)
 
-# Static Mock Data for Demo Mode
 MOCK_ANALYSIS = {
     "extracted_scope": [
         {
@@ -458,30 +366,16 @@ MOCK_ANALYSIS = {
 }
 
 # -----------------------------------------------------------------------------
-# 6. Main Dual Column Layout
+# 5. Dual Column Layout
 # -----------------------------------------------------------------------------
 left_col, right_col = st.columns([1, 1], gap="medium")
 
 with left_col:
     st.header("1. Intake Documents & Media")
     
-    sow_files = st.file_uploader(
-        "Proposals / SOWs (.docx)", 
-        type=["docx"], 
-        accept_multiple_files=True
-    )
-    
-    notes_files = st.file_uploader(
-        "Transcripts / Notes (.txt)", 
-        type=["txt"], 
-        accept_multiple_files=True
-    )
-    
-    media_files = st.file_uploader(
-        "Diagrams & Media (.png, .jpg, .mp4, .mp3)", 
-        type=["png", "jpg", "mp4", "mp3"], 
-        accept_multiple_files=True
-    )
+    sow_files = st.file_uploader("Proposals / SOWs (.docx)", type=["docx"], accept_multiple_files=True)
+    notes_files = st.file_uploader("Transcripts / Notes (.txt)", type=["txt"], accept_multiple_files=True)
+    media_files = st.file_uploader("Diagrams & Media (.png, .jpg, .mp4, .mp3)", type=["png", "jpg", "mp4", "mp3"], accept_multiple_files=True)
     
     loose_notes = st.text_area(
         "Or Paste Loose Client Emails / Notes:", 
@@ -494,21 +388,23 @@ with left_col:
 with right_col:
     st.header("2. AI Scope & Handover Analysis")
 
-    # Dedicated Container Box for Single Progress Bar Processing
+    # Custom Stylish Progress Render Box
     if generate_btn:
         progress_card = st.empty()
         
         if demo_mode:
             with progress_card.container(border=True):
                 st.markdown("### 🧠 Running Scope Analysis")
-                lbl = st.empty()
-                p_bar = st.progress(0)
-                for i in range(100):
+                bar_ph = st.empty()
+                
+                for i in range(101):
                     time.sleep(0.01)
-                    lbl.markdown(f"**Analyzing Intake Materials... ({i+1}%)**")
-                    p_bar.progress(i + 1)
-                st.success("✅ Demo Analysis Complete!")
-                time.sleep(0.5)
+                    bar_ph.markdown(
+                        render_stylish_progress(i, "⚙️ Processing intake materials & generating user stories..."), 
+                        unsafe_allow_html=True
+                    )
+                st.success("✅ Demo Analysis Loaded Successfully!")
+                time.sleep(0.4)
             
             progress_card.empty()
             st.session_state["analysis_data"] = MOCK_ANALYSIS
@@ -519,26 +415,22 @@ with right_col:
                 st.warning("Please upload at least one document or paste text before analyzing.")
             else:
                 with progress_card.container(border=True):
-                    st.markdown("### 🧠 Live Gemini Processing")
-                    lbl = st.empty()
-                    p_bar = st.progress(15)
+                    st.markdown("### 🧠 Live Gemini Scope Extraction")
+                    bar_ph = st.empty()
                     
-                    lbl.markdown("**📄 Step 1/3: Extracting raw text from documents...**")
+                    bar_ph.markdown(render_stylish_progress(20, "📄 Step 1/3: Extracting raw text from intake documents..."), unsafe_allow_html=True)
                     time.sleep(0.3)
                     
-                    p_bar.progress(45)
-                    lbl.markdown("**⚡ Step 2/3: Transmitting payload to Gemini 3.6 API...**")
+                    bar_ph.markdown(render_stylish_progress(50, "⚡ Step 2/3: Transmitting payload to Gemini 3.6 API..."), unsafe_allow_html=True)
                     time.sleep(0.3)
                     
-                    p_bar.progress(75)
-                    lbl.markdown("**🔍 Step 3/3: Auditing missing SLAs, risks, and functional modules...**")
+                    bar_ph.markdown(render_stylish_progress(80, "🔍 Step 3/3: Auditing missing SLAs, risks & user stories..."), unsafe_allow_html=True)
                     
                     result = analyze_with_gemini(raw_text)
                     
                     if result:
-                        p_bar.progress(100)
-                        lbl.markdown("**✅ Smart Scope Handover Complete!**")
-                        st.success("✅ Analysis Successfully Generated!")
+                        bar_ph.markdown(render_stylish_progress(100, "✅ Smart Scope Handover Analysis Complete!"), unsafe_allow_html=True)
+                        st.success("✅ Scope Successfully Extracted!")
                         time.sleep(0.5)
                         st.session_state["analysis_data"] = result
                         st.toast("⚡ Live Gemini Extraction Complete!", icon="✅")
@@ -547,7 +439,6 @@ with right_col:
                 
                 progress_card.empty()
 
-    # State fallback
     if "analysis_data" not in st.session_state:
         st.session_state["analysis_data"] = MOCK_ANALYSIS
 

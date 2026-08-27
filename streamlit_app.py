@@ -33,7 +33,7 @@ div[data-testid="stForm"] {
     border: 2.5px solid #a855f7 !important;
     border-radius: 18px !important;
     padding: 36px !important;
-    box-shadow: 0 0 40px rgba(168, 120, 247, 0.5) !important;
+    box-shadow: 0 0 40px rgba(168, 85, 247, 0.5) !important;
 }
 
 /* Left-Aligned Input Text Labels (Username / Password) */

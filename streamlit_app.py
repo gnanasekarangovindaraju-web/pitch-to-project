@@ -29,8 +29,8 @@ css_code = """
 /* 2. HIGH-VISIBILITY & EXTRA-LARGE FONT LOGIN PAGE STYLING */
 div[data-testid="stForm"] {
     background: rgba(15, 23, 42, 0.95) !important;
-    border: 2px solid #a855f7 !important;
-    border-radius: 0 0 16px 16px !important;
+    border: 2.5px solid #a855f7 !important;
+    border-radius: 0 0 18px 18px !important;
     padding: 36px !important;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5) !important;
 }
@@ -62,7 +62,7 @@ input[type="password"] {
     box-shadow: 0 0 14px rgba(56, 189, 248, 0.3) !important;
 }
 
-/* CRITICAL FIX: Stops Browser Autofill / Focus from Forcing Light White Backgrounds */
+/* Browser Autofill Fix */
 input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus,
@@ -309,43 +309,45 @@ def check_password():
     if st.session_state.get("authenticated", False):
         return True
 
-    # Render High-Contrast Gradient Login Card with Direct Inline Style Attributes
     st.markdown("<br><br>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2.4, 1])
     
     with col2:
-        # Explicit Inlined Dark Purple Card Banner Header
+        # ABSOLUTE HIGH-CONTRAST HEADER CARD
+        # Explicit inline text fill & heavy contrast text-shadows
         st.markdown(
             """
             <div style="
-                background: #1e1b4b !important;
+                background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%) !important;
+                border-radius: 18px 18px 0 0 !important;
                 border: 2.5px solid #a855f7 !important;
                 border-bottom: none !important;
-                border-radius: 18px 18px 0 0 !important;
-                padding: 32px 24px !important;
-                box-shadow: 0 0 35px rgba(168, 85, 247, 0.5) !important;
+                padding: 34px 24px !important;
+                box-shadow: 0 0 35px rgba(236, 72, 153, 0.6) !important;
                 text-align: center !important;
                 margin-bottom: -1px !important;
             ">
                 <div style="margin-bottom: 8px !important;">
                     <span style="
-                        color: #ffffff !important; 
-                        -webkit-text-fill-color: #ffffff !important;
-                        font-size: 3rem !important; 
+                        color: #FFFFFF !important; 
+                        -webkit-text-fill-color: #FFFFFF !important;
+                        opacity: 1 !important;
+                        font-size: 3.2rem !important; 
                         font-weight: 900 !important; 
-                        text-shadow: 0 3px 12px rgba(0,0,0,0.8) !important;
+                        text-shadow: 0 3px 10px rgba(0, 0, 0, 0.9) !important;
                         letter-spacing: -0.5px !important;
                         display: inline-block !important;
                     ">🔒 Pitch to Project</span>
                 </div>
                 <div>
                     <span style="
-                        color: #38bdf8 !important; 
-                        -webkit-text-fill-color: #38bdf8 !important;
-                        font-weight: 800 !important; 
-                        font-size: 1.35rem !important; 
-                        letter-spacing: 1.2px !important;
-                        text-shadow: 0 2px 10px rgba(0,0,0,0.8) !important;
+                        color: #FFFFFF !important; 
+                        -webkit-text-fill-color: #FFFFFF !important;
+                        opacity: 1 !important;
+                        font-weight: 900 !important; 
+                        font-size: 1.4rem !important; 
+                        letter-spacing: 1px !important;
+                        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9) !important;
                         display: inline-block !important;
                     ">⚡ Scope Intelligence Engine Access</span>
                 </div>

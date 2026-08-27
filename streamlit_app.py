@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 # -----------------------------------------------------------------------------
-# 2. Comprehensive Custom CSS (Global + Fixed High-Contrast Login)
+# 2. Comprehensive Custom CSS (Global + Fixed Contrast Overrides)
 # -----------------------------------------------------------------------------
 css_code = """
 <style>
@@ -26,7 +26,7 @@ css_code = """
     background-attachment: fixed;
 }
 
-/* 2. HIGH-VISIBILITY & VIBRANT LOGIN PAGE STYLING */
+/* 2. HIGH-VISIBILITY LOGIN PAGE STYLING */
 div[data-testid="stForm"] {
     background: rgba(15, 23, 42, 0.95) !important;
     border: 2px solid #a855f7 !important;
@@ -35,7 +35,7 @@ div[data-testid="stForm"] {
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5) !important;
 }
 
-/* Force Input Text Labels Visibility */
+/* Input Text Labels Visibility */
 div[data-testid="stForm"] label,
 div[data-testid="stForm"] label p,
 div[data-testid="stTextInput"] label p {
@@ -45,7 +45,7 @@ div[data-testid="stTextInput"] label p {
     letter-spacing: 0.5px !important;
 }
 
-/* TARGET FIX: High-Contrast Inputs (Typed Text & Background) */
+/* High-Contrast Inputs (Typed Text & Background) */
 div[data-testid="stForm"] div[data-testid="stTextInput"] input,
 div[data-testid="stTextInput"] input,
 input[type="text"],
@@ -61,7 +61,7 @@ input[type="password"] {
     box-shadow: 0 0 12px rgba(56, 189, 248, 0.25) !important;
 }
 
-/* TARGET FIX: Placeholder Text Visibility Across Webkit/Blink Browsers */
+/* Placeholder Text Visibility */
 div[data-testid="stTextInput"] input::placeholder,
 input::placeholder {
     color: #94a3b8 !important;
@@ -83,9 +83,10 @@ div[data-testid="stForm"] svg {
     stroke: #38bdf8 !important;
 }
 
-/* Glowing Multi-Color Login Submit Button */
+/* LOGIN BUTTON CONTRAST FIX: Enforces Solid White Text */
 div[data-testid="stForm"] button[type="submit"],
-div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] {
+div[data-testid="stForm"] button[data-testid="stFormSubmitButton"],
+div[data-testid="stForm"] button {
     background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%) !important;
     border: none !important;
     border-radius: 12px !important;
@@ -97,8 +98,13 @@ div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] {
 }
 
 div[data-testid="stForm"] button[type="submit"] *,
-div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] * {
+div[data-testid="stForm"] button[type="submit"] p,
+div[data-testid="stForm"] button[type="submit"] span,
+div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] *,
+div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] p,
+div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] span {
     color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
     font-weight: 900 !important;
     font-size: 1.1rem !important;
     letter-spacing: 1px !important;
@@ -140,7 +146,7 @@ section[data-testid="stSidebar"] div.stButton > button {
 }
 
 /* 4. Main App Typography & Components */
-h1 {
+.main h1 {
     background: linear-gradient(90deg, #38bdf8, #a855f7, #f43f5e) !important;
     -webkit-background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
@@ -291,7 +297,7 @@ def check_password():
     col1, col2, col3 = st.columns([1, 2, 1])
     
     with col2:
-        # High-Contrast Banner Header
+        # Isolated Banner Header Fix (Uses Inline Elements to Prevent H1 Transparency Bleed)
         st.markdown(
             """
             <div style="
@@ -302,22 +308,21 @@ def check_password():
                 text-align: center;
                 margin-bottom: -1px;
             ">
-                <h1 style="
+                <div style="
                     color: #ffffff !important; 
-                    -webkit-text-fill-color: #ffffff !important; 
-                    font-size: 2.4rem !important; 
+                    font-size: 2.2rem !important; 
                     font-weight: 900 !important; 
                     margin: 0 0 6px 0 !important;
-                    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-                ">🔒 Pitch to Project</h1>
-                <p style="
-                    color: #f8fafc !important; 
+                    text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+                ">🔒 Pitch to Project</div>
+                <div style="
+                    color: #ffffff !important; 
                     font-weight: 800 !important; 
                     font-size: 1.1rem !important; 
                     margin: 0 !important;
                     letter-spacing: 0.8px;
                     text-shadow: 0 1px 5px rgba(0,0,0,0.4);
-                ">⚡ Scope Intelligence Engine Access</p>
+                ">⚡ Scope Intelligence Engine Access</div>
             </div>
             """, 
             unsafe_allow_html=True

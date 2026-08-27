@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 # -----------------------------------------------------------------------------
-# 2. Comprehensive Custom CSS (Global + Fixed Contrast Overrides)
+# 2. Comprehensive Custom CSS (Increased Font Sizes & Ultra High-Contrast)
 # -----------------------------------------------------------------------------
 css_code = """
 <style>
@@ -26,26 +26,27 @@ css_code = """
     background-attachment: fixed;
 }
 
-/* 2. HIGH-VISIBILITY LOGIN PAGE STYLING */
+/* 2. HIGH-VISIBILITY & LARGER FONT LOGIN PAGE STYLING */
 div[data-testid="stForm"] {
     background: rgba(15, 23, 42, 0.95) !important;
     border: 2px solid #a855f7 !important;
     border-radius: 0 0 16px 16px !important;
-    padding: 28px !important;
+    padding: 32px !important;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5) !important;
 }
 
-/* Input Text Labels Visibility */
+/* Increased Input Text Labels Visibility (Username / Password) */
 div[data-testid="stForm"] label,
 div[data-testid="stForm"] label p,
 div[data-testid="stTextInput"] label p {
     color: #38bdf8 !important;
     font-weight: 800 !important;
-    font-size: 1.05rem !important;
+    font-size: 1.25rem !important;
     letter-spacing: 0.5px !important;
+    margin-bottom: 6px !important;
 }
 
-/* High-Contrast Inputs (Typed Text & Background) */
+/* High-Contrast Inputs (Typed Text, Font Size & Background) */
 div[data-testid="stForm"] div[data-testid="stTextInput"] input,
 div[data-testid="stTextInput"] input,
 input[type="text"],
@@ -56,17 +57,18 @@ input[type="password"] {
     border: 2px solid #38bdf8 !important;
     border-radius: 10px !important;
     font-weight: 800 !important;
-    font-size: 1.05rem !important;
-    padding: 12px 16px !important;
+    font-size: 1.2rem !important;
+    padding: 14px 18px !important;
     box-shadow: 0 0 12px rgba(56, 189, 248, 0.25) !important;
 }
 
-/* Placeholder Text Visibility */
+/* Placeholder Text Visibility & Font Size */
 div[data-testid="stTextInput"] input::placeholder,
 input::placeholder {
-    color: #94a3b8 !important;
-    -webkit-text-fill-color: #94a3b8 !important;
+    color: #cbd5e1 !important;
+    -webkit-text-fill-color: #cbd5e1 !important;
     font-weight: 600 !important;
+    font-size: 1.1rem !important;
     opacity: 1 !important;
 }
 
@@ -81,19 +83,21 @@ div[data-testid="stTextInput"] button svg,
 div[data-testid="stForm"] svg {
     fill: #38bdf8 !important;
     stroke: #38bdf8 !important;
+    width: 22px !important;
+    height: 22px !important;
 }
 
-/* LOGIN BUTTON CONTRAST FIX: Enforces Solid White Text */
+/* ENFORCED LARGE & HIGH CONTRAST LOGIN BUTTON */
 div[data-testid="stForm"] button[type="submit"],
 div[data-testid="stForm"] button[data-testid="stFormSubmitButton"],
 div[data-testid="stForm"] button {
     background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%) !important;
     border: none !important;
     border-radius: 12px !important;
-    padding: 14px 28px !important;
+    padding: 16px 28px !important;
     box-shadow: 0 0 25px rgba(236, 72, 153, 0.6) !important;
     transition: all 0.3s ease !important;
-    margin-top: 10px !important;
+    margin-top: 14px !important;
     width: 100% !important;
 }
 
@@ -106,7 +110,7 @@ div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] span {
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
     font-weight: 900 !important;
-    font-size: 1.1rem !important;
+    font-size: 1.3rem !important;
     letter-spacing: 1px !important;
 }
 
@@ -123,7 +127,7 @@ section[data-testid="stSidebar"] {
 
 section[data-testid="stSidebar"] h3 {
     color: #38bdf8 !important;
-    font-size: 1.2rem !important;
+    font-size: 1.3rem !important;
     font-weight: 800 !important;
 }
 
@@ -131,6 +135,7 @@ section[data-testid="stSidebar"] p,
 section[data-testid="stSidebar"] span,
 section[data-testid="stSidebar"] div {
     color: #f8fafc !important;
+    font-size: 1.05rem !important;
     font-weight: 700 !important;
     background: transparent !important;
 }
@@ -139,6 +144,7 @@ section[data-testid="stSidebar"] div.stButton > button {
     background: linear-gradient(90deg, #ec4899 0%, #f43f5e 100%) !important;
     color: #ffffff !important;
     font-weight: 800 !important;
+    font-size: 1.1rem !important;
     border-radius: 10px !important;
     box-shadow: 0 0 15px rgba(244, 63, 94, 0.5) !important;
     border: none !important;
@@ -292,36 +298,37 @@ def check_password():
     if st.session_state.get("authenticated", False):
         return True
 
-    # Render High-Contrast Gradient Login Card
+    # Render High-Contrast Gradient Login Card with Increased Font Sizes
     st.markdown("<br><br>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
     
     with col2:
-        # Isolated Banner Header Fix (Uses Inline Elements to Prevent H1 Transparency Bleed)
+        # High-Contrast Banner Header (Explicit Font Sizes & White Color)
         st.markdown(
             """
             <div style="
                 background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%);
                 border-radius: 16px 16px 0 0;
-                padding: 28px 20px;
+                padding: 32px 20px;
                 box-shadow: 0 0 30px rgba(236, 72, 153, 0.5);
                 text-align: center;
                 margin-bottom: -1px;
             ">
                 <div style="
                     color: #ffffff !important; 
-                    font-size: 2.2rem !important; 
+                    font-size: 2.6rem !important; 
                     font-weight: 900 !important; 
-                    margin: 0 0 6px 0 !important;
-                    text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+                    margin: 0 0 8px 0 !important;
+                    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+                    letter-spacing: -0.5px;
                 ">🔒 Pitch to Project</div>
                 <div style="
                     color: #ffffff !important; 
                     font-weight: 800 !important; 
-                    font-size: 1.1rem !important; 
+                    font-size: 1.25rem !important; 
                     margin: 0 !important;
-                    letter-spacing: 0.8px;
-                    text-shadow: 0 1px 5px rgba(0,0,0,0.4);
+                    letter-spacing: 1px;
+                    text-shadow: 0 1px 5px rgba(0,0,0,0.5);
                 ">⚡ Scope Intelligence Engine Access</div>
             </div>
             """, 

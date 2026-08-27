@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 # -----------------------------------------------------------------------------
-# 2. Comprehensive Custom CSS (Centered & Extra-Large Font Overrides)
+# 2. Comprehensive Custom CSS (Header Centered, Form Fields Left-Aligned)
 # -----------------------------------------------------------------------------
 css_code = """
 <style>
@@ -35,21 +35,21 @@ div[data-testid="stForm"] {
     box-shadow: 0 0 40px rgba(168, 85, 247, 0.5) !important;
 }
 
-/* Center-Aligned Extra-Large Input Text Labels (Username / Password) */
+/* Left-Aligned Extra-Large Input Text Labels (Username / Password) */
 div[data-testid="stForm"] label,
 div[data-testid="stForm"] label p,
 div[data-testid="stTextInput"] label p {
     color: #38bdf8 !important;
     font-weight: 900 !important;
-    font-size: 1.5rem !important;
+    font-size: 1.4rem !important;
     letter-spacing: 0.5px !important;
     margin-bottom: 8px !important;
-    text-align: center !important;
+    text-align: left !important;
     width: 100% !important;
     display: block !important;
 }
 
-/* Center-Aligned Inputs (Typed Text, Font Size & Dark Background) */
+/* Left-Aligned Inputs (Typed Text, Font Size & Dark Background) */
 div[data-testid="stForm"] div[data-testid="stTextInput"] input,
 div[data-testid="stTextInput"] input,
 input[type="text"],
@@ -60,9 +60,9 @@ input[type="password"] {
     border: 2.5px solid #38bdf8 !important;
     border-radius: 12px !important;
     font-weight: 800 !important;
-    font-size: 1.4rem !important;
+    font-size: 1.35rem !important;
     padding: 16px 20px !important;
-    text-align: center !important;
+    text-align: left !important;
     box-shadow: 0 0 14px rgba(56, 189, 248, 0.3) !important;
 }
 
@@ -77,15 +77,15 @@ input:-webkit-autofill:active {
     border: 2.5px solid #38bdf8 !important;
 }
 
-/* Placeholder Text Center-Alignment & Visibility */
+/* Placeholder Text Left-Alignment & Visibility */
 div[data-testid="stTextInput"] input::placeholder,
 input::placeholder {
     color: #94a3b8 !important;
     -webkit-text-fill-color: #94a3b8 !important;
     font-weight: 700 !important;
-    font-size: 1.3rem !important;
+    font-size: 1.25rem !important;
     opacity: 1 !important;
-    text-align: center !important;
+    text-align: left !important;
 }
 
 /* Input Focus Glow */
@@ -94,7 +94,7 @@ div[data-testid="stTextInput"] input:focus {
     box-shadow: 0 0 25px rgba(244, 63, 94, 0.7) !important;
 }
 
-/* Password Eye Icon Visibility & Positioning */
+/* Password Eye Icon Visibility */
 div[data-testid="stTextInput"] button svg,
 div[data-testid="stForm"] svg {
     fill: #38bdf8 !important;
@@ -103,7 +103,7 @@ div[data-testid="stForm"] svg {
     height: 26px !important;
 }
 
-/* CENTER-ALIGNED ENFORCED LOGIN BUTTON */
+/* ENFORCED LOGIN BUTTON */
 div[data-testid="stForm"] button[type="submit"],
 div[data-testid="stForm"] button[data-testid="stFormSubmitButton"],
 div[data-testid="stForm"] button {
@@ -115,7 +115,6 @@ div[data-testid="stForm"] button {
     transition: all 0.3s ease !important;
     margin-top: 22px !important;
     width: 100% !important;
-    text-align: center !important;
 }
 
 div[data-testid="stForm"] button[type="submit"] *,
@@ -127,9 +126,8 @@ div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] span {
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
     font-weight: 900 !important;
-    font-size: 1.6rem !important;
+    font-size: 1.5rem !important;
     letter-spacing: 1.2px !important;
-    text-align: center !important;
 }
 
 div[data-testid="stForm"] button[type="submit"]:hover {
@@ -320,8 +318,8 @@ def check_password():
     col1, col2, col3 = st.columns([1, 2.4, 1])
     
     with col2:
-        # Single Form Container enclosing BOTH Centered Header + Form Inputs
         with st.form("login_form"):
+            # Header block remains explicitly CENTERED
             st.markdown(
                 """
                 <div style="

@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 # -----------------------------------------------------------------------------
-# 2. Comprehensive Custom CSS (Global + Autofill & Layout Controls)
+# 2. Comprehensive Custom CSS (Global + Layout Controls)
 # -----------------------------------------------------------------------------
 css_code = """
 <style>
@@ -319,43 +319,44 @@ def check_password():
     
     with col2:
         with st.form("login_form"):
-            # CENTER-ALIGNED GRADIENT BANNER HEADER
+            # FLEXBOX FORCE-CENTER BANNER
             st.markdown(
                 """
                 <div style="
+                    display: flex !important;
+                    flex-direction: column !important;
+                    align-items: center !important;
+                    justify-content: center !important;
                     background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%) !important;
                     border-radius: 14px !important;
                     padding: 28px 16px !important;
                     box-shadow: 0 0 25px rgba(236, 72, 153, 0.6) !important;
-                    text-align: center !important;
                     margin-bottom: 28px !important;
                     width: 100% !important;
+                    box-sizing: border-box !important;
                 ">
-                    <p style="
+                    <div style="
                         color: #ffffff !important; 
                         -webkit-text-fill-color: #ffffff !important;
                         font-size: 2.8rem !important; 
                         font-weight: 900 !important; 
-                        margin: 0 0 8px 0 !important;
+                        margin-bottom: 8px !important;
                         line-height: 1.2 !important;
                         letter-spacing: -0.5px !important;
                         text-shadow: 0 3px 12px rgba(0, 0, 0, 0.8) !important;
                         text-align: center !important;
                         width: 100% !important;
-                        display: block !important;
-                    ">🔒 Pitch to Project</p>
-                    <p style="
+                    ">🔒 Pitch to Project</div>
+                    <div style="
                         color: #ffffff !important; 
                         -webkit-text-fill-color: #ffffff !important;
                         font-size: 1.35rem !important; 
                         font-weight: 800 !important; 
-                        margin: 0 !important;
                         letter-spacing: 1px !important;
                         text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8) !important;
                         text-align: center !important;
                         width: 100% !important;
-                        display: block !important;
-                    ">⚡ Scope Intelligence Engine Access</p>
+                    ">⚡ Scope Intelligence Engine Access</div>
                 </div>
                 """, 
                 unsafe_allow_html=True

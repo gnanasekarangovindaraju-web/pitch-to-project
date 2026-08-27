@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 # -----------------------------------------------------------------------------
-# 2. Comprehensive Custom CSS (Global + Neon High-Contrast Login)
+# 2. Comprehensive Custom CSS (Global + Fixed High-Contrast Login)
 # -----------------------------------------------------------------------------
 css_code = """
 <style>
@@ -30,25 +30,29 @@ css_code = """
 div[data-testid="stForm"] {
     background: rgba(15, 23, 42, 0.95) !important;
     border: 2px solid #a855f7 !important;
-    border-radius: 16px !important;
+    border-radius: 0 0 16px 16px !important;
     padding: 28px !important;
-    box-shadow: 0 0 35px rgba(168, 85, 247, 0.45) !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5) !important;
 }
 
 /* Force Input Text Labels Visibility */
 div[data-testid="stForm"] label,
-div[data-testid="stForm"] label p {
+div[data-testid="stForm"] label p,
+div[data-testid="stTextInput"] label p {
     color: #38bdf8 !important;
     font-weight: 800 !important;
     font-size: 1.05rem !important;
     letter-spacing: 0.5px !important;
 }
 
-/* Vibrant Inputs (Username & Password) */
-div[data-testid="stForm"] input[type="text"],
-div[data-testid="stForm"] input[type="password"] {
-    background-color: #1e1b4b !important;
+/* TARGET FIX: High-Contrast Inputs (Typed Text & Background) */
+div[data-testid="stForm"] div[data-testid="stTextInput"] input,
+div[data-testid="stTextInput"] input,
+input[type="text"],
+input[type="password"] {
+    background-color: #0f172a !important;
     color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
     border: 2px solid #38bdf8 !important;
     border-radius: 10px !important;
     font-weight: 800 !important;
@@ -57,20 +61,23 @@ div[data-testid="stForm"] input[type="password"] {
     box-shadow: 0 0 12px rgba(56, 189, 248, 0.25) !important;
 }
 
-div[data-testid="stForm"] input[type="text"]::placeholder,
-div[data-testid="stForm"] input[type="password"]::placeholder {
+/* TARGET FIX: Placeholder Text Visibility Across Webkit/Blink Browsers */
+div[data-testid="stTextInput"] input::placeholder,
+input::placeholder {
     color: #94a3b8 !important;
+    -webkit-text-fill-color: #94a3b8 !important;
     font-weight: 600 !important;
+    opacity: 1 !important;
 }
 
 /* Input Focus Glow */
-div[data-testid="stForm"] input[type="text"]:focus,
-div[data-testid="stForm"] input[type="password"]:focus {
+div[data-testid="stTextInput"] input:focus {
     border-color: #f43f5e !important;
     box-shadow: 0 0 20px rgba(244, 63, 94, 0.6) !important;
 }
 
-/* Eye Icon / Password Visibility Icon Fix */
+/* Password Eye Icon Visibility */
+div[data-testid="stTextInput"] button svg,
 div[data-testid="stForm"] svg {
     fill: #38bdf8 !important;
     stroke: #38bdf8 !important;
@@ -245,7 +252,7 @@ div.stButton > button {
     width: 100%;
 }
 
-/* Tabs & Cards */
+/* Navigation Tabs & Cards */
 button[aria-selected="true"] {
     background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%) !important;
     color: #ffffff !important;

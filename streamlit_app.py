@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 # -----------------------------------------------------------------------------
-# 2. Comprehensive Custom CSS (Global + Unified Card Border Fix)
+# 2. Comprehensive Custom CSS (Centered & Extra-Large Font Overrides)
 # -----------------------------------------------------------------------------
 css_code = """
 <style>
@@ -35,18 +35,21 @@ div[data-testid="stForm"] {
     box-shadow: 0 0 40px rgba(168, 85, 247, 0.5) !important;
 }
 
-/* Input Text Labels Visibility (Username / Password) */
+/* Center-Aligned Extra-Large Input Text Labels (Username / Password) */
 div[data-testid="stForm"] label,
 div[data-testid="stForm"] label p,
 div[data-testid="stTextInput"] label p {
     color: #38bdf8 !important;
     font-weight: 900 !important;
-    font-size: 1.4rem !important;
+    font-size: 1.5rem !important;
     letter-spacing: 0.5px !important;
     margin-bottom: 8px !important;
+    text-align: center !important;
+    width: 100% !important;
+    display: block !important;
 }
 
-/* High-Contrast Inputs (Typed Text, Font Size & Dark Background) */
+/* Center-Aligned Inputs (Typed Text, Font Size & Dark Background) */
 div[data-testid="stForm"] div[data-testid="stTextInput"] input,
 div[data-testid="stTextInput"] input,
 input[type="text"],
@@ -57,8 +60,9 @@ input[type="password"] {
     border: 2.5px solid #38bdf8 !important;
     border-radius: 12px !important;
     font-weight: 800 !important;
-    font-size: 1.35rem !important;
+    font-size: 1.4rem !important;
     padding: 16px 20px !important;
+    text-align: center !important;
     box-shadow: 0 0 14px rgba(56, 189, 248, 0.3) !important;
 }
 
@@ -73,14 +77,15 @@ input:-webkit-autofill:active {
     border: 2.5px solid #38bdf8 !important;
 }
 
-/* Placeholder Text Visibility */
+/* Placeholder Text Center-Alignment & Visibility */
 div[data-testid="stTextInput"] input::placeholder,
 input::placeholder {
     color: #94a3b8 !important;
     -webkit-text-fill-color: #94a3b8 !important;
     font-weight: 700 !important;
-    font-size: 1.25rem !important;
+    font-size: 1.3rem !important;
     opacity: 1 !important;
+    text-align: center !important;
 }
 
 /* Input Focus Glow */
@@ -89,7 +94,7 @@ div[data-testid="stTextInput"] input:focus {
     box-shadow: 0 0 25px rgba(244, 63, 94, 0.7) !important;
 }
 
-/* Password Eye Icon Visibility */
+/* Password Eye Icon Visibility & Positioning */
 div[data-testid="stTextInput"] button svg,
 div[data-testid="stForm"] svg {
     fill: #38bdf8 !important;
@@ -98,7 +103,7 @@ div[data-testid="stForm"] svg {
     height: 26px !important;
 }
 
-/* LOGIN BUTTON HIGH CONTRAST STYLING */
+/* CENTER-ALIGNED ENFORCED LOGIN BUTTON */
 div[data-testid="stForm"] button[type="submit"],
 div[data-testid="stForm"] button[data-testid="stFormSubmitButton"],
 div[data-testid="stForm"] button {
@@ -110,6 +115,7 @@ div[data-testid="stForm"] button {
     transition: all 0.3s ease !important;
     margin-top: 22px !important;
     width: 100% !important;
+    text-align: center !important;
 }
 
 div[data-testid="stForm"] button[type="submit"] *,
@@ -121,8 +127,9 @@ div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] span {
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
     font-weight: 900 !important;
-    font-size: 1.5rem !important;
+    font-size: 1.6rem !important;
     letter-spacing: 1.2px !important;
+    text-align: center !important;
 }
 
 div[data-testid="stForm"] button[type="submit"]:hover {
@@ -313,37 +320,38 @@ def check_password():
     col1, col2, col3 = st.columns([1, 2.4, 1])
     
     with col2:
-        # Form Container enclosing BOTH Header + Form Fields inside one border
+        # Single Form Container enclosing BOTH Centered Header + Form Inputs
         with st.form("login_form"):
-            # Header Card nested directly inside the Form element
             st.markdown(
                 """
                 <div style="
                     background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%) !important;
                     border-radius: 14px !important;
-                    padding: 28px 20px !important;
-                    box-shadow: 0 0 25px rgba(236, 72, 153, 0.5) !important;
+                    padding: 32px 20px !important;
+                    box-shadow: 0 0 25px rgba(236, 72, 153, 0.6) !important;
                     text-align: center !important;
-                    margin-bottom: 24px !important;
+                    margin-bottom: 28px !important;
                 ">
                     <p style="
                         color: #ffffff !important; 
                         -webkit-text-fill-color: #ffffff !important;
-                        font-size: 3rem !important; 
+                        font-size: 3.6rem !important; 
                         font-weight: 900 !important; 
-                        margin: 0 0 8px 0 !important;
+                        margin: 0 0 10px 0 !important;
                         line-height: 1.2 !important;
                         letter-spacing: -0.5px !important;
-                        text-shadow: 0 3px 12px rgba(0, 0, 0, 0.9) !important;
+                        text-shadow: 0 4px 16px rgba(0, 0, 0, 0.9) !important;
+                        text-align: center !important;
                     ">🔒 Pitch to Project</p>
                     <p style="
                         color: #ffffff !important; 
                         -webkit-text-fill-color: #ffffff !important;
-                        font-size: 1.35rem !important; 
+                        font-size: 1.6rem !important; 
                         font-weight: 800 !important; 
                         margin: 0 !important;
                         letter-spacing: 1px !important;
-                        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9) !important;
+                        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9) !important;
+                        text-align: center !important;
                     ">⚡ Scope Intelligence Engine Access</p>
                 </div>
                 """, 

@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 # -----------------------------------------------------------------------------
-# 2. Comprehensive Custom CSS (Global + Fixed High-Contrast Login)
+# 2. Comprehensive Custom CSS (Global + Complete Autofill & Contrast Fixes)
 # -----------------------------------------------------------------------------
 css_code = """
 <style>
@@ -26,27 +26,27 @@ css_code = """
     background-attachment: fixed;
 }
 
-/* 2. HIGH-VISIBILITY & LARGER FONT LOGIN PAGE STYLING */
+/* 2. HIGH-VISIBILITY & EXTRA-LARGE FONT LOGIN PAGE STYLING */
 div[data-testid="stForm"] {
     background: rgba(15, 23, 42, 0.95) !important;
     border: 2px solid #a855f7 !important;
     border-radius: 0 0 16px 16px !important;
-    padding: 32px !important;
+    padding: 36px !important;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5) !important;
 }
 
-/* Increased Input Text Labels Visibility (Username / Password) */
+/* Input Text Labels Visibility (Username / Password) */
 div[data-testid="stForm"] label,
 div[data-testid="stForm"] label p,
 div[data-testid="stTextInput"] label p {
     color: #38bdf8 !important;
-    font-weight: 800 !important;
-    font-size: 1.25rem !important;
+    font-weight: 900 !important;
+    font-size: 1.4rem !important;
     letter-spacing: 0.5px !important;
-    margin-bottom: 6px !important;
+    margin-bottom: 8px !important;
 }
 
-/* High-Contrast Inputs (Typed Text, Font Size & Background) */
+/* High-Contrast Inputs (Typed Text, Font Size & Dark Background) */
 div[data-testid="stForm"] div[data-testid="stTextInput"] input,
 div[data-testid="stTextInput"] input,
 input[type="text"],
@@ -54,28 +54,39 @@ input[type="password"] {
     background-color: #0f172a !important;
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
-    border: 2px solid #38bdf8 !important;
-    border-radius: 10px !important;
+    border: 2.5px solid #38bdf8 !important;
+    border-radius: 12px !important;
     font-weight: 800 !important;
-    font-size: 1.2rem !important;
-    padding: 14px 18px !important;
-    box-shadow: 0 0 12px rgba(56, 189, 248, 0.25) !important;
+    font-size: 1.35rem !important;
+    padding: 16px 20px !important;
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.3) !important;
 }
 
-/* Placeholder Text Visibility & Font Size */
+/* CRITICAL FIX: Stops Browser Autofill / Focus from Forcing Light White Backgrounds */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px #0f172a inset !important;
+    -webkit-text-fill-color: #ffffff !important;
+    caret-color: #ffffff !important;
+    border: 2.5px solid #38bdf8 !important;
+}
+
+/* Placeholder Text Visibility */
 div[data-testid="stTextInput"] input::placeholder,
 input::placeholder {
-    color: #cbd5e1 !important;
-    -webkit-text-fill-color: #cbd5e1 !important;
-    font-weight: 600 !important;
-    font-size: 1.1rem !important;
+    color: #94a3b8 !important;
+    -webkit-text-fill-color: #94a3b8 !important;
+    font-weight: 700 !important;
+    font-size: 1.25rem !important;
     opacity: 1 !important;
 }
 
 /* Input Focus Glow */
 div[data-testid="stTextInput"] input:focus {
     border-color: #f43f5e !important;
-    box-shadow: 0 0 20px rgba(244, 63, 94, 0.6) !important;
+    box-shadow: 0 0 25px rgba(244, 63, 94, 0.7) !important;
 }
 
 /* Password Eye Icon Visibility */
@@ -83,21 +94,21 @@ div[data-testid="stTextInput"] button svg,
 div[data-testid="stForm"] svg {
     fill: #38bdf8 !important;
     stroke: #38bdf8 !important;
-    width: 22px !important;
-    height: 22px !important;
+    width: 26px !important;
+    height: 26px !important;
 }
 
-/* ENFORCED LARGE & HIGH CONTRAST LOGIN BUTTON */
+/* LOGIN BUTTON HIGH CONTRAST STYLING */
 div[data-testid="stForm"] button[type="submit"],
 div[data-testid="stForm"] button[data-testid="stFormSubmitButton"],
 div[data-testid="stForm"] button {
     background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%) !important;
     border: none !important;
-    border-radius: 12px !important;
-    padding: 16px 28px !important;
-    box-shadow: 0 0 25px rgba(236, 72, 153, 0.6) !important;
+    border-radius: 14px !important;
+    padding: 18px 32px !important;
+    box-shadow: 0 0 30px rgba(236, 72, 153, 0.7) !important;
     transition: all 0.3s ease !important;
-    margin-top: 14px !important;
+    margin-top: 18px !important;
     width: 100% !important;
 }
 
@@ -110,13 +121,13 @@ div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] span {
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
     font-weight: 900 !important;
-    font-size: 1.3rem !important;
-    letter-spacing: 1px !important;
+    font-size: 1.5rem !important;
+    letter-spacing: 1.2px !important;
 }
 
 div[data-testid="stForm"] button[type="submit"]:hover {
     transform: translateY(-2px) scale(1.01) !important;
-    box-shadow: 0 0 35px rgba(244, 63, 94, 0.8) !important;
+    box-shadow: 0 0 40px rgba(244, 63, 94, 0.9) !important;
 }
 
 /* 3. Sidebar Dark Theme */
@@ -298,42 +309,44 @@ def check_password():
     if st.session_state.get("authenticated", False):
         return True
 
-    # Render High-Contrast Gradient Login Card with Direct-Styled Text
+    # Render High-Contrast Gradient Login Card with Direct Inline Style Attributes
     st.markdown("<br><br>", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1, 2, 1])
+    col1, col2, col3 = st.columns([1, 2.4, 1])
     
     with col2:
-        # Enforced White Text Banner Header
+        # Explicit Inlined Dark Purple Card Banner Header
         st.markdown(
             """
             <div style="
-                background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%);
-                border-radius: 16px 16px 0 0;
-                padding: 30px 20px;
-                box-shadow: 0 0 30px rgba(236, 72, 153, 0.5);
-                text-align: center;
-                margin-bottom: -1px;
+                background: #1e1b4b !important;
+                border: 2.5px solid #a855f7 !important;
+                border-bottom: none !important;
+                border-radius: 18px 18px 0 0 !important;
+                padding: 32px 24px !important;
+                box-shadow: 0 0 35px rgba(168, 85, 247, 0.5) !important;
+                text-align: center !important;
+                margin-bottom: -1px !important;
             ">
-                <div style="margin-bottom: 8px;">
+                <div style="margin-bottom: 8px !important;">
                     <span style="
                         color: #ffffff !important; 
                         -webkit-text-fill-color: #ffffff !important;
-                        font-size: 2.6rem !important; 
+                        font-size: 3rem !important; 
                         font-weight: 900 !important; 
-                        text-shadow: 0 3px 12px rgba(0,0,0,0.6);
-                        letter-spacing: -0.5px;
-                        display: inline-block;
+                        text-shadow: 0 3px 12px rgba(0,0,0,0.8) !important;
+                        letter-spacing: -0.5px !important;
+                        display: inline-block !important;
                     ">🔒 Pitch to Project</span>
                 </div>
                 <div>
                     <span style="
-                        color: #ffffff !important; 
-                        -webkit-text-fill-color: #ffffff !important;
+                        color: #38bdf8 !important; 
+                        -webkit-text-fill-color: #38bdf8 !important;
                         font-weight: 800 !important; 
-                        font-size: 1.25rem !important; 
-                        letter-spacing: 1px;
-                        text-shadow: 0 2px 8px rgba(0,0,0,0.6);
-                        display: inline-block;
+                        font-size: 1.35rem !important; 
+                        letter-spacing: 1.2px !important;
+                        text-shadow: 0 2px 10px rgba(0,0,0,0.8) !important;
+                        display: inline-block !important;
                     ">⚡ Scope Intelligence Engine Access</span>
                 </div>
             </div>

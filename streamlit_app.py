@@ -15,7 +15,72 @@ st.set_page_config(
     layout="wide",
 )
 
-# Initialize Gemini Client (Uses GEMINI_API_KEY from st.secrets)
+# -----------------------------------------------------------------------------
+# 2. Authentication Shield (Option 1)
+# -----------------------------------------------------------------------------
+def check_password():
+    """Returns `True` if the user enters correct credentials."""
+    if st.session_state.get("authenticated", False):
+        return True
+
+    # Render High-Contrast Glassmorphic Login Form
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1, 2, 1])
+    
+    with col2:
+        st.markdown(
+            """
+            <div style="
+                background: rgba(30, 27, 75, 0.85);
+                border: 2px solid #a855f7;
+                border-radius: 16px;
+                padding: 30px;
+                box-shadow: 0 0 30px rgba(168, 85, 247, 0.3);
+                text-align: center;
+            ">
+                <h2 style="margin-bottom: 5px;">🔒 Pitch to Project</h2>
+                <p style="color: #38bdf8; font-weight: 700;">Scope Intelligence Engine Access</p>
+            </div>
+            """, 
+            unsafe_allow_html=True
+        )
+        
+        with st.form("login_form"):
+            username = st.text_input("Username", placeholder="Enter username")
+            password = st.text_input("Password", type="password", placeholder="Enter password")
+            submit = st.form_submit_button("🔑 LOGIN TO APP")
+
+            if submit:
+                # Fetches from .streamlit/secrets.toml if available, else defaults to fallback demo credentials
+                VALID_USER = st.secrets.get("APP_USER", "admin")
+                VALID_PASSWORD = st.secrets.get("APP_PASSWORD", "project2026")
+
+                if username == VALID_USER and password == VALID_PASSWORD:
+                    st.session_state["authenticated"] = True
+                    st.toast("⚡ Login Successful!", icon="✅")
+                    st.rerun()
+                else:
+                    st.error("❌ Invalid Username or Password")
+
+    return False
+
+# Stop execution here if user is not authenticated
+if not check_password():
+    st.stop()
+
+# -----------------------------------------------------------------------------
+# 3. Sidebar Logout Control
+# -----------------------------------------------------------------------------
+with st.sidebar:
+    st.markdown("### 👤 User Session")
+    st.write("Logged in as **Admin**")
+    if st.button("🚪 Logout", use_container_width=True):
+        st.session_state["authenticated"] = False
+        st.rerun()
+
+# -----------------------------------------------------------------------------
+# 4. API Client & Helper Functions
+# -----------------------------------------------------------------------------
 @st.cache_resource
 def get_gemini_client():
     try:
@@ -26,9 +91,6 @@ def get_gemini_client():
 
 client = get_gemini_client()
 
-# -----------------------------------------------------------------------------
-# 2. Helper Functions for Live Parsing & Custom Progress Bar
-# -----------------------------------------------------------------------------
 def render_stylish_progress(percentage, status_text):
     """Renders a custom neon Emerald-Gold shimmering progress bar."""
     return f"""
@@ -139,7 +201,7 @@ def analyze_with_gemini(raw_text):
         return None
 
 def build_docx_report(data):
-    """Generates Word document in-memory (Cross-platform compatible for Windows/Linux)."""
+    """Generates Word document in-memory."""
     doc = docx.Document()
     doc.add_heading("Pitch to Project - Handover Scope Analysis", 0)
     
@@ -167,17 +229,23 @@ def build_docx_report(data):
     return target_stream.getvalue()
 
 # -----------------------------------------------------------------------------
-# 3. Custom CSS Theme (Complete Contrast Overrides)
+# 5. Custom CSS Theme (Complete Contrast Overrides)
 # -----------------------------------------------------------------------------
 css_code = """
 <style>
-/* 1. Background Baseline */
+/* Background Baseline */
 .stApp {
     background: linear-gradient(125deg, #0f172a 0%, #1e1b4b 35%, #311042 70%, #0284c7 100%) !important;
     background-attachment: fixed;
 }
 
-/* 2. Neon Titles & Headings */
+/* Sidebar Dark Glassmorphic Theme */
+section[data-testid="stSidebar"] {
+    background: rgba(15, 23, 42, 0.9) !important;
+    border-right: 1px solid rgba(168, 85, 247, 0.3) !important;
+}
+
+/* Neon Titles & Headings */
 h1 {
     background: linear-gradient(90deg, #38bdf8, #a855f7, #f43f5e) !important;
     -webkit-background-clip: text !important;
@@ -192,7 +260,7 @@ h2, h3 {
     text-shadow: 0 0 10px rgba(168, 85, 247, 0.3) !important;
 }
 
-/* 3. Text Labels & Captions */
+/* Text Labels & Captions */
 div[data-testid="stMarkdownContainer"] p, 
 label[data-testid="stWidgetLabel"] p,
 div[data-testid="stToggle"] span {
@@ -206,7 +274,7 @@ div[data-testid="stCaptionContainer"] p {
     font-weight: 700 !important;
 }
 
-/* 4. Complete Fix for File Uploaders & Inner Dropzones */
+/* File Uploaders & Dropzone */
 div[data-testid="stFileUploader"] {
     background: rgba(15, 23, 42, 0.95) !important;
     border: 2px solid #a855f7 !important;
@@ -242,7 +310,7 @@ div[data-testid="stFileUploaderDropzone"] button * {
     font-weight: 800 !important;
 }
 
-/* 5. Complete Target Fix for Toast Notifications (Previously White Washed) */
+/* Toast Notifications Fix */
 div[data-testid="stToast"],
 div[data-testid="stToast"] > div {
     background-color: #1e1b4b !important;
@@ -261,7 +329,7 @@ div[data-testid="stToast"] div {
     font-size: 0.95rem !important;
 }
 
-/* 6. Complete Target Fix for Download/Export Button */
+/* Download/Export Button */
 div[data-testid="stDownloadButton"],
 div[data-testid="stDownloadButton"] > button {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
@@ -292,7 +360,7 @@ div[data-testid="stTextArea"] textarea {
     color: #ffffff !important;
 }
 
-/* Primary Button */
+/* Primary Action Buttons */
 div.stButton > button {
     background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #3b82f6 100%) !important;
     color: #ffffff !important;
@@ -305,7 +373,7 @@ div.stButton > button {
     width: 100%;
 }
 
-/* Tabs & Cards */
+/* Navigation Tabs & Cards */
 button[aria-selected="true"] {
     background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%) !important;
     color: #ffffff !important;
@@ -332,7 +400,7 @@ code {
 st.markdown(css_code, unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# 4. Header Banner & Title
+# 6. Header Banner & Title
 # -----------------------------------------------------------------------------
 st.markdown(
     """
@@ -342,12 +410,12 @@ st.markdown(
         padding: 10px 0px;
         border-radius: 10px;
         font-weight: 800;
-        font-size: 2.05rem;
+        font-size: 1.05rem;
         box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
         margin-bottom: 24px;
     ">
         <marquee behavior="scroll" direction="left" scrollamount="8">
-            ⚡ Hurix - Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer
+            ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ⚡ Smart Scope Handover Engine &nbsp;|&nbsp; Project Intelligence Layer
         </marquee>
     </div>
     """,
@@ -410,7 +478,7 @@ MOCK_ANALYSIS = {
 }
 
 # -----------------------------------------------------------------------------
-# 5. Dual Column Layout
+# 7. Dual Column Layout
 # -----------------------------------------------------------------------------
 left_col, right_col = st.columns([1, 1], gap="medium")
 

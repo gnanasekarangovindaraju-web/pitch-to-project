@@ -16,39 +16,311 @@ st.set_page_config(
 )
 
 # -----------------------------------------------------------------------------
-# 2. Authentication Shield (Option 1)
+# 2. Comprehensive Custom CSS (Global + Neon High-Contrast Login)
+# -----------------------------------------------------------------------------
+css_code = """
+<style>
+/* 1. Global Mesh Gradient Background Baseline */
+.stApp {
+    background: linear-gradient(125deg, #0f172a 0%, #1e1b4b 35%, #311042 70%, #0284c7 100%) !important;
+    background-attachment: fixed;
+}
+
+/* 2. HIGH-VISIBILITY & VIBRANT LOGIN PAGE STYLING */
+div[data-testid="stForm"] {
+    background: rgba(15, 23, 42, 0.95) !important;
+    border: 2px solid #a855f7 !important;
+    border-radius: 16px !important;
+    padding: 28px !important;
+    box-shadow: 0 0 35px rgba(168, 85, 247, 0.45) !important;
+}
+
+/* Force Input Text Labels Visibility */
+div[data-testid="stForm"] label,
+div[data-testid="stForm"] label p {
+    color: #38bdf8 !important;
+    font-weight: 800 !important;
+    font-size: 1.05rem !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* Vibrant Inputs (Username & Password) */
+div[data-testid="stForm"] input[type="text"],
+div[data-testid="stForm"] input[type="password"] {
+    background-color: #1e1b4b !important;
+    color: #ffffff !important;
+    border: 2px solid #38bdf8 !important;
+    border-radius: 10px !important;
+    font-weight: 800 !important;
+    font-size: 1.05rem !important;
+    padding: 12px 16px !important;
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.25) !important;
+}
+
+div[data-testid="stForm"] input[type="text"]::placeholder,
+div[data-testid="stForm"] input[type="password"]::placeholder {
+    color: #94a3b8 !important;
+    font-weight: 600 !important;
+}
+
+/* Input Focus Glow */
+div[data-testid="stForm"] input[type="text"]:focus,
+div[data-testid="stForm"] input[type="password"]:focus {
+    border-color: #f43f5e !important;
+    box-shadow: 0 0 20px rgba(244, 63, 94, 0.6) !important;
+}
+
+/* Eye Icon / Password Visibility Icon Fix */
+div[data-testid="stForm"] svg {
+    fill: #38bdf8 !important;
+    stroke: #38bdf8 !important;
+}
+
+/* Glowing Multi-Color Login Submit Button */
+div[data-testid="stForm"] button[type="submit"],
+div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] {
+    background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 14px 28px !important;
+    box-shadow: 0 0 25px rgba(236, 72, 153, 0.6) !important;
+    transition: all 0.3s ease !important;
+    margin-top: 10px !important;
+    width: 100% !important;
+}
+
+div[data-testid="stForm"] button[type="submit"] *,
+div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] * {
+    color: #ffffff !important;
+    font-weight: 900 !important;
+    font-size: 1.1rem !important;
+    letter-spacing: 1px !important;
+}
+
+div[data-testid="stForm"] button[type="submit"]:hover {
+    transform: translateY(-2px) scale(1.01) !important;
+    box-shadow: 0 0 35px rgba(244, 63, 94, 0.8) !important;
+}
+
+/* 3. Sidebar Dark Theme */
+section[data-testid="stSidebar"] {
+    background: rgba(15, 23, 42, 0.95) !important;
+    border-right: 1.5px solid #a855f7 !important;
+}
+
+section[data-testid="stSidebar"] h3 {
+    color: #38bdf8 !important;
+    font-size: 1.2rem !important;
+    font-weight: 800 !important;
+}
+
+section[data-testid="stSidebar"] p, 
+section[data-testid="stSidebar"] span,
+section[data-testid="stSidebar"] div {
+    color: #f8fafc !important;
+    font-weight: 700 !important;
+    background: transparent !important;
+}
+
+section[data-testid="stSidebar"] div.stButton > button {
+    background: linear-gradient(90deg, #ec4899 0%, #f43f5e 100%) !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    border-radius: 10px !important;
+    box-shadow: 0 0 15px rgba(244, 63, 94, 0.5) !important;
+    border: none !important;
+    margin-top: 10px !important;
+}
+
+/* 4. Main App Typography & Components */
+h1 {
+    background: linear-gradient(90deg, #38bdf8, #a855f7, #f43f5e) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    font-weight: 900 !important;
+    font-size: 2.8rem !important;
+}
+
+h2, h3 {
+    color: #f8fafc !important;
+    font-weight: 800 !important;
+    text-shadow: 0 0 10px rgba(168, 85, 247, 0.3) !important;
+}
+
+div[data-testid="stMarkdownContainer"] p, 
+label[data-testid="stWidgetLabel"] p,
+div[data-testid="stToggle"] span {
+    color: #f8fafc !important;
+    font-weight: 700 !important;
+}
+
+div[data-testid="stCaptionContainer"] p {
+    color: #38bdf8 !important;
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+}
+
+/* File Uploaders */
+div[data-testid="stFileUploader"] {
+    background: rgba(15, 23, 42, 0.95) !important;
+    border: 2px solid #a855f7 !important;
+    border-radius: 14px !important;
+    padding: 12px !important;
+}
+
+div[data-testid="stFileUploader"] section,
+div[data-testid="stFileUploaderDropzone"],
+div[data-testid="stFileUploader"] [data-testid="stFileUploaderDropzone"] {
+    background: #1e1b4b !important;
+    border: 2px dashed #38bdf8 !important;
+    border-radius: 10px !important;
+}
+
+div[data-testid="stFileUploaderDropzone"] *,
+div[data-testid="stFileUploaderDropzone"] span,
+div[data-testid="stFileUploaderDropzone"] small,
+div[data-testid="stFileUploaderDropzone"] p {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+}
+
+div[data-testid="stFileUploaderDropzone"] button {
+    background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 100%) !important;
+    border: 1px solid #f43f5e !important;
+    border-radius: 8px !important;
+}
+
+div[data-testid="stFileUploaderDropzone"] button * {
+    color: #ffffff !important;
+    font-weight: 800 !important;
+}
+
+/* Toast Notifications */
+div[data-testid="stToast"],
+div[data-testid="stToast"] > div {
+    background-color: #1e1b4b !important;
+    background: #1e1b4b !important;
+    border: 2px solid #38bdf8 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.5) !important;
+}
+
+div[data-testid="stToast"] * {
+    color: #ffffff !important;
+    font-weight: 800 !important;
+}
+
+/* Export Button */
+div[data-testid="stDownloadButton"] > button {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    border-radius: 12px !important;
+    border: none !important;
+    box-shadow: 0 0 18px rgba(16, 185, 129, 0.5) !important;
+    width: 100%;
+}
+
+div[data-testid="stDownloadButton"] > button * {
+    color: #ffffff !important;
+    font-weight: 900 !important;
+}
+
+/* Text Area Input */
+div[data-testid="stTextArea"] textarea {
+    background: rgba(15, 23, 42, 0.85) !important;
+    border: 2px solid #a855f7 !important;
+    border-radius: 14px !important;
+    color: #ffffff !important;
+}
+
+/* Main Buttons */
+div.stButton > button {
+    background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #3b82f6 100%) !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    font-size: 1.05rem !important;
+    border-radius: 12px !important;
+    border: none !important;
+    padding: 14px 28px !important;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.5) !important;
+    width: 100%;
+}
+
+/* Tabs & Cards */
+button[aria-selected="true"] {
+    background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%) !important;
+    color: #ffffff !important;
+}
+
+div[data-testid="stVerticalBlockBorderWrapper"] > div {
+    background: rgba(15, 23, 42, 0.8) !important;
+    backdrop-filter: blur(10px) !important;
+    border-left: 6px solid #06b6d4 !important;
+    border-radius: 14px !important;
+    padding: 20px !important;
+}
+
+code {
+    background-color: rgba(30, 27, 75, 0.95) !important;
+    color: #38bdf8 !important;
+    border: 1px solid #a855f7 !important;
+    border-radius: 6px !important;
+    padding: 3px 8px !important;
+}
+</style>
+"""
+
+st.markdown(css_code, unsafe_allow_html=True)
+
+# -----------------------------------------------------------------------------
+# 3. Authentication Shield
 # -----------------------------------------------------------------------------
 def check_password():
     """Returns `True` if the user enters correct credentials."""
     if st.session_state.get("authenticated", False):
         return True
 
-    # Render High-Contrast Glassmorphic Login Form
+    # Render High-Contrast Gradient Login Card
     st.markdown("<br><br>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
     
     with col2:
+        # High-Contrast Banner Header
         st.markdown(
             """
             <div style="
-                background: rgba(30, 27, 75, 0.95);
-                border: 2px solid #a855f7;
+                background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%);
                 border-radius: 16px 16px 0 0;
-                padding: 24px;
-                box-shadow: 0 0 25px rgba(168, 85, 247, 0.4);
+                padding: 28px 20px;
+                box-shadow: 0 0 30px rgba(236, 72, 153, 0.5);
                 text-align: center;
+                margin-bottom: -1px;
             ">
-                <h2 style="color: #ffffff !important; font-size: 2.2rem !important; margin-bottom: 6px !important; text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);">🔒 Pitch to Project</h2>
-                <p style="color: #38bdf8 !important; font-weight: 800; font-size: 1.05rem; margin: 0;">Scope Intelligence Engine Access</p>
+                <h1 style="
+                    color: #ffffff !important; 
+                    -webkit-text-fill-color: #ffffff !important; 
+                    font-size: 2.4rem !important; 
+                    font-weight: 900 !important; 
+                    margin: 0 0 6px 0 !important;
+                    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                ">🔒 Pitch to Project</h1>
+                <p style="
+                    color: #f8fafc !important; 
+                    font-weight: 800 !important; 
+                    font-size: 1.1rem !important; 
+                    margin: 0 !important;
+                    letter-spacing: 0.8px;
+                    text-shadow: 0 1px 5px rgba(0,0,0,0.4);
+                ">⚡ Scope Intelligence Engine Access</p>
             </div>
             """, 
             unsafe_allow_html=True
         )
         
+        # Form Container
         with st.form("login_form"):
             username = st.text_input("Username", placeholder="Enter username")
             password = st.text_input("Password", type="password", placeholder="Enter password")
-            submit = st.form_submit_button("🔑 LOGIN TO APP")
+            submit = st.form_submit_button("🔑 LOGIN TO ENGINE")
 
             if submit:
                 VALID_USER = st.secrets.get("APP_USER", "admin")
@@ -68,7 +340,7 @@ if not check_password():
     st.stop()
 
 # -----------------------------------------------------------------------------
-# 3. Sidebar Logout Control
+# 4. Sidebar Logout Control
 # -----------------------------------------------------------------------------
 with st.sidebar:
     st.markdown("### 👤 User Session")
@@ -78,7 +350,7 @@ with st.sidebar:
         st.rerun()
 
 # -----------------------------------------------------------------------------
-# 4. API Client & Helper Functions
+# 5. API Client & Helper Functions
 # -----------------------------------------------------------------------------
 @st.cache_resource
 def get_gemini_client():
@@ -228,227 +500,7 @@ def build_docx_report(data):
     return target_stream.getvalue()
 
 # -----------------------------------------------------------------------------
-# 5. Custom CSS Theme (Complete Dark Contrast & Form Styling)
-# -----------------------------------------------------------------------------
-css_code = """
-<style>
-/* Background Baseline */
-.stApp {
-    background: linear-gradient(125deg, #0f172a 0%, #1e1b4b 35%, #311042 70%, #0284c7 100%) !important;
-    background-attachment: fixed;
-}
-
-/* LOGIN FORM DARK MODE OVERRIDE */
-div[data-testid="stForm"] {
-    background: rgba(15, 23, 42, 0.95) !important;
-    border: 2px solid #a855f7 !important;
-    border-top: none !important;
-    border-radius: 0 0 16px 16px !important;
-    padding: 24px !important;
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4) !important;
-}
-
-/* Form Inputs */
-div[data-testid="stForm"] input[type="text"],
-div[data-testid="stForm"] input[type="password"] {
-    background-color: #1e1b4b !important;
-    color: #ffffff !important;
-    border: 1.5px solid #38bdf8 !important;
-    border-radius: 10px !important;
-    font-weight: 700 !important;
-}
-
-div[data-testid="stForm"] input[type="text"]::placeholder,
-div[data-testid="stForm"] input[type="password"]::placeholder {
-    color: #94a3b8 !important;
-}
-
-/* Form Submit Button */
-div[data-testid="stForm"] button[type="submit"],
-div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] {
-    background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #3b82f6 100%) !important;
-    border: none !important;
-    border-radius: 10px !important;
-    padding: 12px 24px !important;
-    box-shadow: 0 0 15px rgba(139, 92, 246, 0.5) !important;
-}
-
-div[data-testid="stForm"] button[type="submit"] *,
-div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] * {
-    color: #ffffff !important;
-    font-weight: 800 !important;
-    font-size: 1rem !important;
-}
-
-/* Sidebar Styling */
-section[data-testid="stSidebar"] {
-    background: rgba(15, 23, 42, 0.95) !important;
-    border-right: 1.5px solid #a855f7 !important;
-}
-
-section[data-testid="stSidebar"] h3 {
-    color: #38bdf8 !important;
-    font-size: 1.2rem !important;
-    font-weight: 800 !important;
-    margin-bottom: 8px !important;
-}
-
-section[data-testid="stSidebar"] p, 
-section[data-testid="stSidebar"] span,
-section[data-testid="stSidebar"] div {
-    color: #f8fafc !important;
-    font-weight: 700 !important;
-    background: transparent !important;
-}
-
-section[data-testid="stSidebar"] div.stButton > button {
-    background: linear-gradient(90deg, #ec4899 0%, #f43f5e 100%) !important;
-    color: #ffffff !important;
-    font-weight: 800 !important;
-    border-radius: 10px !important;
-    box-shadow: 0 0 15px rgba(244, 63, 94, 0.5) !important;
-    border: none !important;
-    margin-top: 10px !important;
-}
-
-/* Neon Headings */
-h1 {
-    background: linear-gradient(90deg, #38bdf8, #a855f7, #f43f5e) !important;
-    -webkit-background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
-    font-weight: 900 !important;
-    font-size: 2.8rem !important;
-}
-
-h2, h3 {
-    color: #f8fafc !important;
-    font-weight: 800 !important;
-    text-shadow: 0 0 10px rgba(168, 85, 247, 0.3) !important;
-}
-
-/* General Text Labels */
-div[data-testid="stMarkdownContainer"] p, 
-label[data-testid="stWidgetLabel"] p,
-div[data-testid="stToggle"] span {
-    color: #f8fafc !important;
-    font-weight: 700 !important;
-}
-
-div[data-testid="stCaptionContainer"] p {
-    color: #38bdf8 !important;
-    font-size: 1.05rem !important;
-    font-weight: 700 !important;
-}
-
-/* File Uploaders */
-div[data-testid="stFileUploader"] {
-    background: rgba(15, 23, 42, 0.95) !important;
-    border: 2px solid #a855f7 !important;
-    border-radius: 14px !important;
-    padding: 12px !important;
-}
-
-div[data-testid="stFileUploader"] section,
-div[data-testid="stFileUploaderDropzone"] {
-    background: #1e1b4b !important;
-    border: 2px dashed #38bdf8 !important;
-    border-radius: 10px !important;
-}
-
-div[data-testid="stFileUploaderDropzone"] * {
-    color: #ffffff !important;
-    font-weight: 700 !important;
-}
-
-div[data-testid="stFileUploaderDropzone"] button {
-    background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 100%) !important;
-    border: 1px solid #f43f5e !important;
-    border-radius: 8px !important;
-}
-
-div[data-testid="stFileUploaderDropzone"] button * {
-    color: #ffffff !important;
-    font-weight: 800 !important;
-}
-
-/* Toast Notifications */
-div[data-testid="stToast"],
-div[data-testid="stToast"] > div {
-    background-color: #1e1b4b !important;
-    background: #1e1b4b !important;
-    border: 2px solid #38bdf8 !important;
-    border-radius: 12px !important;
-    box-shadow: 0 0 20px rgba(56, 189, 248, 0.5) !important;
-}
-
-div[data-testid="stToast"] * {
-    color: #ffffff !important;
-    font-weight: 800 !important;
-}
-
-/* Export Button */
-div[data-testid="stDownloadButton"] > button {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-    border-radius: 12px !important;
-    border: none !important;
-    box-shadow: 0 0 18px rgba(16, 185, 129, 0.5) !important;
-    width: 100%;
-}
-
-div[data-testid="stDownloadButton"] > button * {
-    color: #ffffff !important;
-    font-weight: 900 !important;
-}
-
-/* Text Area Input */
-div[data-testid="stTextArea"] textarea {
-    background: rgba(15, 23, 42, 0.85) !important;
-    border: 2px solid #a855f7 !important;
-    border-radius: 14px !important;
-    color: #ffffff !important;
-}
-
-/* Primary Action Buttons */
-div.stButton > button {
-    background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #3b82f6 100%) !important;
-    color: #ffffff !important;
-    font-weight: 800 !important;
-    font-size: 1.05rem !important;
-    border-radius: 12px !important;
-    border: none !important;
-    padding: 14px 28px !important;
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.5) !important;
-    width: 100%;
-}
-
-/* Navigation Tabs & Cards */
-button[aria-selected="true"] {
-    background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%) !important;
-    color: #ffffff !important;
-}
-
-div[data-testid="stVerticalBlockBorderWrapper"] > div {
-    background: rgba(15, 23, 42, 0.8) !important;
-    backdrop-filter: blur(10px) !important;
-    border-left: 6px solid #06b6d4 !important;
-    border-radius: 14px !important;
-    padding: 20px !important;
-}
-
-code {
-    background-color: rgba(30, 27, 75, 0.95) !important;
-    color: #38bdf8 !important;
-    border: 1px solid #a855f7 !important;
-    border-radius: 6px !important;
-    padding: 3px 8px !important;
-}
-</style>
-"""
-
-st.markdown(css_code, unsafe_allow_html=True)
-
-# -----------------------------------------------------------------------------
-# 6. Header Banner & Title
+# 6. Main App Header Banner & Controls
 # -----------------------------------------------------------------------------
 st.markdown(
     """

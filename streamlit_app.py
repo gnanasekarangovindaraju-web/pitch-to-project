@@ -3,6 +3,7 @@ import time
 import io
 import docx
 import streamlit as st
+import streamlit.components.v1 as components
 from google import genai
 from google.genai import types
 
@@ -16,7 +17,7 @@ st.set_page_config(
 )
 
 # -----------------------------------------------------------------------------
-# 2. Comprehensive Custom CSS (Global + Layout Controls)
+# 2. Comprehensive Custom CSS (Global App Dark Theme & Input Fixes)
 # -----------------------------------------------------------------------------
 css_code = """
 <style>
@@ -77,7 +78,7 @@ input:-webkit-autofill:active {
     border: 2.5px solid #38bdf8 !important;
 }
 
-/* Placeholder Text Left-Alignment & Visibility */
+/* Placeholder Text Visibility */
 div[data-testid="stTextInput"] input::placeholder,
 input::placeholder {
     color: #94a3b8 !important;
@@ -86,12 +87,6 @@ input::placeholder {
     font-size: 1.25rem !important;
     opacity: 1 !important;
     text-align: left !important;
-}
-
-/* Input Focus Glow */
-div[data-testid="stTextInput"] input:focus {
-    border-color: #f43f5e !important;
-    box-shadow: 0 0 25px rgba(244, 63, 94, 0.7) !important;
 }
 
 /* Password Eye Icon Visibility */
@@ -103,7 +98,7 @@ div[data-testid="stForm"] svg {
     height: 26px !important;
 }
 
-/* ENFORCED LOGIN BUTTON */
+/* LOGIN BUTTON HIGH CONTRAST STYLING */
 div[data-testid="stForm"] button[type="submit"],
 div[data-testid="stForm"] button[data-testid="stFormSubmitButton"],
 div[data-testid="stForm"] button {
@@ -130,12 +125,7 @@ div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] span {
     letter-spacing: 1.2px !important;
 }
 
-div[data-testid="stForm"] button[type="submit"]:hover {
-    transform: translateY(-2px) scale(1.01) !important;
-    box-shadow: 0 0 40px rgba(244, 63, 94, 0.9) !important;
-}
-
-/* 3. Sidebar Dark Theme */
+/* Sidebar Dark Theme */
 section[data-testid="stSidebar"] {
     background: rgba(15, 23, 42, 0.95) !important;
     border-right: 1.5px solid #a855f7 !important;
@@ -167,7 +157,7 @@ section[data-testid="stSidebar"] div.stButton > button {
     margin-top: 10px !important;
 }
 
-/* 4. Main App Typography & Components */
+/* Main Dashboard Elements */
 h2, h3 {
     color: #f8fafc !important;
     font-weight: 800 !important;
@@ -181,13 +171,6 @@ div[data-testid="stToggle"] span {
     font-weight: 700 !important;
 }
 
-div[data-testid="stCaptionContainer"] p {
-    color: #38bdf8 !important;
-    font-size: 1.05rem !important;
-    font-weight: 700 !important;
-}
-
-/* File Uploaders */
 div[data-testid="stFileUploader"] {
     background: rgba(15, 23, 42, 0.95) !important;
     border: 2px solid #a855f7 !important;
@@ -211,18 +194,6 @@ div[data-testid="stFileUploaderDropzone"] p {
     font-weight: 700 !important;
 }
 
-div[data-testid="stFileUploaderDropzone"] button {
-    background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 100%) !important;
-    border: 1px solid #f43f5e !important;
-    border-radius: 8px !important;
-}
-
-div[data-testid="stFileUploaderDropzone"] button * {
-    color: #ffffff !important;
-    font-weight: 800 !important;
-}
-
-/* Toast Notifications */
 div[data-testid="stToast"],
 div[data-testid="stToast"] > div {
     background-color: #1e1b4b !important;
@@ -237,7 +208,6 @@ div[data-testid="stToast"] * {
     font-weight: 800 !important;
 }
 
-/* Export Button */
 div[data-testid="stDownloadButton"] > button {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
     border-radius: 12px !important;
@@ -251,7 +221,6 @@ div[data-testid="stDownloadButton"] > button * {
     font-weight: 900 !important;
 }
 
-/* Text Area Input */
 div[data-testid="stTextArea"] textarea {
     background: rgba(15, 23, 42, 0.85) !important;
     border: 2px solid #a855f7 !important;
@@ -259,7 +228,6 @@ div[data-testid="stTextArea"] textarea {
     color: #ffffff !important;
 }
 
-/* Main Buttons */
 div.stButton > button {
     background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #3b82f6 100%) !important;
     color: #ffffff !important;
@@ -272,7 +240,6 @@ div.stButton > button {
     width: 100%;
 }
 
-/* Navigation Tabs & Cards */
 button[aria-selected="true"] {
     background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%) !important;
     color: #ffffff !important;
@@ -311,47 +278,35 @@ def check_password():
     
     with col2:
         with st.form("login_form"):
-            st.markdown(
+            # ISOLATED COMPONENT RENDER FOR GUARANTEED CENTERED WHITE TEXT
+            components.html(
                 """
-                <style>
-                .login-header-box {
-                    background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%) !important;
-                    border-radius: 14px !important;
-                    padding: 28px 16px !important;
-                    box-shadow: 0 0 25px rgba(236, 72, 153, 0.6) !important;
-                    text-align: center !important;
-                    margin-bottom: 28px !important;
-                    width: 100% !important;
-                    box-sizing: border-box !important;
-                }
-                .login-header-title {
-                    color: #ffffff !important; 
-                    -webkit-text-fill-color: #ffffff !important;
-                    font-size: 2.8rem !important; 
-                    font-weight: 900 !important; 
-                    margin: 0 0 8px 0 !important;
-                    line-height: 1.2 !important;
-                    letter-spacing: -0.5px !important;
-                    text-shadow: 0 3px 12px rgba(0, 0, 0, 0.8) !important;
-                    text-align: center !important;
-                }
-                .login-header-subtitle {
-                    color: #ffffff !important; 
-                    -webkit-text-fill-color: #ffffff !important;
-                    font-size: 1.35rem !important; 
-                    font-weight: 800 !important; 
-                    margin: 0 !important;
-                    letter-spacing: 1px !important;
-                    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8) !important;
-                    text-align: center !important;
-                }
-                </style>
-                <div class="login-header-box">
-                    <div class="login-header-title">🔒 Pitch to Project</div>
-                    <div class="login-header-subtitle">⚡ Scope Intelligence Engine Access</div>
+                <div style="
+                    background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%);
+                    border-radius: 14px;
+                    padding: 24px 10px;
+                    box-shadow: 0 0 25px rgba(236, 72, 153, 0.6);
+                    text-align: center;
+                    font-family: system-ui, -apple-system, sans-serif;
+                ">
+                    <div style="
+                        color: #ffffff;
+                        font-size: 2.8rem;
+                        font-weight: 900;
+                        margin-bottom: 6px;
+                        text-shadow: 0 3px 12px rgba(0, 0, 0, 0.8);
+                        letter-spacing: -0.5px;
+                    ">🔒 Pitch to Project</div>
+                    <div style="
+                        color: #ffffff;
+                        font-size: 1.35rem;
+                        font-weight: 800;
+                        letter-spacing: 1px;
+                        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+                    ">⚡ Scope Intelligence Engine Access</div>
                 </div>
-                """, 
-                unsafe_allow_html=True
+                """,
+                height=140
             )
             
             username = st.text_input("Username", placeholder="Enter username")
@@ -561,21 +516,27 @@ st.markdown(
 col_title, col_toggle = st.columns([3, 1])
 
 with col_title:
-    # FIXED DASHBOARD TITLE VISIBILITY (Solid White Text Override)
-    st.markdown(
+    # ISOLATED COMPONENT FOR MAIN DASHBOARD TITLE (Bypasses CSS Transparency Overrides)
+    components.html(
         """
-        <h1 style="
-            color: #ffffff !important; 
-            -webkit-text-fill-color: #ffffff !important; 
-            font-size: 2.8rem !important; 
-            font-weight: 900 !important; 
-            margin: 0 !important;
-            text-shadow: 0 0 15px rgba(56, 189, 248, 0.5) !important;
-        ">Pitch to Project</h1>
-        """, 
-        unsafe_allow_html=True
+        <div style="font-family: system-ui, -apple-system, sans-serif;">
+            <div style="
+                color: #ffffff;
+                font-size: 2.8rem;
+                font-weight: 900;
+                margin: 0;
+                text-shadow: 0 0 15px rgba(56, 189, 248, 0.6);
+            ">Pitch to Project</div>
+            <div style="
+                color: #38bdf8;
+                font-size: 1.05rem;
+                font-weight: 700;
+                margin-top: 4px;
+            ">🚀 AI-Powered Scope Intelligence & Handover Engine</div>
+        </div>
+        """,
+        height=85
     )
-    st.caption("🚀 AI-Powered Scope Intelligence & Handover Engine")
 
 with col_toggle:
     demo_mode = st.toggle("Demo Mode (Safe Pitch)", value=True)

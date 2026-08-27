@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 # -----------------------------------------------------------------------------
-# 2. Comprehensive Custom CSS (Increased Font Sizes & Ultra High-Contrast)
+# 2. Comprehensive Custom CSS (Global + Fixed High-Contrast Login)
 # -----------------------------------------------------------------------------
 css_code = """
 <style>
@@ -298,38 +298,44 @@ def check_password():
     if st.session_state.get("authenticated", False):
         return True
 
-    # Render High-Contrast Gradient Login Card with Increased Font Sizes
+    # Render High-Contrast Gradient Login Card with Direct-Styled Text
     st.markdown("<br><br>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
     
     with col2:
-        # High-Contrast Banner Header (Explicit Font Sizes & White Color)
+        # Enforced White Text Banner Header
         st.markdown(
             """
             <div style="
                 background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%);
                 border-radius: 16px 16px 0 0;
-                padding: 32px 20px;
+                padding: 30px 20px;
                 box-shadow: 0 0 30px rgba(236, 72, 153, 0.5);
                 text-align: center;
                 margin-bottom: -1px;
             ">
-                <div style="
-                    color: #ffffff !important; 
-                    font-size: 2.6rem !important; 
-                    font-weight: 900 !important; 
-                    margin: 0 0 8px 0 !important;
-                    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-                    letter-spacing: -0.5px;
-                ">🔒 Pitch to Project</div>
-                <div style="
-                    color: #ffffff !important; 
-                    font-weight: 800 !important; 
-                    font-size: 1.25rem !important; 
-                    margin: 0 !important;
-                    letter-spacing: 1px;
-                    text-shadow: 0 1px 5px rgba(0,0,0,0.5);
-                ">⚡ Scope Intelligence Engine Access</div>
+                <div style="margin-bottom: 8px;">
+                    <span style="
+                        color: #ffffff !important; 
+                        -webkit-text-fill-color: #ffffff !important;
+                        font-size: 2.6rem !important; 
+                        font-weight: 900 !important; 
+                        text-shadow: 0 3px 12px rgba(0,0,0,0.6);
+                        letter-spacing: -0.5px;
+                        display: inline-block;
+                    ">🔒 Pitch to Project</span>
+                </div>
+                <div>
+                    <span style="
+                        color: #ffffff !important; 
+                        -webkit-text-fill-color: #ffffff !important;
+                        font-weight: 800 !important; 
+                        font-size: 1.25rem !important; 
+                        letter-spacing: 1px;
+                        text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+                        display: inline-block;
+                    ">⚡ Scope Intelligence Engine Access</span>
+                </div>
             </div>
             """, 
             unsafe_allow_html=True

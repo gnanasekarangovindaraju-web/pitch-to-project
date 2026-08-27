@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 # -----------------------------------------------------------------------------
-# 2. Comprehensive Custom CSS (Global + Input Styling)
+# 2. Comprehensive Custom CSS (Global + Layout Controls)
 # -----------------------------------------------------------------------------
 css_code = """
 <style>
@@ -26,7 +26,7 @@ css_code = """
     background-attachment: fixed;
 }
 
-/* 2. HIGH-VISIBILITY LOGIN PAGE STYLING */
+/* 2. HIGH-VISIBILITY LOGIN PAGE & UNIFIED CARD STYLING */
 div[data-testid="stForm"] {
     background: rgba(15, 23, 42, 0.95) !important;
     border: 2.5px solid #a855f7 !important;
@@ -35,7 +35,7 @@ div[data-testid="stForm"] {
     box-shadow: 0 0 40px rgba(168, 85, 247, 0.5) !important;
 }
 
-/* Input Text Labels Visibility (Username / Password) */
+/* Left-Aligned Input Text Labels (Username / Password) */
 div[data-testid="stForm"] label,
 div[data-testid="stForm"] label p,
 div[data-testid="stTextInput"] label p {
@@ -49,7 +49,7 @@ div[data-testid="stTextInput"] label p {
     display: block !important;
 }
 
-/* High-Contrast Inputs (Typed Text, Font Size & Dark Background) */
+/* Left-Aligned Inputs (Typed Text, Font Size & Dark Background) */
 div[data-testid="stForm"] div[data-testid="stTextInput"] input,
 div[data-testid="stTextInput"] input,
 input[type="text"],
@@ -77,7 +77,7 @@ input:-webkit-autofill:active {
     border: 2.5px solid #38bdf8 !important;
 }
 
-/* Placeholder Text Visibility */
+/* Placeholder Text Left-Alignment & Visibility */
 div[data-testid="stTextInput"] input::placeholder,
 input::placeholder {
     color: #94a3b8 !important;
@@ -103,7 +103,7 @@ div[data-testid="stForm"] svg {
     height: 26px !important;
 }
 
-/* LOGIN BUTTON HIGH CONTRAST STYLING */
+/* ENFORCED LOGIN BUTTON */
 div[data-testid="stForm"] button[type="submit"],
 div[data-testid="stForm"] button[data-testid="stFormSubmitButton"],
 div[data-testid="stForm"] button {
@@ -168,14 +168,6 @@ section[data-testid="stSidebar"] div.stButton > button {
 }
 
 /* 4. Main App Typography & Components */
-.main h1 {
-    background: linear-gradient(90deg, #38bdf8, #a855f7, #f43f5e) !important;
-    -webkit-background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
-    font-weight: 900 !important;
-    font-size: 2.8rem !important;
-}
-
 h2, h3 {
     color: #f8fafc !important;
     font-weight: 800 !important;
@@ -319,7 +311,6 @@ def check_password():
     
     with col2:
         with st.form("login_form"):
-            # INLINE-SCOPED GRADIENT HEADER WITH OVERRIDE RULES
             st.markdown(
                 """
                 <style>
@@ -570,7 +561,20 @@ st.markdown(
 col_title, col_toggle = st.columns([3, 1])
 
 with col_title:
-    st.title("Pitch to Project")
+    # FIXED DASHBOARD TITLE VISIBILITY (Solid White Text Override)
+    st.markdown(
+        """
+        <h1 style="
+            color: #ffffff !important; 
+            -webkit-text-fill-color: #ffffff !important; 
+            font-size: 2.8rem !important; 
+            font-weight: 900 !important; 
+            margin: 0 !important;
+            text-shadow: 0 0 15px rgba(56, 189, 248, 0.5) !important;
+        ">Pitch to Project</h1>
+        """, 
+        unsafe_allow_html=True
+    )
     st.caption("🚀 AI-Powered Scope Intelligence & Handover Engine")
 
 with col_toggle:

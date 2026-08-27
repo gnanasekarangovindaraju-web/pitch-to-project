@@ -313,8 +313,8 @@ def check_password():
     col1, col2, col3 = st.columns([1, 2.4, 1])
     
     with col2:
-        # ABSOLUTE HIGH-CONTRAST HEADER CARD
-        # Explicit inline text fill & heavy contrast text-shadows
+        # ULTRA-HIGH CONTRAST HEADER CARD
+        # Uses explicit styling on <p> elements to force pure white rendering
         st.markdown(
             """
             <div style="
@@ -327,30 +327,27 @@ def check_password():
                 text-align: center !important;
                 margin-bottom: -1px !important;
             ">
-                <div style="margin-bottom: 8px !important;">
-                    <span style="
-                        color: #FFFFFF !important; 
-                        -webkit-text-fill-color: #FFFFFF !important;
-                        opacity: 1 !important;
-                        font-size: 3.2rem !important; 
-                        font-weight: 900 !important; 
-                        text-shadow: 0 3px 10px rgba(0, 0, 0, 0.9) !important;
-                        letter-spacing: -0.5px !important;
-                        display: inline-block !important;
-                    ">🔒 Pitch to Project</span>
-                </div>
-                <div>
-                    <span style="
-                        color: #FFFFFF !important; 
-                        -webkit-text-fill-color: #FFFFFF !important;
-                        opacity: 1 !important;
-                        font-weight: 900 !important; 
-                        font-size: 1.4rem !important; 
-                        letter-spacing: 1px !important;
-                        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9) !important;
-                        display: inline-block !important;
-                    ">⚡ Scope Intelligence Engine Access</span>
-                </div>
+                <p style="
+                    color: #ffffff !important; 
+                    -webkit-text-fill-color: #ffffff !important;
+                    font-size: 3.2rem !important; 
+                    font-weight: 900 !important; 
+                    margin: 0 0 8px 0 !important;
+                    line-height: 1.2 !important;
+                    letter-spacing: -0.5px !important;
+                    text-shadow: 0 3px 12px rgba(0, 0, 0, 0.9) !important;
+                    background: none !important;
+                ">🔒 Pitch to Project</p>
+                <p style="
+                    color: #ffffff !important; 
+                    -webkit-text-fill-color: #ffffff !important;
+                    font-size: 1.4rem !important; 
+                    font-weight: 800 !important; 
+                    margin: 0 !important;
+                    letter-spacing: 1px !important;
+                    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9) !important;
+                    background: none !important;
+                ">⚡ Scope Intelligence Engine Access</p>
             </div>
             """, 
             unsafe_allow_html=True

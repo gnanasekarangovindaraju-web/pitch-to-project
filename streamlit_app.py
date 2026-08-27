@@ -31,15 +31,15 @@ def check_password():
         st.markdown(
             """
             <div style="
-                background: rgba(30, 27, 75, 0.85);
+                background: rgba(30, 27, 75, 0.95);
                 border: 2px solid #a855f7;
-                border-radius: 16px;
-                padding: 30px;
-                box-shadow: 0 0 30px rgba(168, 85, 247, 0.3);
+                border-radius: 16px 16px 0 0;
+                padding: 24px;
+                box-shadow: 0 0 25px rgba(168, 85, 247, 0.4);
                 text-align: center;
             ">
-                <h2 style="margin-bottom: 5px;">🔒 Pitch to Project</h2>
-                <p style="color: #38bdf8; font-weight: 700;">Scope Intelligence Engine Access</p>
+                <h2 style="color: #ffffff !important; font-size: 2.2rem !important; margin-bottom: 6px !important; text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);">🔒 Pitch to Project</h2>
+                <p style="color: #38bdf8 !important; font-weight: 800; font-size: 1.05rem; margin: 0;">Scope Intelligence Engine Access</p>
             </div>
             """, 
             unsafe_allow_html=True
@@ -51,7 +51,6 @@ def check_password():
             submit = st.form_submit_button("🔑 LOGIN TO APP")
 
             if submit:
-                # Fetches from .streamlit/secrets.toml if available, else defaults to fallback demo credentials
                 VALID_USER = st.secrets.get("APP_USER", "admin")
                 VALID_PASSWORD = st.secrets.get("APP_PASSWORD", "project2026")
 
@@ -229,7 +228,7 @@ def build_docx_report(data):
     return target_stream.getvalue()
 
 # -----------------------------------------------------------------------------
-# 5. Custom CSS Theme (Complete Contrast Overrides)
+# 5. Custom CSS Theme (Complete Dark Contrast & Form Styling)
 # -----------------------------------------------------------------------------
 css_code = """
 <style>
@@ -239,13 +238,80 @@ css_code = """
     background-attachment: fixed;
 }
 
-/* Sidebar Dark Glassmorphic Theme */
-section[data-testid="stSidebar"] {
-    background: rgba(15, 23, 42, 0.9) !important;
-    border-right: 1px solid rgba(168, 85, 247, 0.3) !important;
+/* LOGIN FORM DARK MODE OVERRIDE */
+div[data-testid="stForm"] {
+    background: rgba(15, 23, 42, 0.95) !important;
+    border: 2px solid #a855f7 !important;
+    border-top: none !important;
+    border-radius: 0 0 16px 16px !important;
+    padding: 24px !important;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4) !important;
 }
 
-/* Neon Titles & Headings */
+/* Form Inputs */
+div[data-testid="stForm"] input[type="text"],
+div[data-testid="stForm"] input[type="password"] {
+    background-color: #1e1b4b !important;
+    color: #ffffff !important;
+    border: 1.5px solid #38bdf8 !important;
+    border-radius: 10px !important;
+    font-weight: 700 !important;
+}
+
+div[data-testid="stForm"] input[type="text"]::placeholder,
+div[data-testid="stForm"] input[type="password"]::placeholder {
+    color: #94a3b8 !important;
+}
+
+/* Form Submit Button */
+div[data-testid="stForm"] button[type="submit"],
+div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] {
+    background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #3b82f6 100%) !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 12px 24px !important;
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.5) !important;
+}
+
+div[data-testid="stForm"] button[type="submit"] *,
+div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] * {
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    font-size: 1rem !important;
+}
+
+/* Sidebar Styling */
+section[data-testid="stSidebar"] {
+    background: rgba(15, 23, 42, 0.95) !important;
+    border-right: 1.5px solid #a855f7 !important;
+}
+
+section[data-testid="stSidebar"] h3 {
+    color: #38bdf8 !important;
+    font-size: 1.2rem !important;
+    font-weight: 800 !important;
+    margin-bottom: 8px !important;
+}
+
+section[data-testid="stSidebar"] p, 
+section[data-testid="stSidebar"] span,
+section[data-testid="stSidebar"] div {
+    color: #f8fafc !important;
+    font-weight: 700 !important;
+    background: transparent !important;
+}
+
+section[data-testid="stSidebar"] div.stButton > button {
+    background: linear-gradient(90deg, #ec4899 0%, #f43f5e 100%) !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    border-radius: 10px !important;
+    box-shadow: 0 0 15px rgba(244, 63, 94, 0.5) !important;
+    border: none !important;
+    margin-top: 10px !important;
+}
+
+/* Neon Headings */
 h1 {
     background: linear-gradient(90deg, #38bdf8, #a855f7, #f43f5e) !important;
     -webkit-background-clip: text !important;
@@ -260,7 +326,7 @@ h2, h3 {
     text-shadow: 0 0 10px rgba(168, 85, 247, 0.3) !important;
 }
 
-/* Text Labels & Captions */
+/* General Text Labels */
 div[data-testid="stMarkdownContainer"] p, 
 label[data-testid="stWidgetLabel"] p,
 div[data-testid="stToggle"] span {
@@ -274,7 +340,7 @@ div[data-testid="stCaptionContainer"] p {
     font-weight: 700 !important;
 }
 
-/* File Uploaders & Dropzone */
+/* File Uploaders */
 div[data-testid="stFileUploader"] {
     background: rgba(15, 23, 42, 0.95) !important;
     border: 2px solid #a855f7 !important;
@@ -283,17 +349,13 @@ div[data-testid="stFileUploader"] {
 }
 
 div[data-testid="stFileUploader"] section,
-div[data-testid="stFileUploaderDropzone"],
-div[data-testid="stFileUploader"] [data-testid="stFileUploaderDropzone"] {
+div[data-testid="stFileUploaderDropzone"] {
     background: #1e1b4b !important;
     border: 2px dashed #38bdf8 !important;
     border-radius: 10px !important;
 }
 
-div[data-testid="stFileUploaderDropzone"] *,
-div[data-testid="stFileUploaderDropzone"] span,
-div[data-testid="stFileUploaderDropzone"] small,
-div[data-testid="stFileUploaderDropzone"] p {
+div[data-testid="stFileUploaderDropzone"] * {
     color: #ffffff !important;
     font-weight: 700 !important;
 }
@@ -302,7 +364,6 @@ div[data-testid="stFileUploaderDropzone"] button {
     background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 100%) !important;
     border: 1px solid #f43f5e !important;
     border-radius: 8px !important;
-    box-shadow: 0 0 10px rgba(236, 72, 153, 0.5) !important;
 }
 
 div[data-testid="stFileUploaderDropzone"] button * {
@@ -310,7 +371,7 @@ div[data-testid="stFileUploaderDropzone"] button * {
     font-weight: 800 !important;
 }
 
-/* Toast Notifications Fix */
+/* Toast Notifications */
 div[data-testid="stToast"],
 div[data-testid="stToast"] > div {
     background-color: #1e1b4b !important;
@@ -320,17 +381,12 @@ div[data-testid="stToast"] > div {
     box-shadow: 0 0 20px rgba(56, 189, 248, 0.5) !important;
 }
 
-div[data-testid="stToast"] *,
-div[data-testid="stToast"] span,
-div[data-testid="stToast"] p,
-div[data-testid="stToast"] div {
+div[data-testid="stToast"] * {
     color: #ffffff !important;
     font-weight: 800 !important;
-    font-size: 0.95rem !important;
 }
 
-/* Download/Export Button */
-div[data-testid="stDownloadButton"],
+/* Export Button */
 div[data-testid="stDownloadButton"] > button {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
     border-radius: 12px !important;
@@ -339,17 +395,9 @@ div[data-testid="stDownloadButton"] > button {
     width: 100%;
 }
 
-div[data-testid="stDownloadButton"] > button *,
-div[data-testid="stDownloadButton"] > button p,
-div[data-testid="stDownloadButton"] > button span {
+div[data-testid="stDownloadButton"] > button * {
     color: #ffffff !important;
     font-weight: 900 !important;
-    font-size: 1.05rem !important;
-}
-
-div[data-testid="stDownloadButton"] > button:hover {
-    box-shadow: 0 0 28px rgba(16, 185, 129, 0.8) !important;
-    transform: translateY(-2px) !important;
 }
 
 /* Text Area Input */

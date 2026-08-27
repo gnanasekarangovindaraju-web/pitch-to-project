@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 # -----------------------------------------------------------------------------
-# 2. Comprehensive Custom CSS (Global + Layout Controls)
+# 2. Comprehensive Custom CSS (Global + Input Styling)
 # -----------------------------------------------------------------------------
 css_code = """
 <style>
@@ -26,7 +26,7 @@ css_code = """
     background-attachment: fixed;
 }
 
-/* 2. HIGH-VISIBILITY LOGIN PAGE & UNIFIED CARD STYLING */
+/* 2. HIGH-VISIBILITY LOGIN PAGE STYLING */
 div[data-testid="stForm"] {
     background: rgba(15, 23, 42, 0.95) !important;
     border: 2.5px solid #a855f7 !important;
@@ -35,7 +35,7 @@ div[data-testid="stForm"] {
     box-shadow: 0 0 40px rgba(168, 85, 247, 0.5) !important;
 }
 
-/* Left-Aligned Input Text Labels (Username / Password) */
+/* Input Text Labels Visibility (Username / Password) */
 div[data-testid="stForm"] label,
 div[data-testid="stForm"] label p,
 div[data-testid="stTextInput"] label p {
@@ -49,7 +49,7 @@ div[data-testid="stTextInput"] label p {
     display: block !important;
 }
 
-/* Left-Aligned Inputs (Typed Text, Font Size & Dark Background) */
+/* High-Contrast Inputs (Typed Text, Font Size & Dark Background) */
 div[data-testid="stForm"] div[data-testid="stTextInput"] input,
 div[data-testid="stTextInput"] input,
 input[type="text"],
@@ -77,7 +77,7 @@ input:-webkit-autofill:active {
     border: 2.5px solid #38bdf8 !important;
 }
 
-/* Placeholder Text Left-Alignment & Visibility */
+/* Placeholder Text Visibility */
 div[data-testid="stTextInput"] input::placeholder,
 input::placeholder {
     color: #94a3b8 !important;
@@ -103,7 +103,7 @@ div[data-testid="stForm"] svg {
     height: 26px !important;
 }
 
-/* ENFORCED LOGIN BUTTON */
+/* LOGIN BUTTON HIGH CONTRAST STYLING */
 div[data-testid="stForm"] button[type="submit"],
 div[data-testid="stForm"] button[data-testid="stFormSubmitButton"],
 div[data-testid="stForm"] button {
@@ -319,44 +319,45 @@ def check_password():
     
     with col2:
         with st.form("login_form"):
-            # FLEXBOX FORCE-CENTER BANNER
+            # INLINE-SCOPED GRADIENT HEADER WITH OVERRIDE RULES
             st.markdown(
                 """
-                <div style="
-                    display: flex !important;
-                    flex-direction: column !important;
-                    align-items: center !important;
-                    justify-content: center !important;
+                <style>
+                .login-header-box {
                     background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%) !important;
                     border-radius: 14px !important;
                     padding: 28px 16px !important;
                     box-shadow: 0 0 25px rgba(236, 72, 153, 0.6) !important;
+                    text-align: center !important;
                     margin-bottom: 28px !important;
                     width: 100% !important;
                     box-sizing: border-box !important;
-                ">
-                    <div style="
-                        color: #ffffff !important; 
-                        -webkit-text-fill-color: #ffffff !important;
-                        font-size: 2.8rem !important; 
-                        font-weight: 900 !important; 
-                        margin-bottom: 8px !important;
-                        line-height: 1.2 !important;
-                        letter-spacing: -0.5px !important;
-                        text-shadow: 0 3px 12px rgba(0, 0, 0, 0.8) !important;
-                        text-align: center !important;
-                        width: 100% !important;
-                    ">🔒 Pitch to Project</div>
-                    <div style="
-                        color: #ffffff !important; 
-                        -webkit-text-fill-color: #ffffff !important;
-                        font-size: 1.35rem !important; 
-                        font-weight: 800 !important; 
-                        letter-spacing: 1px !important;
-                        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8) !important;
-                        text-align: center !important;
-                        width: 100% !important;
-                    ">⚡ Scope Intelligence Engine Access</div>
+                }
+                .login-header-title {
+                    color: #ffffff !important; 
+                    -webkit-text-fill-color: #ffffff !important;
+                    font-size: 2.8rem !important; 
+                    font-weight: 900 !important; 
+                    margin: 0 0 8px 0 !important;
+                    line-height: 1.2 !important;
+                    letter-spacing: -0.5px !important;
+                    text-shadow: 0 3px 12px rgba(0, 0, 0, 0.8) !important;
+                    text-align: center !important;
+                }
+                .login-header-subtitle {
+                    color: #ffffff !important; 
+                    -webkit-text-fill-color: #ffffff !important;
+                    font-size: 1.35rem !important; 
+                    font-weight: 800 !important; 
+                    margin: 0 !important;
+                    letter-spacing: 1px !important;
+                    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8) !important;
+                    text-align: center !important;
+                }
+                </style>
+                <div class="login-header-box">
+                    <div class="login-header-title">🔒 Pitch to Project</div>
+                    <div class="login-header-subtitle">⚡ Scope Intelligence Engine Access</div>
                 </div>
                 """, 
                 unsafe_allow_html=True

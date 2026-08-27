@@ -278,7 +278,6 @@ def check_password():
     
     with col2:
         with st.form("login_form"):
-            # ISOLATED COMPONENT RENDER FOR GUARANTEED CENTERED WHITE TEXT
             components.html(
                 """
                 <div style="
@@ -516,7 +515,7 @@ st.markdown(
 col_title, col_toggle = st.columns([3, 1])
 
 with col_title:
-    # ISOLATED COMPONENT FOR MAIN DASHBOARD TITLE (Bypasses CSS Transparency Overrides)
+    # INCREASED COMPONENT HEIGHT TO 120 TO PREVENT TEXT CLIPPING
     components.html(
         """
         <div style="font-family: system-ui, -apple-system, sans-serif;">
@@ -525,17 +524,19 @@ with col_title:
                 font-size: 2.8rem;
                 font-weight: 900;
                 margin: 0;
+                line-height: 1.2;
                 text-shadow: 0 0 15px rgba(56, 189, 248, 0.6);
             ">Pitch to Project</div>
             <div style="
                 color: #38bdf8;
                 font-size: 1.05rem;
                 font-weight: 700;
-                margin-top: 4px;
+                margin-top: 6px;
+                line-height: 1.3;
             ">🚀 AI-Powered Scope Intelligence & Handover Engine</div>
         </div>
         """,
-        height=85
+        height=120
     )
 
 with col_toggle:

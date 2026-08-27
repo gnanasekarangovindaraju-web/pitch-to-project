@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 # -----------------------------------------------------------------------------
-# 2. Comprehensive Custom CSS (Global + Complete Autofill & Contrast Fixes)
+# 2. Comprehensive Custom CSS (Global + Unified Card Border Fix)
 # -----------------------------------------------------------------------------
 css_code = """
 <style>
@@ -26,13 +26,13 @@ css_code = """
     background-attachment: fixed;
 }
 
-/* 2. HIGH-VISIBILITY & EXTRA-LARGE FONT LOGIN PAGE STYLING */
+/* 2. HIGH-VISIBILITY LOGIN PAGE & UNIFIED CARD STYLING */
 div[data-testid="stForm"] {
     background: rgba(15, 23, 42, 0.95) !important;
     border: 2.5px solid #a855f7 !important;
-    border-radius: 0 0 18px 18px !important;
+    border-radius: 18px !important;
     padding: 36px !important;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5) !important;
+    box-shadow: 0 0 40px rgba(168, 85, 247, 0.5) !important;
 }
 
 /* Input Text Labels Visibility (Username / Password) */
@@ -108,7 +108,7 @@ div[data-testid="stForm"] button {
     padding: 18px 32px !important;
     box-shadow: 0 0 30px rgba(236, 72, 153, 0.7) !important;
     transition: all 0.3s ease !important;
-    margin-top: 18px !important;
+    margin-top: 22px !important;
     width: 100% !important;
 }
 
@@ -313,48 +313,43 @@ def check_password():
     col1, col2, col3 = st.columns([1, 2.4, 1])
     
     with col2:
-        # ULTRA-HIGH CONTRAST HEADER CARD
-        # Uses explicit styling on <p> elements to force pure white rendering
-        st.markdown(
-            """
-            <div style="
-                background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%) !important;
-                border-radius: 18px 18px 0 0 !important;
-                border: 2.5px solid #a855f7 !important;
-                border-bottom: none !important;
-                padding: 34px 24px !important;
-                box-shadow: 0 0 35px rgba(236, 72, 153, 0.6) !important;
-                text-align: center !important;
-                margin-bottom: -1px !important;
-            ">
-                <p style="
-                    color: #ffffff !important; 
-                    -webkit-text-fill-color: #ffffff !important;
-                    font-size: 3.2rem !important; 
-                    font-weight: 900 !important; 
-                    margin: 0 0 8px 0 !important;
-                    line-height: 1.2 !important;
-                    letter-spacing: -0.5px !important;
-                    text-shadow: 0 3px 12px rgba(0, 0, 0, 0.9) !important;
-                    background: none !important;
-                ">🔒 Pitch to Project</p>
-                <p style="
-                    color: #ffffff !important; 
-                    -webkit-text-fill-color: #ffffff !important;
-                    font-size: 1.4rem !important; 
-                    font-weight: 800 !important; 
-                    margin: 0 !important;
-                    letter-spacing: 1px !important;
-                    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9) !important;
-                    background: none !important;
-                ">⚡ Scope Intelligence Engine Access</p>
-            </div>
-            """, 
-            unsafe_allow_html=True
-        )
-        
-        # Form Container
+        # Form Container enclosing BOTH Header + Form Fields inside one border
         with st.form("login_form"):
+            # Header Card nested directly inside the Form element
+            st.markdown(
+                """
+                <div style="
+                    background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%) !important;
+                    border-radius: 14px !important;
+                    padding: 28px 20px !important;
+                    box-shadow: 0 0 25px rgba(236, 72, 153, 0.5) !important;
+                    text-align: center !important;
+                    margin-bottom: 24px !important;
+                ">
+                    <p style="
+                        color: #ffffff !important; 
+                        -webkit-text-fill-color: #ffffff !important;
+                        font-size: 3rem !important; 
+                        font-weight: 900 !important; 
+                        margin: 0 0 8px 0 !important;
+                        line-height: 1.2 !important;
+                        letter-spacing: -0.5px !important;
+                        text-shadow: 0 3px 12px rgba(0, 0, 0, 0.9) !important;
+                    ">🔒 Pitch to Project</p>
+                    <p style="
+                        color: #ffffff !important; 
+                        -webkit-text-fill-color: #ffffff !important;
+                        font-size: 1.35rem !important; 
+                        font-weight: 800 !important; 
+                        margin: 0 !important;
+                        letter-spacing: 1px !important;
+                        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9) !important;
+                    ">⚡ Scope Intelligence Engine Access</p>
+                </div>
+                """, 
+                unsafe_allow_html=True
+            )
+            
             username = st.text_input("Username", placeholder="Enter username")
             password = st.text_input("Password", type="password", placeholder="Enter password")
             submit = st.form_submit_button("🔑 LOGIN TO ENGINE")

@@ -693,24 +693,18 @@ client = get_gemini_client()
 
 
 # =============================================================================
-# 6. PROGRESS BAR
+# 6. PROGRESS BAR (FIXED CSS CONTAINER COLLAPSE ISSUE)
 # =============================================================================
 
-def render_stylish_progress(
-    percentage,
-    status_text
-):
-
+def render_stylish_progress(percentage, status_text):
     return f"""
-    <div style="margin: 10px 0 18px 0;">
-
+    <div style="margin: 10px 0 18px 0; width: 100%;">
         <div style="
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 6px;
         ">
-
             <span style="
                 color: #06b6d4;
                 font-weight: 800;
@@ -718,57 +712,40 @@ def render_stylish_progress(
             ">
                 {status_text}
             </span>
-
             <span style="
                 color: #f59e0b;
                 font-weight: 900;
                 font-size: 1.05rem;
-                text-shadow:
-                    0 0 10px rgba(245, 158, 11, 0.5);
+                text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
             ">
                 {percentage}%
             </span>
-
         </div>
-
         <div style="
             background: rgba(15, 23, 42, 0.9);
             border: 2px solid #10b981;
             border-radius: 12px;
             padding: 3px;
-
-            box-shadow:
-                0 0 15px rgba(16, 185, 129, 0.3);
-
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
             position: relative;
             overflow: hidden;
+            height: 24px;
         ">
-
             <div style="
                 width: {percentage}%;
-
                 height: 18px;
-
-                background:
-                    linear-gradient(
-                        90deg,
-                        #10b981 0%,
-                        #3b82f6 50%,
-                        #f59e0b 100%
-                    );
-
+                background: linear-gradient(
+                    90deg,
+                    #10b981 0%,
+                    #3b82f6 50%,
+                    #f59e0b 100%
+                );
                 border-radius: 8px;
-
-                box-shadow:
-                    0 0 20px rgba(245, 158, 11, 0.8);
-
-                transition:
-                    width 0.2s ease-in-out;
+                box-shadow: 0 0 20px rgba(245, 158, 11, 0.8);
+                transition: width 0.3s ease-in-out;
             ">
             </div>
-
         </div>
-
     </div>
     """
 
@@ -1322,7 +1299,7 @@ with left_col:
 
 
 # =============================================================================
-# 16. RIGHT COLUMN - AI ANALYSIS (PROGRESS BAR FIXED HERE)
+# 16. RIGHT COLUMN - AI ANALYSIS (CONTAINER PERSISTENCE FIXED)
 # =============================================================================
 
 with right_col:
@@ -1374,6 +1351,7 @@ with right_col:
 
                 if not payload:
                     st.warning("Please upload at least one document/media file or paste notes before analyzing.")
+                    time.sleep(2)
                     progress_card.empty()
                 else:
                     # Step 2: Transmitting
@@ -1381,7 +1359,7 @@ with right_col:
                         render_stylish_progress(50, "⚡ Step 2/3: Transmitting multimodal payload to Gemini..."),
                         unsafe_allow_html=True
                     )
-                    time.sleep(0.2)
+                    time.sleep(0.4)
 
                     # Step 3: Auditing
                     bar_ph.markdown(
@@ -1396,14 +1374,18 @@ with right_col:
                             render_stylish_progress(100, "✅ Smart Scope Handover Analysis Complete!"),
                             unsafe_allow_html=True
                         )
-                        st.success("✅ Scope Successfully Extracted!")
-                        time.sleep(0.5)
                         st.session_state["analysis_data"] = result
+                        
+                        # Retain completed 100% status state visible before clearing UI frame
+                        time.sleep(1.5)
+                        progress_card.empty()
+                        
                         st.toast("⚡ Live Gemini Extraction Complete!", icon="✅")
+                        st.rerun()
                     else:
                         st.error("❌ Extraction Failed")
-
-                    progress_card.empty()
+                        time.sleep(2)
+                        progress_card.empty()
 
     # DEFAULT DATA
     if "analysis_data" not in st.session_state:

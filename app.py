@@ -1,664 +1,3092 @@
-import os
 import json
 import time
-import threading
-import tkinter as tk
-from tkinter import filedialog, messagebox
-import customtkinter as ctk
+import io
+import mimetypes
+
 import docx
-from docx.shared import Inches, Pt, RGBColor
-from dotenv import load_dotenv
+import streamlit as st
+import streamlit.components.v1 as components
 
-# Load environment variables
-load_dotenv()
+from google import genai
+from google.genai import types
 
-# Initialize CustomTkinter Appearance
-ctk.set_appearance_mode("Dark")
-ctk.set_default_color_theme("blue")
 
-# --- GEMINI SYSTEM PROMPT (STRICT GAP & RISK AUDIT ENGINE) ---
-SYSTEM_PROMPT = """
-You are an expert Delivery Manager and Solution Architect. Analyze the provided project input text, tables, visual diagrams, and meeting media to generate a structured JSON output with strictly three root keys:
+# =============================================================================
+# 1. PAGE CONFIGURATION
+# =============================================================================
 
-1. "extracted_scope": Array of objects, each containing:
-   - "module": Name of the functional area (e.g., Auth, Payments, UI/UX, Admin)
-   - "requirements": Array of functional requirement strings
-   - "source_citation": String citing the document/section/media (e.g., "Proposal Page 4 Table 2" or "Architecture Diagram PNG")
+st.set_page_config(
+    page_title="Pitch to Project | Smart Scope Engine",
+    page_icon="⚡",
+    layout="wide",
+)
 
-2. "risks_and_gaps": Array of objects, each containing:
-   - "type": Category ("Missing SLA", "Unstated Assumption", "Cross-Document Conflict", "Scope Drift")
-   - "description": Explicit callout of what is missing, vague, contradictory, or conflicting across files
-   - "severity": String ("HIGH", "MEDIUM", "LOW")
 
-3. "user_stories": Array of objects, each containing:
-   - "title": Short story title
-   - "as_a": User role
-   - "i_want": Feature / Capability
-   - "so_that": Business value
-   - "acceptance_criteria": Array of acceptance criteria strings
+# =============================================================================
+# 2. GLOBAL CSS
+#    Existing UI design preserved
+# =============================================================================
 
-CRITICAL AUDIT RULES:
-- Actively search for MISSING non-functional requirements (e.g., unstated uptime SLAs, missing performance bounds, undefined maintenance windows, unmentioned security compliance).
-- Cross-check conflicts between proposal promises, SOW tables, diagrams, and audio notes.
-- If details are not explicitly present, DO NOT invent them—flag them explicitly under 'risks_and_gaps'.
-- Return ONLY valid raw JSON with no Markdown wrapping.
+css_code = """
+<style>
+
+/* ============================================================
+   GLOBAL BACKGROUND
+   ============================================================ */
+
+.stApp {
+    background: linear-gradient(
+        125deg,
+        #0f172a 0%,
+        #1e1b4b 35%,
+        #311042 70%,
+        #0284c7 100%
+    ) !important;
+
+    background-attachment: fixed;
+}
+
+
+/* ============================================================
+   LOGIN FORM
+   ============================================================ */
+
+div[data-testid="stForm"] {
+    background: rgba(15, 23, 42, 0.95) !important;
+    border: 2.5px solid #a855f7 !important;
+    border-radius: 18px !important;
+    padding: 36px !important;
+    box-shadow: 0 0 40px rgba(168, 85, 247, 0.5) !important;
+}
+
+
+/* ============================================================
+   LABELS
+   ============================================================ */
+
+div[data-testid="stForm"] label,
+div[data-testid="stForm"] label p,
+div[data-testid="stTextInput"] label p {
+    color: #38bdf8 !important;
+    font-weight: 900 !important;
+    font-size: 1.4rem !important;
+    letter-spacing: 0.5px !important;
+    margin-bottom: 8px !important;
+    text-align: left !important;
+    width: 100% !important;
+    display: block !important;
+}
+
+
+/* ============================================================
+   INPUTS
+   ============================================================ */
+
+div[data-testid="stForm"] div[data-testid="stTextInput"] input,
+div[data-testid="stTextInput"] input,
+input[type="text"],
+input[type="password"] {
+
+    background-color: #0f172a !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+
+    border: 2.5px solid #38bdf8 !important;
+    border-radius: 12px !important;
+
+    font-weight: 800 !important;
+    font-size: 1.35rem !important;
+
+    padding: 16px 20px !important;
+
+    text-align: left !important;
+
+    box-shadow:
+        0 0 14px rgba(56, 189, 248, 0.3) !important;
+}
+
+
+/* ============================================================
+   AUTOFILL
+   ============================================================ */
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+
+    -webkit-box-shadow:
+        0 0 0 1000px #0f172a inset !important;
+
+    -webkit-text-fill-color: #ffffff !important;
+
+    caret-color: #ffffff !important;
+
+    border: 2.5px solid #38bdf8 !important;
+}
+
+
+/* ============================================================
+   PLACEHOLDER
+   ============================================================ */
+
+div[data-testid="stTextInput"] input::placeholder,
+input::placeholder {
+
+    color: #cbd5e1 !important;
+    -webkit-text-fill-color: #cbd5e1 !important;
+
+    font-weight: 700 !important;
+    font-size: 1.25rem !important;
+
+    opacity: 1 !important;
+
+    text-align: left !important;
+}
+
+
+/* ============================================================
+   PASSWORD ICON
+   ============================================================ */
+
+div[data-testid="stTextInput"] button svg,
+div[data-testid="stForm"] svg {
+
+    fill: #38bdf8 !important;
+    stroke: #38bdf8 !important;
+
+    width: 26px !important;
+    height: 26px !important;
+}
+
+
+/* ============================================================
+   LOGIN BUTTON
+   ============================================================ */
+
+div[data-testid="stForm"] button[type="submit"],
+div[data-testid="stForm"] button[data-testid="stFormSubmitButton"],
+div[data-testid="stForm"] button {
+
+    background:
+        linear-gradient(
+            90deg,
+            #ec4899 0%,
+            #8b5cf6 50%,
+            #06b6d4 100%
+        ) !important;
+
+    border: none !important;
+
+    border-radius: 14px !important;
+
+    padding: 18px 32px !important;
+
+    box-shadow:
+        0 0 30px rgba(236, 72, 153, 0.7) !important;
+
+    transition: all 0.3s ease !important;
+
+    margin-top: 22px !important;
+
+    width: 100% !important;
+}
+
+
+div[data-testid="stForm"] button[type="submit"] *,
+div[data-testid="stForm"] button[type="submit"] p,
+div[data-testid="stForm"] button[type="submit"] span {
+
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+
+    font-weight: 900 !important;
+    font-size: 1.5rem !important;
+
+    letter-spacing: 1.2px !important;
+}
+
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+
+section[data-testid="stSidebar"] {
+
+    background: rgba(15, 23, 42, 0.95) !important;
+
+    border-right:
+        1.5px solid #a855f7 !important;
+}
+
+
+section[data-testid="stSidebar"] h3 {
+
+    color: #38bdf8 !important;
+
+    font-size: 1.3rem !important;
+
+    font-weight: 800 !important;
+}
+
+
+section[data-testid="stSidebar"] p,
+section[data-testid="stSidebar"] span,
+section[data-testid="stSidebar"] div {
+
+    color: #f8fafc !important;
+
+    font-size: 1.05rem !important;
+
+    font-weight: 700 !important;
+
+    background: transparent !important;
+}
+
+
+section[data-testid="stSidebar"] div.stButton > button {
+
+    background:
+        linear-gradient(
+            90deg,
+            #ec4899 0%,
+            #f43f5e 100%
+        ) !important;
+
+    color: #ffffff !important;
+
+    font-weight: 800 !important;
+
+    font-size: 1.1rem !important;
+
+    border-radius: 10px !important;
+
+    box-shadow:
+        0 0 15px rgba(244, 63, 94, 0.5) !important;
+
+    border: none !important;
+
+    margin-top: 10px !important;
+}
+
+
+/* ============================================================
+   MAIN HEADINGS
+   ============================================================ */
+
+h2,
+h3 {
+
+    color: #f8fafc !important;
+
+    font-weight: 800 !important;
+
+    text-shadow:
+        0 0 10px rgba(168, 85, 247, 0.3) !important;
+}
+
+
+/* ============================================================
+   GENERAL TEXT
+   ============================================================ */
+
+div[data-testid="stMarkdownContainer"] p,
+label[data-testid="stWidgetLabel"] p,
+div[data-testid="stToggle"] span {
+
+    color: #f8fafc !important;
+
+    font-weight: 700 !important;
+}
+
+
+/* ============================================================
+   FILE UPLOADER
+   ============================================================ */
+
+div[data-testid="stFileUploader"] {
+
+    background:
+        rgba(15, 23, 42, 0.95) !important;
+
+    border:
+        2px solid #a855f7 !important;
+
+    border-radius:
+        14px !important;
+
+    padding:
+        12px !important;
+}
+
+
+div[data-testid="stFileUploader"] section,
+div[data-testid="stFileUploaderDropzone"],
+div[data-testid="stFileUploader"]
+[data-testid="stFileUploaderDropzone"] {
+
+    background:
+        #1e1b4b !important;
+
+    border:
+        2px dashed #38bdf8 !important;
+
+    border-radius:
+        10px !important;
+}
+
+
+div[data-testid="stFileUploaderDropzone"] *,
+div[data-testid="stFileUploaderDropzone"] span,
+div[data-testid="stFileUploaderDropzone"] small,
+div[data-testid="stFileUploaderDropzone"] p {
+
+    color: #ffffff !important;
+
+    font-weight: 700 !important;
+}
+
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+
+div[data-testid="stToast"],
+div[data-testid="stToast"] > div {
+
+    background-color:
+        #1e1b4b !important;
+
+    background:
+        #1e1b4b !important;
+
+    border:
+        2px solid #38bdf8 !important;
+
+    border-radius:
+        12px !important;
+
+    box-shadow:
+        0 0 20px rgba(56, 189, 248, 0.5) !important;
+}
+
+
+div[data-testid="stToast"] * {
+
+    color: #ffffff !important;
+
+    font-weight: 800 !important;
+}
+
+
+/* ============================================================
+   DOWNLOAD BUTTON
+   ============================================================ */
+
+div[data-testid="stDownloadButton"] > button {
+
+    background:
+        linear-gradient(
+            135deg,
+            #10b981 0%,
+            #059669 100%
+        ) !important;
+
+    border-radius:
+        12px !important;
+
+    border:
+        none !important;
+
+    box-shadow:
+        0 0 18px rgba(16, 185, 129, 0.5) !important;
+
+    width:
+        100%;
+}
+
+
+div[data-testid="stDownloadButton"] > button * {
+
+    color: #ffffff !important;
+
+    font-weight: 900 !important;
+}
+
+
+/* ============================================================
+   TEXT AREA
+   ============================================================ */
+
+div[data-testid="stTextArea"] textarea {
+
+    background:
+        rgba(15, 23, 42, 0.85) !important;
+
+    border:
+        2px solid #a855f7 !important;
+
+    border-radius:
+        14px !important;
+
+    color:
+        #ffffff !important;
+
+    -webkit-text-fill-color:
+        #ffffff !important;
+}
+
+
+div[data-testid="stTextArea"] textarea::placeholder {
+
+    color:
+        #cbd5e1 !important;
+
+    -webkit-text-fill-color:
+        #cbd5e1 !important;
+
+    opacity:
+        1 !important;
+}
+
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+
+div.stButton > button {
+
+    background:
+        linear-gradient(
+            90deg,
+            #ec4899 0%,
+            #8b5cf6 50%,
+            #3b82f6 100%
+        ) !important;
+
+    color:
+        #ffffff !important;
+
+    font-weight:
+        800 !important;
+
+    font-size:
+        1.05rem !important;
+
+    border-radius:
+        12px !important;
+
+    border:
+        none !important;
+
+    padding:
+        14px 28px !important;
+
+    box-shadow:
+        0 0 20px rgba(139, 92, 246, 0.5) !important;
+
+    width:
+        100%;
+}
+
+
+button[aria-selected="true"] {
+
+    background:
+        linear-gradient(
+            135deg,
+            #8b5cf6 0%,
+            #ec4899 100%
+        ) !important;
+
+    color:
+        #ffffff !important;
+}
+
+
+/* ============================================================
+   ANALYSIS CARDS
+   ============================================================ */
+
+div[data-testid="stVerticalBlockBorderWrapper"] > div {
+
+    background:
+        rgba(15, 23, 42, 0.8) !important;
+
+    backdrop-filter:
+        blur(10px) !important;
+
+    border-left:
+        6px solid #06b6d4 !important;
+
+    border-radius:
+        14px !important;
+
+    padding:
+        20px !important;
+}
+
+
+/* ============================================================
+   CODE
+   ============================================================ */
+
+code {
+
+    background-color:
+        rgba(30, 27, 75, 0.95) !important;
+
+    color:
+        #38bdf8 !important;
+
+    border:
+        1px solid #a855f7 !important;
+
+    border-radius:
+        6px !important;
+
+    padding:
+        3px 8px !important;
+}
+
+</style>
 """
 
-# --- DEMO FALLBACK DATA (SAFE PITCH MODE) ---
-DEMO_DATA = {
+st.markdown(css_code, unsafe_allow_html=True)
+
+
+# =============================================================================
+# 3. AUTHENTICATION
+# =============================================================================
+
+def check_password():
+
+    if st.session_state.get("authenticated", False):
+        return True
+
+    st.markdown("<br><br>", unsafe_allow_html=True)
+
+    col1, col2, col3 = st.columns([1, 2.4, 1])
+
+    with col2:
+
+        with st.form("login_form"):
+
+            components.html(
+                """
+                <div style="
+                    background:
+                        linear-gradient(
+                            135deg,
+                            #ec4899 0%,
+                            #8b5cf6 50%,
+                            #06b6d4 100%
+                        );
+
+                    border-radius: 14px;
+
+                    padding: 24px 10px;
+
+                    box-shadow:
+                        0 0 25px rgba(236, 72, 153, 0.6);
+
+                    text-align: center;
+
+                    font-family:
+                        system-ui,
+                        -apple-system,
+                        sans-serif;
+                ">
+
+                    <div style="
+                        color: #ffffff;
+                        font-size: 2.8rem;
+                        font-weight: 900;
+                        margin-bottom: 6px;
+                        text-shadow:
+                            0 3px 12px rgba(0,0,0,0.8);
+                        letter-spacing: -0.5px;
+                    ">
+                        🔒 Pitch to Project
+                    </div>
+
+                    <div style="
+                        color: #ffffff;
+                        font-size: 1.35rem;
+                        font-weight: 800;
+                        letter-spacing: 1px;
+                        text-shadow:
+                            0 2px 8px rgba(0,0,0,0.8);
+                    ">
+                        ⚡ Scope Intelligence Engine Access
+                    </div>
+
+                </div>
+                """,
+                height=140
+            )
+
+            username = st.text_input(
+                "Username",
+                placeholder="Enter username"
+            )
+
+            password = st.text_input(
+                "Password",
+                type="password",
+                placeholder="Enter password"
+            )
+
+            submit = st.form_submit_button(
+                "🔑 LOGIN TO ENGINE"
+            )
+
+            if submit:
+
+                valid_user = st.secrets.get(
+                    "APP_USER",
+                    "admin"
+                )
+
+                valid_password = st.secrets.get(
+                    "APP_PASSWORD",
+                    "project2026"
+                )
+
+                if (
+                    username == valid_user
+                    and password == valid_password
+                ):
+
+                    st.session_state["authenticated"] = True
+
+                    st.toast(
+                        "⚡ Login Successful!",
+                        icon="✅"
+                    )
+
+                    st.rerun()
+
+                else:
+
+                    st.error(
+                        "❌ Invalid Username or Password"
+                    )
+
+    return False
+
+
+if not check_password():
+    st.stop()
+
+
+# =============================================================================
+# 4. SIDEBAR
+# =============================================================================
+
+with st.sidebar:
+
+    st.markdown("### 👤 User Session")
+
+    st.write(
+        "Logged in as **Admin**"
+    )
+
+    if st.button(
+        "🚪 Logout",
+        use_container_width=True
+    ):
+
+        st.session_state["authenticated"] = False
+
+        st.rerun()
+
+
+# =============================================================================
+# 5. GEMINI CLIENT
+# =============================================================================
+
+@st.cache_resource
+def get_gemini_client():
+
+    try:
+
+        api_key = st.secrets["GEMINI_API_KEY"]
+
+        return genai.Client(
+            api_key=api_key
+        )
+
+    except Exception:
+
+        return None
+
+
+client = get_gemini_client()
+
+
+# =============================================================================
+# 6. MODEL CONFIGURATION
+# =============================================================================
+
+GEMINI_MODEL = st.secrets.get(
+    "GEMINI_MODEL",
+    "gemini-3.7-flash"
+)
+
+
+# =============================================================================
+# 7. PROGRESS BAR
+# =============================================================================
+
+def render_stylish_progress(
+    percentage,
+    status_text
+):
+
+    return f"""
+    <div style="margin: 10px 0 18px 0;">
+
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:6px;
+        ">
+
+            <span style="
+                color:#06b6d4;
+                font-weight:800;
+                font-size:0.95rem;
+            ">
+                {status_text}
+            </span>
+
+            <span style="
+                color:#f59e0b;
+                font-weight:900;
+                font-size:1.05rem;
+                text-shadow:
+                    0 0 10px rgba(245,158,11,0.5);
+            ">
+                {percentage}%
+            </span>
+
+        </div>
+
+        <div style="
+            background:rgba(15,23,42,0.9);
+            border:2px solid #10b981;
+            border-radius:12px;
+            padding:3px;
+            box-shadow:
+                0 0 15px rgba(16,185,129,0.3);
+            position:relative;
+            overflow:hidden;
+        ">
+
+            <div style="
+                width:{percentage}%;
+                height:18px;
+                background:
+                    linear-gradient(
+                        90deg,
+                        #10b981 0%,
+                        #3b82f6 50%,
+                        #f59e0b 100%
+                    );
+                border-radius:8px;
+                box-shadow:
+                    0 0 20px rgba(245,158,11,0.8);
+                transition:
+                    width 0.2s ease-in-out;
+            ">
+            </div>
+
+        </div>
+
+    </div>
+    """
+
+
+# =============================================================================
+# 8. DOCX EXTRACTION
+# =============================================================================
+
+def extract_docx_content(file):
+
+    """
+    Extract:
+        - paragraphs
+        - tables
+
+    This is intentionally done locally so the application
+    has reliable DOCX processing independent of Gemini's
+    direct DOCX input support.
+    """
+
+    output = []
+
+    try:
+
+        doc = docx.Document(file)
+
+        output.append(
+            f"\n===== DOCUMENT: {file.name} =====\n"
+        )
+
+        # ---------------------------------------------------------
+        # Paragraphs
+        # ---------------------------------------------------------
+
+        paragraph_number = 0
+
+        for paragraph in doc.paragraphs:
+
+            text = paragraph.text.strip()
+
+            if not text:
+                continue
+
+            paragraph_number += 1
+
+            output.append(
+                f"[{file.name} | Paragraph {paragraph_number}] "
+                f"{text}"
+            )
+
+
+        # ---------------------------------------------------------
+        # Tables
+        # ---------------------------------------------------------
+
+        for table_index, table in enumerate(
+            doc.tables,
+            start=1
+        ):
+
+            output.append(
+                f"\n[{file.name} | TABLE {table_index}]\n"
+            )
+
+            for row_index, row in enumerate(
+                table.rows,
+                start=1
+            ):
+
+                cells = []
+
+                for cell in row.cells:
+
+                    cell_text = cell.text.strip()
+
+                    cells.append(
+                        cell_text
+                    )
+
+                output.append(
+                    f"Row {row_index}: "
+                    + " | ".join(cells)
+                )
+
+
+        return "\n".join(output)
+
+    except Exception as exc:
+
+        return (
+            f"\n===== DOCUMENT: {file.name} =====\n"
+            f"[ERROR READING DOCX] {str(exc)}\n"
+        )
+
+
+# =============================================================================
+# 9. TEXT EXTRACTION
+# =============================================================================
+
+def extract_text_from_uploads(
+    sow_files,
+    notes_files,
+    loose_notes
+):
+
+    combined_text = ""
+
+    # -------------------------------------------------------------
+    # DOCX
+    # -------------------------------------------------------------
+
+    if sow_files:
+
+        for file in sow_files:
+
+            combined_text += (
+                extract_docx_content(file)
+                + "\n"
+            )
+
+
+    # -------------------------------------------------------------
+    # TXT
+    # -------------------------------------------------------------
+
+    if notes_files:
+
+        for file in notes_files:
+
+            try:
+
+                file.seek(0)
+
+                text = file.read().decode(
+                    "utf-8",
+                    errors="replace"
+                )
+
+                combined_text += (
+                    f"\n===== FILE: {file.name} =====\n"
+                )
+
+                combined_text += text
+
+                combined_text += "\n"
+
+            except Exception as exc:
+
+                combined_text += (
+                    f"\n===== FILE: {file.name} =====\n"
+                    f"[ERROR READING FILE] {str(exc)}\n"
+                )
+
+
+    # -------------------------------------------------------------
+    # Pasted notes
+    # -------------------------------------------------------------
+
+    if loose_notes and loose_notes.strip():
+
+        combined_text += (
+            "\n===== LOOSE CLIENT EMAILS / NOTES =====\n"
+        )
+
+        combined_text += (
+            loose_notes.strip()
+        )
+
+        combined_text += "\n"
+
+
+    return combined_text
+
+
+# =============================================================================
+# 10. GEMINI FILE UPLOAD
+# =============================================================================
+
+def upload_media_to_gemini(
+    media_files
+):
+
+    """
+    Upload images/audio/video through Gemini Files API.
+
+    Returns:
+        list of uploaded Gemini File objects
+    """
+
+    uploaded_files = []
+
+    if not media_files:
+        return uploaded_files
+
+
+    if not client:
+        raise RuntimeError(
+            "Gemini client is not available."
+        )
+
+
+    for uploaded in media_files:
+
+        # ---------------------------------------------------------
+        # Convert Streamlit UploadedFile into temporary file
+        # ---------------------------------------------------------
+
+        suffix = ""
+
+        if uploaded.name.lower().endswith(".png"):
+            suffix = ".png"
+
+        elif uploaded.name.lower().endswith(
+            (".jpg", ".jpeg")
+        ):
+            suffix = ".jpg"
+
+        elif uploaded.name.lower().endswith(".mp4"):
+            suffix = ".mp4"
+
+        elif uploaded.name.lower().endswith(".mp3"):
+            suffix = ".mp3"
+
+
+        import tempfile
+
+        with tempfile.NamedTemporaryFile(
+            delete=False,
+            suffix=suffix
+        ) as temp_file:
+
+            temp_file.write(
+                uploaded.getvalue()
+            )
+
+            temp_path = temp_file.name
+
+
+        # ---------------------------------------------------------
+        # MIME type
+        # ---------------------------------------------------------
+
+        mime_type = (
+            uploaded.type
+            or mimetypes.guess_type(
+                uploaded.name
+            )[0]
+        )
+
+
+        # ---------------------------------------------------------
+        # Upload
+        # ---------------------------------------------------------
+
+        try:
+
+            uploaded_gemini_file = (
+                client.files.upload(
+                    file=temp_path
+                )
+            )
+
+            uploaded_files.append(
+                uploaded_gemini_file
+            )
+
+        except Exception as exc:
+
+            raise RuntimeError(
+                f"Failed to upload "
+                f"{uploaded.name}: {exc}"
+            )
+
+
+    return uploaded_files
+
+
+# =============================================================================
+# 11. WAIT FOR MEDIA PROCESSING
+# =============================================================================
+
+def wait_for_gemini_files(
+    uploaded_files,
+    status_callback=None
+):
+
+    """
+    Videos can remain in PROCESSING state for some time.
+    Wait until Gemini reports ACTIVE.
+    """
+
+    ready_files = []
+
+    total = len(uploaded_files)
+
+    for index, gemini_file in enumerate(
+        uploaded_files,
+        start=1
+    ):
+
+        current_file = gemini_file
+
+        while True:
+
+            state = getattr(
+                current_file,
+                "state",
+                None
+            )
+
+            state_name = getattr(
+                state,
+                "name",
+                str(state)
+            )
+
+            if status_callback:
+
+                percentage = int(
+                    ((index - 1) / max(total, 1))
+                    * 100
+                )
+
+                status_callback(
+                    percentage,
+                    (
+                        f"🎞️ Processing media "
+                        f"{index}/{total}: "
+                        f"{getattr(current_file, 'display_name', 'media')}"
+                    )
+                )
+
+
+            if state_name == "ACTIVE":
+
+                ready_files.append(
+                    current_file
+                )
+
+                break
+
+
+            if state_name in (
+                "FAILED",
+                "ERROR"
+            ):
+
+                error_info = getattr(
+                    current_file,
+                    "error",
+                    None
+                )
+
+                raise RuntimeError(
+                    "Gemini media processing failed: "
+                    f"{error_info}"
+                )
+
+
+            time.sleep(2)
+
+            current_file = client.files.get(
+                name=current_file.name
+            )
+
+
+    return ready_files
+
+
+# =============================================================================
+# 12. MASTER AI PROMPT
+# =============================================================================
+
+def build_scope_prompt(
+    raw_text,
+    media_files
+):
+
+    media_names = []
+
+    for media in media_files:
+
+        media_names.append(
+            getattr(
+                media,
+                "display_name",
+                "Uploaded Media"
+            )
+        )
+
+
+    media_context = (
+        ", ".join(media_names)
+        if media_names
+        else "No media files uploaded."
+    )
+
+
+    prompt = f"""
+You are the Lead Business Analyst, Product Manager,
+Solution Architect, QA Lead, and IT Delivery Lead working
+together as a single expert.
+
+Your job is to transform incomplete project-intake material
+into a reliable Project Handover Scope Analysis.
+
+The intake can contain:
+
+- Proposals
+- Statements of Work
+- Client requirements
+- Emails
+- Meeting notes
+- Kickoff transcripts
+- Tables
+- Diagrams
+- Screenshots
+- Audio recordings
+- Videos
+- Architecture discussions
+- Business requirements
+- Technical requirements
+
+IMPORTANT RULES
+===============
+
+1. DO NOT invent requirements.
+
+2. Do not assume that something is required merely because
+   it is common in similar projects.
+
+3. Clearly distinguish:
+   - Explicit requirement
+   - Implied requirement
+   - Assumption
+   - Missing information
+   - Risk
+   - Contradiction
+
+4. When two documents conflict, DO NOT choose one silently.
+   Report the conflict.
+
+5. Preserve important numbers exactly:
+   - dates
+   - amounts
+   - percentages
+   - SLAs
+   - response times
+   - file sizes
+   - user counts
+   - limits
+   - frequencies
+   - deadlines
+
+6. Treat diagrams and screenshots as evidence.
+   Inspect visible:
+   - components
+   - labels
+   - workflows
+   - arrows
+   - screens
+   - entities
+   - integrations
+   - architecture elements
+   - data flows
+
+7. For audio/video:
+   identify relevant business discussions,
+   decisions, requirements, constraints,
+   action items, and unresolved questions.
+
+8. Do not convert a suggestion into a confirmed requirement.
+
+9. If the source says something is optional,
+   preserve it as optional.
+
+10. If the source is ambiguous, mark it as ambiguous.
+
+11. Every extracted requirement should contain a source
+    whenever possible.
+
+12. User stories must be implementation-ready enough
+    for Jira refinement, but must remain faithful to
+    the intake material.
+
+13. Acceptance criteria should be testable.
+
+14. Identify missing information that could cause:
+    - scope creep
+    - estimation problems
+    - development blockers
+    - QA ambiguity
+    - production incidents
+    - contractual disputes
+
+15. Prioritize HIGH risks that can materially affect:
+    - cost
+    - schedule
+    - architecture
+    - security
+    - compliance
+    - customer acceptance
+    - production operations
+
+SOURCE MEDIA FILES
+==================
+
+The following media files are available for analysis:
+
+{media_context}
+
+
+TEXTUAL INTAKE
+==============
+
+{raw_text}
+
+
+ANALYSIS OBJECTIVE
+==================
+
+Produce a complete handover analysis covering:
+
+A. PROJECT SCOPE
+----------------
+
+Extract the actual project scope.
+
+Group related requirements into logical modules.
+
+Examples:
+
+- Authentication & Security
+- User Management
+- Customer Management
+- Dashboard
+- Reporting
+- Payments
+- Notifications
+- Integrations
+- Data Migration
+- Administration
+- Infrastructure
+- Handover / Operations
+
+Do NOT force requirements into these examples.
+Create modules based on the actual source material.
+
+
+B. FUNCTIONAL REQUIREMENTS
+---------------------------
+
+Identify what the system must DO.
+
+Each requirement should be concise but specific.
+
+
+C. NON-FUNCTIONAL REQUIREMENTS
+------------------------------
+
+Look for:
+
+- Performance
+- Availability
+- Scalability
+- Security
+- Accessibility
+- Usability
+- Auditability
+- Logging
+- Monitoring
+- Backup
+- Recovery
+- Compliance
+- Browser/device support
+- Data retention
+
+
+D. DEPENDENCIES
+---------------
+
+Identify:
+
+- Third-party systems
+- APIs
+- Vendors
+- Client dependencies
+- Infrastructure dependencies
+- Data dependencies
+- Authentication providers
+- External services
+
+
+E. ASSUMPTIONS
+--------------
+
+Only include assumptions that are genuinely necessary
+to interpret the intake.
+
+Mark them clearly as assumptions.
+
+
+F. OUT OF SCOPE
+---------------
+
+Identify items explicitly stated as excluded.
+
+Do not invent exclusions.
+
+
+G. GAPS AND RISKS
+-----------------
+
+Look specifically for:
+
+- Missing acceptance criteria
+- Missing SLA
+- Missing security requirements
+- Missing user roles
+- Missing data ownership
+- Missing API specifications
+- Missing integration details
+- Missing error handling
+- Missing reporting requirements
+- Missing deployment requirements
+- Missing environment details
+- Missing backup/recovery requirements
+- Missing monitoring requirements
+- Missing support model
+- Missing ownership
+- Missing deadlines
+- Missing volume estimates
+- Conflicting requirements
+- Ambiguous requirements
+
+
+H. CLIENT QUESTIONS
+-------------------
+
+Generate practical clarification questions.
+
+Questions should help the delivery team resolve
+ambiguity BEFORE development begins.
+
+
+I. JIRA USER STORIES
+--------------------
+
+Generate user stories only for meaningful functional requirements.
+
+Use:
+
+As a <role>,
+I want to <action>,
+so that <business value>.
+
+Acceptance criteria should use:
+
+Given ...
+When ...
+Then ...
+
+Do not create duplicate stories.
+
+
+J. HANDOVER SUMMARY
+-------------------
+
+Provide:
+
+- Executive summary
+- Overall scope confidence
+- Major delivery concerns
+- Recommended next actions
+
+
+JSON OUTPUT
+===========
+
+Return ONLY valid JSON.
+
+Use exactly this top-level structure:
+
+{{
+  "project_summary": {{
+    "project_name": "Unknown if not provided",
+    "executive_summary": "",
+    "scope_confidence": "HIGH/MEDIUM/LOW",
+    "major_concerns": [],
+    "recommended_next_actions": []
+  }},
+
+  "extracted_scope": [
+    {{
+      "module": "",
+      "source": "",
+      "confidence": "HIGH/MEDIUM/LOW",
+      "requirements": [
+        {{
+          "requirement_id": "REQ-001",
+          "type": "FUNCTIONAL/NON_FUNCTIONAL",
+          "description": "",
+          "source": "",
+          "status": "CONFIRMED/IMPLIED/AMBIGUOUS"
+        }}
+      ]
+    }}
+  ],
+
+  "dependencies": [
+    {{
+      "dependency": "",
+      "description": "",
+      "source": "",
+      "impact": "HIGH/MEDIUM/LOW"
+    }}
+  ],
+
+  "assumptions": [
+    {{
+      "assumption": "",
+      "reason": "",
+      "impact": "HIGH/MEDIUM/LOW"
+    }}
+  ],
+
+  "out_of_scope": [
+    {{
+      "item": "",
+      "source": ""
+    }}
+  ],
+
+  "gaps_and_risks": [
+    {{
+      "severity": "HIGH/MEDIUM/LOW",
+      "type": "",
+      "description": "",
+      "impact": "",
+      "source": "",
+      "recommended_action": ""
+    }}
+  ],
+
+  "client_questions": [
+    {{
+      "priority": "HIGH/MEDIUM/LOW",
+      "question": "",
+      "reason": ""
+    }}
+  ],
+
+  "jira_user_stories": [
+    {{
+      "story_id": "US-001",
+      "title": "",
+      "user_role": "",
+      "want_statement": "",
+      "so_that_statement": "",
+      "source": "",
+      "acceptance_criteria": []
+    }}
+  ]
+}}
+
+FINAL VALIDATION
+================
+
+Before returning JSON:
+
+- Ensure valid JSON.
+- Ensure every top-level key exists.
+- Ensure arrays are arrays.
+- Do not return Markdown.
+- Do not wrap JSON inside ```json.
+- Do not add commentary outside JSON.
+- Do not invent source references.
+- Do not invent requirements.
+"""
+
+    return prompt
+
+
+# =============================================================================
+# 13. GEMINI ANALYSIS
+# =============================================================================
+
+def analyze_with_gemini(
+    raw_text,
+    uploaded_media_files
+):
+
+    if not client:
+
+        st.error(
+            "GEMINI_API_KEY is missing "
+            "in Streamlit Secrets."
+        )
+
+        return None
+
+
+    prompt = build_scope_prompt(
+        raw_text,
+        uploaded_media_files
+    )
+
+
+    contents = []
+
+    # -------------------------------------------------------------
+    # Prompt
+    # -------------------------------------------------------------
+
+    contents.append(prompt)
+
+
+    # -------------------------------------------------------------
+    # Media
+    # -------------------------------------------------------------
+
+    for media in uploaded_media_files:
+
+        contents.append(
+            media
+        )
+
+
+    # -------------------------------------------------------------
+    # Gemini request
+    # -------------------------------------------------------------
+
+    try:
+
+        response = client.models.generate_content(
+
+            model=GEMINI_MODEL,
+
+            contents=contents,
+
+            config=types.GenerateContentConfig(
+
+                response_mime_type="application/json",
+
+                temperature=0.1,
+
+            )
+        )
+
+
+        if not response.text:
+
+            st.error(
+                "Gemini returned an empty response."
+            )
+
+            return None
+
+
+        # ---------------------------------------------------------
+        # Parse JSON
+        # ---------------------------------------------------------
+
+        result = json.loads(
+            response.text
+        )
+
+
+        return result
+
+
+    except json.JSONDecodeError as exc:
+
+        st.error(
+            "Gemini returned invalid JSON: "
+            f"{exc}"
+        )
+
+        return None
+
+
+    except Exception as exc:
+
+        st.error(
+            "Gemini API Error: "
+            f"{str(exc)}"
+        )
+
+        return None
+
+
+# =============================================================================
+# 14. DOCX REPORT
+# =============================================================================
+
+def build_docx_report(data):
+
+    doc = docx.Document()
+
+
+    # -------------------------------------------------------------
+    # Title
+    # -------------------------------------------------------------
+
+    doc.add_heading(
+        "Pitch to Project - Handover Scope Analysis",
+        0
+    )
+
+
+    # -------------------------------------------------------------
+    # Project Summary
+    # -------------------------------------------------------------
+
+    summary = data.get(
+        "project_summary",
+        {}
+    )
+
+    doc.add_heading(
+        "1. Project Summary",
+        level=1
+    )
+
+    doc.add_paragraph(
+        f"Project Name: "
+        f"{summary.get('project_name', 'Unknown')}"
+    )
+
+    doc.add_paragraph(
+        f"Scope Confidence: "
+        f"{summary.get('scope_confidence', 'UNKNOWN')}"
+    )
+
+    doc.add_paragraph(
+        summary.get(
+            "executive_summary",
+            ""
+        )
+    )
+
+
+    # -------------------------------------------------------------
+    # Major Concerns
+    # -------------------------------------------------------------
+
+    if summary.get("major_concerns"):
+
+        doc.add_heading(
+            "Major Concerns",
+            level=2
+        )
+
+        for concern in summary["major_concerns"]:
+
+            doc.add_paragraph(
+                f"• {concern}"
+            )
+
+
+    # -------------------------------------------------------------
+    # Recommended Actions
+    # -------------------------------------------------------------
+
+    if summary.get(
+        "recommended_next_actions"
+    ):
+
+        doc.add_heading(
+            "Recommended Next Actions",
+            level=2
+        )
+
+        for action in summary[
+            "recommended_next_actions"
+        ]:
+
+            doc.add_paragraph(
+                f"• {action}"
+            )
+
+
+    # -------------------------------------------------------------
+    # Extracted Scope
+    # -------------------------------------------------------------
+
+    doc.add_heading(
+        "2. Extracted Scope",
+        level=1
+    )
+
+    for module in data.get(
+        "extracted_scope",
+        []
+    ):
+
+        doc.add_heading(
+            f"Module: "
+            f"{module.get('module', 'General')}",
+            level=2
+        )
+
+        doc.add_paragraph(
+            f"Source: "
+            f"{module.get('source', 'Unknown')}"
+        )
+
+        doc.add_paragraph(
+            f"Confidence: "
+            f"{module.get('confidence', 'UNKNOWN')}"
+        )
+
+        for req in module.get(
+            "requirements",
+            []
+        ):
+
+            doc.add_paragraph(
+                f"{req.get('requirement_id', '')} - "
+                f"{req.get('description', '')}"
+            )
+
+            doc.add_paragraph(
+                f"Type: "
+                f"{req.get('type', '')}"
+            )
+
+            doc.add_paragraph(
+                f"Status: "
+                f"{req.get('status', '')}"
+            )
+
+            doc.add_paragraph(
+                f"Source: "
+                f"{req.get('source', '')}"
+            )
+
+
+    # -------------------------------------------------------------
+    # Dependencies
+    # -------------------------------------------------------------
+
+    doc.add_heading(
+        "3. Dependencies",
+        level=1
+    )
+
+    for dependency in data.get(
+        "dependencies",
+        []
+    ):
+
+        doc.add_paragraph(
+            f"[{dependency.get('impact', '')}] "
+            f"{dependency.get('dependency', '')}"
+        )
+
+        doc.add_paragraph(
+            dependency.get(
+                "description",
+                ""
+            )
+        )
+
+        doc.add_paragraph(
+            f"Source: "
+            f"{dependency.get('source', '')}"
+        )
+
+
+    # -------------------------------------------------------------
+    # Assumptions
+    # -------------------------------------------------------------
+
+    doc.add_heading(
+        "4. Assumptions",
+        level=1
+    )
+
+    for assumption in data.get(
+        "assumptions",
+        []
+    ):
+
+        doc.add_paragraph(
+            f"[{assumption.get('impact', '')}] "
+            f"{assumption.get('assumption', '')}"
+        )
+
+        doc.add_paragraph(
+            f"Reason: "
+            f"{assumption.get('reason', '')}"
+        )
+
+
+    # -------------------------------------------------------------
+    # Out of Scope
+    # -------------------------------------------------------------
+
+    doc.add_heading(
+        "5. Out of Scope",
+        level=1
+    )
+
+    for item in data.get(
+        "out_of_scope",
+        []
+    ):
+
+        doc.add_paragraph(
+            f"• {item.get('item', '')}"
+        )
+
+        doc.add_paragraph(
+            f"Source: "
+            f"{item.get('source', '')}"
+        )
+
+
+    # -------------------------------------------------------------
+    # Risks
+    # -------------------------------------------------------------
+
+    doc.add_heading(
+        "6. Gaps & Risk Audit",
+        level=1
+    )
+
+    for risk in data.get(
+        "gaps_and_risks",
+        []
+    ):
+
+        doc.add_heading(
+            f"[{risk.get('severity', 'INFO')}] "
+            f"{risk.get('type', 'Risk')}",
+            level=2
+        )
+
+        doc.add_paragraph(
+            risk.get(
+                "description",
+                ""
+            )
+        )
+
+        doc.add_paragraph(
+            f"Impact: "
+            f"{risk.get('impact', '')}"
+        )
+
+        doc.add_paragraph(
+            f"Source: "
+            f"{risk.get('source', '')}"
+        )
+
+        doc.add_paragraph(
+            f"Recommended Action: "
+            f"{risk.get('recommended_action', '')}"
+        )
+
+
+    # -------------------------------------------------------------
+    # Client Questions
+    # -------------------------------------------------------------
+
+    doc.add_heading(
+        "7. Client Clarification Questions",
+        level=1
+    )
+
+    for question in data.get(
+        "client_questions",
+        []
+    ):
+
+        doc.add_paragraph(
+            f"[{question.get('priority', '')}] "
+            f"{question.get('question', '')}"
+        )
+
+        doc.add_paragraph(
+            f"Reason: "
+            f"{question.get('reason', '')}"
+        )
+
+
+    # -------------------------------------------------------------
+    # Jira Stories
+    # -------------------------------------------------------------
+
+    doc.add_heading(
+        "8. Jira User Stories",
+        level=1
+    )
+
+    for story in data.get(
+        "jira_user_stories",
+        []
+    ):
+
+        doc.add_heading(
+            f"{story.get('story_id', '')} - "
+            f"{story.get('title', 'User Story')}",
+            level=2
+        )
+
+        doc.add_paragraph(
+            f"As a "
+            f"{story.get('user_role', 'User')}, "
+            f"I want to "
+            f"{story.get('want_statement', '')}, "
+            f"so that "
+            f"{story.get('so_that_statement', '')}."
+        )
+
+        doc.add_paragraph(
+            "Source: "
+            f"{story.get('source', '')}"
+        )
+
+        doc.add_paragraph(
+            "Acceptance Criteria:"
+        )
+
+        for criterion in story.get(
+            "acceptance_criteria",
+            []
+        ):
+
+            doc.add_paragraph(
+                f"• {criterion}"
+            )
+
+
+    # -------------------------------------------------------------
+    # Save
+    # -------------------------------------------------------------
+
+    target_stream = io.BytesIO()
+
+    doc.save(
+        target_stream
+    )
+
+    return target_stream.getvalue()
+
+
+# =============================================================================
+# 15. MAIN HEADER BANNER
+# =============================================================================
+
+st.markdown(
+    """
+    <div style="
+        background:
+            linear-gradient(
+                90deg,
+                #ec4899 0%,
+                #8b5cf6 33%,
+                #06b6d4 66%,
+                #10b981 100%
+            );
+
+        color:#ffffff;
+
+        padding:10px 0px;
+
+        border-radius:10px;
+
+        font-weight:800;
+
+        font-size:1.05rem;
+
+        box-shadow:
+            0 0 20px rgba(139,92,246,0.4);
+
+        margin-bottom:24px;
+    ">
+
+        <marquee
+            behavior="scroll"
+            direction="left"
+            scrollamount="8"
+        >
+
+            ⚡ Smart Scope Handover Engine
+            &nbsp;|&nbsp;
+            Project Intelligence Layer
+
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+            ⚡ Smart Scope Handover Engine
+            &nbsp;|&nbsp;
+            Project Intelligence Layer
+
+        </marquee>
+
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+# =============================================================================
+# 16. TITLE
+# =============================================================================
+
+col_title, col_toggle = st.columns(
+    [3, 1]
+)
+
+
+with col_title:
+
+    components.html(
+        """
+        <div style="
+            font-family:
+                system-ui,
+                -apple-system,
+                sans-serif;
+        ">
+
+            <div style="
+                color:#ffffff;
+                font-size:2.8rem;
+                font-weight:900;
+                margin:0;
+                line-height:1.2;
+
+                text-shadow:
+                    0 0 15px
+                    rgba(56,189,248,0.6);
+            ">
+                Pitch to Project
+            </div>
+
+            <div style="
+                color:#38bdf8;
+                font-size:1.05rem;
+                font-weight:700;
+                margin-top:6px;
+                line-height:1.3;
+            ">
+                🚀 AI-Powered Scope Intelligence
+                & Handover Engine
+            </div>
+
+        </div>
+        """,
+        height=120
+    )
+
+
+with col_toggle:
+
+    demo_mode = st.toggle(
+        "Demo Mode (Safe Pitch)",
+        value=True
+    )
+
+
+# =============================================================================
+# 17. DEMO DATA
+# =============================================================================
+
+MOCK_ANALYSIS = {
+
+    "project_summary": {
+
+        "project_name":
+            "Smart Scope Handover Engine",
+
+        "executive_summary":
+            "The project focuses on automated intake analysis, "
+            "scope extraction, risk identification, and Jira "
+            "user-story generation.",
+
+        "scope_confidence":
+            "MEDIUM",
+
+        "major_concerns": [
+            "Operational SLA is not clearly defined.",
+            "Document processing limits require confirmation."
+        ],
+
+        "recommended_next_actions": [
+            "Confirm processing SLA.",
+            "Confirm maximum upload size.",
+            "Confirm supported user roles."
+        ]
+    },
+
+
     "extracted_scope": [
+
         {
-            "module": "Authentication & Security",
+
+            "module":
+                "AUTHENTICATION & SECURITY",
+
+            "source":
+                "Proposal Page 4, Section 2",
+
+            "confidence":
+                "HIGH",
+
             "requirements": [
-                "Multi-factor authentication (MFA) via SMS/Email.",
-                "Role-based access control (RBAC) for Admin and Client roles."
-            ],
-            "source_citation": "Proposal Page 4, Section 2"
+
+                {
+
+                    "requirement_id":
+                        "REQ-001",
+
+                    "type":
+                        "FUNCTIONAL",
+
+                    "description":
+                        "Multi-factor authentication "
+                        "via SMS or email.",
+
+                    "source":
+                        "Proposal Page 4, Section 2",
+
+                    "status":
+                        "CONFIRMED"
+                },
+
+                {
+
+                    "requirement_id":
+                        "REQ-002",
+
+                    "type":
+                        "FUNCTIONAL",
+
+                    "description":
+                        "Role-based access control "
+                        "for Admin and Client roles.",
+
+                    "source":
+                        "Proposal Page 4, Section 2",
+
+                    "status":
+                        "CONFIRMED"
+                }
+            ]
         },
+
+
         {
-            "module": "Handover Intelligence Engine",
+
+            "module":
+                "HANDOVER INTELLIGENCE ENGINE",
+
+            "source":
+                "Kickoff Transcript Lines 12-45",
+
+            "confidence":
+                "HIGH",
+
             "requirements": [
-                "Multi-format document parsing (.docx, .txt, tables, media).",
-                "Automated gap auditing and structured JSON extraction."
-            ],
-            "source_citation": "Kickoff Transcript Lines 12-45"
+
+                {
+
+                    "requirement_id":
+                        "REQ-003",
+
+                    "type":
+                        "FUNCTIONAL",
+
+                    "description":
+                        "Process multiple intake "
+                        "document formats.",
+
+                    "source":
+                        "Kickoff Transcript Lines 12-45",
+
+                    "status":
+                        "CONFIRMED"
+                },
+
+                {
+
+                    "requirement_id":
+                        "REQ-004",
+
+                    "type":
+                        "FUNCTIONAL",
+
+                    "description":
+                        "Identify scope gaps and "
+                        "generate structured analysis.",
+
+                    "source":
+                        "Kickoff Transcript Lines 12-45",
+
+                    "status":
+                        "CONFIRMED"
+                }
+            ]
         }
     ],
-    "risks_and_gaps": [
+
+
+    "dependencies": [],
+
+    "assumptions": [],
+
+    "out_of_scope": [],
+
+
+    "gaps_and_risks": [
+
         {
-            "type": "Missing SLA",
-            "description": "System requests 99.9% availability, but maintenance windows and downtime penalties are undefined.",
-            "severity": "HIGH"
+
+            "severity":
+                "HIGH",
+
+            "type":
+                "Missing SLA",
+
+            "description":
+                "No operational SLA is defined "
+                "for document processing speed.",
+
+            "impact":
+                "Performance expectations cannot "
+                "be objectively validated.",
+
+            "source":
+                "No SLA found in intake material.",
+
+            "recommended_action":
+                "Agree processing-time targets "
+                "with the client."
         },
+
+
         {
-            "type": "Unstated Assumption",
-            "description": "Third-party payment API keys are assumed to be provided by the client prior to Sprint 1.",
-            "severity": "MEDIUM"
-        },
-        {
-            "type": "Cross-Document Conflict",
-            "description": "Proposal promises a 2-week QA phase, but the Meeting Transcript specifies a requested 1-week timeline.",
-            "severity": "HIGH"
+
+            "severity":
+                "MEDIUM",
+
+            "type":
+                "Cross-Document Conflict",
+
+            "description":
+                "One source requests 500MB upload "
+                "support while another specifies "
+                "a 200MB limit.",
+
+            "impact":
+                "Architecture and infrastructure "
+                "capacity may be incorrectly estimated.",
+
+            "source":
+                "Kickoff transcript vs SOW.",
+
+            "recommended_action":
+                "Confirm the contractual upload limit."
         }
     ],
-    "user_stories": [
+
+
+    "client_questions": [
+
         {
-            "title": "Automated Scope Parsing",
-            "as_a": "Delivery Lead",
-            "i_want": "to convert unstructured SOW text into categorized requirements",
-            "so_that": "I can establish project readiness in seconds",
+
+            "priority":
+                "HIGH",
+
+            "question":
+                "What is the maximum acceptable "
+                "processing time for an uploaded document?",
+
+            "reason":
+                "An operational SLA is not defined."
+        }
+    ],
+
+
+    "jira_user_stories": [
+
+        {
+
+            "story_id":
+                "US-001",
+
+            "title":
+                "Configurable Document Processing Engine",
+
+            "user_role":
+                "Delivery Lead",
+
+            "want_statement":
+                "ingest intake SOWs and transcripts concurrently",
+
+            "so_that_statement":
+                "I can automatically extract system "
+                "requirements without manual document review",
+
+            "source":
+                "Project intake materials",
+
             "acceptance_criteria": [
-                "Support multi-.docx, tables, and media ingestion",
-                "Categorize output by functional module",
-                "Include source citations for extracted points"
+
+                "Given a user uploads supported intake documents",
+
+                "When the user selects Generate Smart Scope",
+
+                "Then the system analyzes the available "
+                "requirements and produces structured scope modules."
             ]
         }
     ]
 }
 
 
-class PitchToProjectApp(ctk.CTk):
+# =============================================================================
+# 18. MAIN TWO-COLUMN LAYOUT
+# =============================================================================
 
-    def __init__(self):
-        super().__init__()
+left_col, right_col = st.columns(
+    [1, 1],
+    gap="medium"
+)
 
-        self.title("Pitch To Project — Smart Scope Handover Engine")
-        self.geometry("1100x780")
-        self.minsize(950, 700)
 
-        self.proposal_files = []
-        self.transcript_files = []
-        self.media_files = []
-        self.current_analysis_data = None
+# =============================================================================
+# 19. LEFT COLUMN
+# =============================================================================
 
-        self._build_ui()
+with left_col:
 
-    def _build_ui(self):
-        # Header Frame
-        header_frame = ctk.CTkFrame(self, corner_radius=0, fg_color="#1E293B")
-        header_frame.pack(fill="x", side="top")
+    st.header(
+        "1. Intake Documents & Media"
+    )
 
-        title_label = ctk.CTkLabel(
-            header_frame,
-            text="PITCH TO PROJECT",
-            font=ctk.CTkFont(size=20, weight="bold"),
-            text_color="#38BDF8",
+
+    sow_files = st.file_uploader(
+        "Proposals / SOWs (.docx)",
+        type=["docx"],
+        accept_multiple_files=True
+    )
+
+
+    notes_files = st.file_uploader(
+        "Transcripts / Notes (.txt)",
+        type=["txt"],
+        accept_multiple_files=True
+    )
+
+
+    media_files = st.file_uploader(
+        "Diagrams & Media (.png, .jpg, .mp4, .mp3)",
+        type=[
+            "png",
+            "jpg",
+            "jpeg",
+            "mp4",
+            "mp3"
+        ],
+        accept_multiple_files=True
+    )
+
+
+    loose_notes = st.text_area(
+        "Or Paste Loose Client Emails / Notes:",
+
+        height=120,
+
+        placeholder=(
+            "Paste kickoff notes or client "
+            "requirements here..."
         )
-        title_label.pack(side="left", padx=20, pady=12)
+    )
 
-        subtitle_label = ctk.CTkLabel(
-            header_frame,
-            text="Smart Scope Handover Engine | Project Intelligence Layer",
-            font=ctk.CTkFont(size=12, slant="italic"),
-            text_color="#94A3B8",
-        )
-        subtitle_label.pack(side="left", padx=0, pady=12)
 
-        # Demo Mode Switch
-        self.demo_mode_switch = ctk.CTkSwitch(
-            header_frame,
-            text="Demo Mode (Safe Pitch)",
-            font=ctk.CTkFont(size=12, weight="bold"),
-            progress_color="#0EA5E9",
-        )
-        self.demo_mode_switch.pack(side="right", padx=20, pady=12)
-        self.demo_mode_switch.select()
+    generate_btn = st.button(
+        "⚡ GENERATE SMART SCOPE"
+    )
 
-        # Main Layout (2 Columns)
-        main_container = ctk.CTkFrame(self, fg_color="transparent")
-        main_container.pack(fill="both", expand=True, padx=15, pady=15)
 
-        # Left Panel - Inputs
-        left_panel = ctk.CTkFrame(main_container, width=380, corner_radius=8)
-        left_panel.pack(side="left", fill="both", padx=(0, 10), pady=0)
+# =============================================================================
+# 20. RIGHT COLUMN
+# =============================================================================
 
-        ctk.CTkLabel(
-            left_panel,
-            text="1. Intake Documents & Media",
-            font=ctk.CTkFont(size=15, weight="bold"),
-        ).pack(anchor="w", padx=15, pady=(15, 10))
+with right_col:
 
-        # Multi-File Pickers
-        self.btn_proposal = ctk.CTkButton(
-            left_panel,
-            text="📁 Proposals / SOWs (.docx)",
-            command=self._select_proposals,
-            fg_color="#334155",
-            hover_color="#475569",
-        )
-        self.btn_proposal.pack(fill="x", padx=15, pady=4)
+    st.header(
+        "2. AI Scope & Handover Analysis"
+    )
 
-        self.lbl_proposal = ctk.CTkLabel(
-            left_panel,
-            text="No files selected",
-            font=ctk.CTkFont(size=11),
-            text_color="#64748B",
-            anchor="w",
-        )
-        self.lbl_proposal.pack(fill="x", padx=15, pady=(0, 6))
 
-        self.btn_transcript = ctk.CTkButton(
-            left_panel,
-            text="📁 Transcripts / Notes (.txt)",
-            command=self._select_transcripts,
-            fg_color="#334155",
-            hover_color="#475569",
-        )
-        self.btn_transcript.pack(fill="x", padx=15, pady=4)
+    # -------------------------------------------------------------
+    # GENERATE
+    # -------------------------------------------------------------
 
-        self.lbl_transcript = ctk.CTkLabel(
-            left_panel,
-            text="No files selected",
-            font=ctk.CTkFont(size=11),
-            text_color="#64748B",
-            anchor="w",
-        )
-        self.lbl_transcript.pack(fill="x", padx=15, pady=(0, 6))
+    if generate_btn:
 
-        self.btn_media = ctk.CTkButton(
-            left_panel,
-            text="🖼️ Diagrams & Media (.png, .mp4, .mp3)",
-            command=self._select_media,
-            fg_color="#334155",
-            hover_color="#475569",
-        )
-        self.btn_media.pack(fill="x", padx=15, pady=4)
+        progress_card = st.empty()
 
-        self.lbl_media = ctk.CTkLabel(
-            left_panel,
-            text="No media selected",
-            font=ctk.CTkFont(size=11),
-            text_color="#64748B",
-            anchor="w",
-        )
-        self.lbl_media.pack(fill="x", padx=15, pady=(0, 6))
 
-        # Raw Text Box
-        ctk.CTkLabel(
-            left_panel,
-            text="Or Paste Loose Client Emails / Notes:",
-            font=ctk.CTkFont(size=12, weight="bold"),
-        ).pack(anchor="w", padx=15, pady=(5, 5))
+        # =========================================================
+        # DEMO MODE
+        # =========================================================
 
-        self.txt_raw_input = ctk.CTkTextbox(
-            left_panel, height=140, font=ctk.CTkFont(size=12)
-        )
-        self.txt_raw_input.pack(fill="both", expand=True, padx=15, pady=(0, 10))
+        if demo_mode:
 
-        # Progress Bar Indicator (Hidden by default)
-        self.progress_bar = ctk.CTkProgressBar(
-            left_panel, mode="indeterminate", progress_color="#38BDF8"
-        )
-        self.progress_bar.pack(fill="x", padx=15, pady=(0, 10))
-        self.progress_bar.pack_forget()
+            with progress_card.container(
+                border=True
+            ):
 
-        # Generate Button
-        self.btn_generate = ctk.CTkButton(
-            left_panel,
-            text="⚡ GENERATE SMART SCOPE",
-            font=ctk.CTkFont(size=14, weight="bold"),
-            fg_color="#0284C7",
-            hover_color="#0369A1",
-            height=42,
-            command=self._start_generation_thread,
-        )
-        self.btn_generate.pack(fill="x", padx=15, pady=(0, 15))
+                st.markdown(
+                    "### 🧠 Running Scope Analysis"
+                )
 
-        # Right Panel - Output Tabs
-        right_panel = ctk.CTkFrame(main_container, corner_radius=8)
-        right_panel.pack(side="right", fill="both", expand=True, padx=0, pady=0)
+                bar_ph = st.empty()
 
-        ctk.CTkLabel(
-            right_panel,
-            text="2. AI Scope & Handover Analysis",
-            font=ctk.CTkFont(size=15, weight="bold"),
-        ).pack(anchor="w", padx=15, pady=(15, 5))
 
-        # Tabview
-        self.tabview = ctk.CTkTabview(right_panel)
-        self.tabview.pack(fill="both", expand=True, padx=15, pady=(0, 10))
+                for i in range(101):
 
-        self.tab_scope = self.tabview.add("Extracted Scope")
-        self.tab_risks = self.tabview.add("Missing Items & Risks")
-        self.tab_jira = self.tabview.add("Jira User Stories")
-
-        # Text Views in Tabs
-        self.view_scope = ctk.CTkTextbox(
-            self.tab_scope, font=ctk.CTkFont(size=12)
-        )
-        self.view_scope.pack(fill="both", expand=True, padx=5, pady=5)
-
-        self.view_risks = ctk.CTkTextbox(
-            self.tab_risks, font=ctk.CTkFont(size=12)
-        )
-        self.view_risks.pack(fill="both", expand=True, padx=5, pady=5)
-
-        self.view_jira = ctk.CTkTextbox(
-            self.tab_jira, font=ctk.CTkFont(size=12)
-        )
-        self.view_jira.pack(fill="both", expand=True, padx=5, pady=5)
-
-        # Export Button
-        self.btn_export = ctk.CTkButton(
-            right_panel,
-            text="📄 Export Handover Report (.docx)",
-            font=ctk.CTkFont(size=13, weight="bold"),
-            fg_color="#16A34A",
-            hover_color="#15803D",
-            height=36,
-            command=self._export_word_doc,
-        )
-        self.btn_export.pack(anchor="e", padx=15, pady=(0, 15))
-
-    # --- MULTI-FILE SELECTION METHODS ---
-    def _select_proposals(self):
-        paths = filedialog.askopenfilenames(
-            title="Select Proposals / SOWs", filetypes=[("Word Files", "*.docx")]
-        )
-        if paths:
-            self.proposal_files = list(paths)
-            cnt = len(self.proposal_files)
-            txt = f"{cnt} Word file(s) selected" if cnt > 1 else os.path.basename(self.proposal_files[0])
-            self.lbl_proposal.configure(text=txt, text_color="#38BDF8")
-
-    def _select_transcripts(self):
-        paths = filedialog.askopenfilenames(
-            title="Select Transcripts", filetypes=[("Text Files", "*.txt")]
-        )
-        if paths:
-            self.transcript_files = list(paths)
-            cnt = len(self.transcript_files)
-            txt = f"{cnt} Text file(s) selected" if cnt > 1 else os.path.basename(self.transcript_files[0])
-            self.lbl_transcript.configure(text=txt, text_color="#38BDF8")
-
-    def _select_media(self):
-        paths = filedialog.askopenfilenames(
-            title="Select Diagrams or Audio/Video",
-            filetypes=[("Media Files", "*.png *.jpg *.jpeg *.mp4 *.mp3 *.wav")]
-        )
-        if paths:
-            self.media_files = list(paths)
-            cnt = len(self.media_files)
-            txt = f"{cnt} Media file(s) selected" if cnt > 1 else os.path.basename(self.media_files[0])
-            self.lbl_media.configure(text=txt, text_color="#38BDF8")
-
-    # --- PARSING PARAGRAPHS & TABLES IN DOCX ---
-    def _read_input_sources(self):
-        combined_text = []
-
-        for path in self.proposal_files:
-            if os.path.exists(path):
-                try:
-                    doc = docx.Document(path)
-                    doc_content = []
-                    
-                    for p in doc.paragraphs:
-                        if p.text.strip():
-                            doc_content.append(p.text.strip())
-                    
-                    for t_idx, table in enumerate(doc.tables):
-                        doc_content.append(f"\n[TABLE {t_idx + 1} DATA]:")
-                        for row in table.rows:
-                            row_vals = [cell.text.strip().replace("\n", " ") for cell in row.cells if cell.text.strip()]
-                            if row_vals:
-                                doc_content.append(" | ".join(row_vals))
-                    
-                    combined_text.append(
-                        f"--- DOCUMENT: {os.path.basename(path)} ---\n" + "\n".join(doc_content)
+                    time.sleep(
+                        0.01
                     )
-                except Exception as e:
-                    print(f"Error reading docx ({path}): {e}")
 
-        for path in self.transcript_files:
-            if os.path.exists(path):
-                try:
-                    with open(path, "r", encoding="utf-8") as f:
-                        t_text = f.read()
-                    combined_text.append(
-                        f"--- TRANSCRIPT FILE: {os.path.basename(path)} ---\n{t_text}"
+                    bar_ph.markdown(
+                        render_stylish_progress(
+                            i,
+                            "⚙️ Processing intake materials "
+                            "& generating user stories..."
+                        ),
+                        unsafe_allow_html=True
                     )
-                except Exception as e:
-                    print(f"Error reading txt ({path}): {e}")
 
-        pasted_text = self.txt_raw_input.get("1.0", "end").strip()
-        if pasted_text:
-            combined_text.append(f"--- PASTED NOTES ---\n{pasted_text}")
 
-        return "\n\n".join(combined_text)
+                st.success(
+                    "✅ Demo Analysis Loaded Successfully!"
+                )
 
-    # --- THREAD & LOADING CONTROLLERS ---
-    def _start_generation_thread(self):
-        self.btn_generate.configure(
-            state="disabled", text="⏳ ANALYZING SCOPE...", fg_color="#475569"
-        )
-        self.progress_bar.pack(fill="x", padx=15, pady=(0, 10))
-        self.progress_bar.start()
+                time.sleep(
+                    0.4
+                )
 
-        thread = threading.Thread(target=self._run_async_handover, daemon=True)
-        thread.start()
 
-    def _run_async_handover(self):
-        try:
-            self._process_handover()
-        finally:
-            self.after(0, self._stop_loading_animation)
+            progress_card.empty()
 
-    # --- DOCUMENT VALIDATION HELPER ---
-    def _validate_analysis_data(self, data):
-        has_scope = bool(data.get("extracted_scope"))
-        has_risks = bool(data.get("risks_and_gaps"))
-        has_stories = bool(data.get("user_stories"))
 
-        if not (has_scope or has_risks or has_stories):
-            messagebox.showwarning(
-                "Non-Technical Document",
-                "The uploaded document does not contain software requirements or SOW scope.\n\n"
-                "Please upload a Software Proposal, SOW, or Technical Requirements document."
+            st.session_state[
+                "analysis_data"
+            ] = MOCK_ANALYSIS
+
+
+            st.toast(
+                "⚡ Demo Analysis Loaded!",
+                icon="✅"
             )
-            return False
-        return True
 
-    def _stop_loading_animation(self):
-        self.progress_bar.stop()
-        self.progress_bar.pack_forget()
-        self.btn_generate.configure(
-            state="normal", text="⚡ GENERATE SMART SCOPE", fg_color="#0284C7"
-        )
 
-        messagebox.showinfo(
-            "Completed",
-            "✨ Smart scope analysis has been successfully generated!"
-        )
+        # =========================================================
+        # LIVE GEMINI MODE
+        # =========================================================
 
-    # --- API CALL & MULTIMODAL MEDIA PROCESSING ---
-    def _process_handover(self):
-        is_demo_mode = self.demo_mode_switch.get() == 1
+        else:
 
-        if is_demo_mode:
-            self.current_analysis_data = DEMO_DATA
-            self._render_output_tabs(DEMO_DATA)
-            return
-
-        combined_raw = self._read_input_sources()
-        if not combined_raw.strip() and not self.media_files:
-            messagebox.showwarning(
-                "No Input",
-                "Please select files or paste text before generating scope.",
+            raw_text = extract_text_from_uploads(
+                sow_files,
+                notes_files,
+                loose_notes
             )
-            return
 
-        api_key = os.environ.get("GEMINI_API_KEY")
-        if not api_key:
-            messagebox.showerror(
-                "API Key Missing",
-                "GEMINI_API_KEY not found in .env file. Falling back to Demo Mode.",
-            )
-            self.current_analysis_data = DEMO_DATA
-            self._render_output_tabs(DEMO_DATA)
-            return
 
-        uploaded_media_handles = []
-        try:
-            from google import genai
-            from google.genai import types
+            if (
+                not raw_text.strip()
+                and not media_files
+            ):
 
-            client = genai.Client(api_key=api_key)
+                st.warning(
+                    "Please upload at least one "
+                    "document/media file or paste "
+                    "text before analyzing."
+                )
 
-            for media_path in self.media_files:
-                if os.path.exists(media_path):
-                    try:
-                        print(f"Uploading media file to Gemini API: {os.path.basename(media_path)}...")
-                        f_handle = client.files.upload(file=media_path)
-                        uploaded_media_handles.append(f_handle)
-                    except Exception as upload_err:
-                        print(f"Failed to upload media file ({media_path}): {upload_err}")
+            elif not client:
 
-            available_models = []
-            try:
-                for m in client.models.list():
-                    if hasattr(m, "supported_generation_methods") and "generateContent" in m.supported_generation_methods:
-                        name = m.name.replace("models/", "")
-                        available_models.append(name)
-            except Exception as list_err:
-                print(f"Model listing skipped: {list_err}")
+                st.error(
+                    "❌ GEMINI_API_KEY is missing "
+                    "from Streamlit Secrets."
+                )
 
-            preferred_models = [
-                "gemini-3.6-flash",
-                "gemini-3.1-pro-preview",
-                "gemini-2.5-flash"
-            ]
+            else:
 
-            candidate_models = [m for m in preferred_models if m in available_models]
-            if not candidate_models:
-                candidate_models = available_models if available_models else ["gemini-3.6-flash"]
+                with progress_card.container(
+                    border=True
+                ):
 
-            contents_payload = [SYSTEM_PROMPT] + uploaded_media_handles + [f"PROJECT INPUT TEXT AND TABLES:\n{combined_raw}"]
+                    st.markdown(
+                        "### 🧠 Live Gemini Scope Extraction"
+                    )
 
-            response = None
-            last_error = None
+                    bar_ph = st.empty()
 
-            for model_name in candidate_models:
-                try:
-                    print(f"Executing scope analysis with model: {model_name}...")
-                    
-                    response = client.models.generate_content(
-                        model=model_name,
-                        contents=contents_payload,
-                        config=types.GenerateContentConfig(
-                            response_mime_type="application/json"
+
+                    # -------------------------------------------------
+                    # STEP 1
+                    # -------------------------------------------------
+
+                    bar_ph.markdown(
+                        render_stylish_progress(
+                            15,
+                            "📄 Step 1/5: Reading "
+                            "intake documents..."
+                        ),
+                        unsafe_allow_html=True
+                    )
+
+                    time.sleep(
+                        0.3
+                    )
+
+
+                    # -------------------------------------------------
+                    # STEP 2
+                    # -------------------------------------------------
+
+                    bar_ph.markdown(
+                        render_stylish_progress(
+                            30,
+                            "📊 Step 2/5: Extracting "
+                            "paragraphs & tables..."
+                        ),
+                        unsafe_allow_html=True
+                    )
+
+                    time.sleep(
+                        0.3
+                    )
+
+
+                    # -------------------------------------------------
+                    # STEP 3 - MEDIA
+                    # -------------------------------------------------
+
+                    uploaded_media = []
+
+
+                    if media_files:
+
+                        try:
+
+                            bar_ph.markdown(
+                                render_stylish_progress(
+                                    45,
+                                    "🎞️ Step 3/5: Uploading "
+                                    "diagrams & media to Gemini..."
+                                ),
+                                unsafe_allow_html=True
+                            )
+
+
+                            uploaded_media = (
+                                upload_media_to_gemini(
+                                    media_files
+                                )
+                            )
+
+
+                            uploaded_media = (
+                                wait_for_gemini_files(
+                                    uploaded_media
+                                )
+                            )
+
+
+                        except Exception as exc:
+
+                            st.error(
+                                f"❌ Media processing error: "
+                                f"{str(exc)}"
+                            )
+
+                            uploaded_media = []
+
+
+                    else:
+
+                        bar_ph.markdown(
+                            render_stylish_progress(
+                                45,
+                                "🎞️ Step 3/5: "
+                                "No media files supplied..."
+                            ),
+                            unsafe_allow_html=True
                         )
+
+
+                    # -------------------------------------------------
+                    # STEP 4
+                    # -------------------------------------------------
+
+                    bar_ph.markdown(
+                        render_stylish_progress(
+                            65,
+                            "⚡ Step 4/5: Sending "
+                            "project evidence to Gemini..."
+                        ),
+                        unsafe_allow_html=True
                     )
 
-                    if response and response.text:
-                        print(f"Successfully generated response using {model_name}!")
-                        break
-                except Exception as model_err:
-                    print(f"Model {model_name} execution failed: {model_err}")
-                    last_error = model_err
-                    continue
+                    time.sleep(
+                        0.3
+                    )
 
-            if not response or not response.text:
-                raise last_error or Exception("All candidate Gemini models were unavailable.")
 
-            clean_text = response.text.strip()
-            if clean_text.startswith("```json"):
-                clean_text = clean_text.replace("```json", "", 1).rstrip("`")
-            if clean_text.endswith("```"):
-                clean_text = clean_text[:-3].strip()
+                    # -------------------------------------------------
+                    # STEP 5
+                    # -------------------------------------------------
 
-            data = json.loads(clean_text)
+                    bar_ph.markdown(
+                        render_stylish_progress(
+                            80,
+                            "🔍 Step 5/5: Auditing scope, "
+                            "risks, gaps & Jira stories..."
+                        ),
+                        unsafe_allow_html=True
+                    )
 
-            # Validate input matches software SOW requirements
-            if not self._validate_analysis_data(data):
-                return
 
-            self.current_analysis_data = data
-            self._render_output_tabs(data)
+                    # -------------------------------------------------
+                    # AI CALL
+                    # -------------------------------------------------
 
-        except Exception as e:
-            print(f"[API Fallback]: {e}")
-            self.current_analysis_data = DEMO_DATA
-            self._render_output_tabs(DEMO_DATA)
+                    result = analyze_with_gemini(
+                        raw_text,
+                        uploaded_media
+                    )
 
-    # --- TAB RENDERING ---
-    def _render_output_tabs(self, data):
-        # Render Scope
-        self.view_scope.delete("1.0", "end")
-        for item in data.get("extracted_scope", []):
-            module = item.get("module", "General")
-            citation = item.get("source_citation", "Document Reference")
-            self.view_scope.insert("end", f"📌 MODULE: {module.upper()}\n")
-            self.view_scope.insert("end", f"   Source: {citation}\n")
-            for req in item.get("requirements", []):
-                self.view_scope.insert("end", f"   • {req}\n")
-            self.view_scope.insert("end", "\n")
 
-        # Render Risks & Gaps
-        self.view_risks.delete("1.0", "end")
-        for risk in data.get("risks_and_gaps", []):
-            r_type = risk.get("type", "Gap")
-            sev = risk.get("severity", "MEDIUM")
-            desc = risk.get("description", "")
-            icon = "🔴" if sev == "HIGH" else "🟠"
-            self.view_risks.insert(
-                "end", f"{icon} [{sev}] {r_type.upper()}\n"
-            )
-            self.view_risks.insert("end", f"   {desc}\n\n")
+                    if result:
 
-        # Render User Stories
-        self.view_jira.delete("1.0", "end")
-        for story in data.get("user_stories", []):
-            title = story.get("title", "User Story")
-            as_a = story.get("as_a", "User")
-            i_want = story.get("i_want", "Feature").replace("to ", "", 1)
-            so_that = story.get("so_that", "Benefit")
+                        bar_ph.markdown(
+                            render_stylish_progress(
+                                100,
+                                "✅ Smart Scope Handover "
+                                "Analysis Complete!"
+                            ),
+                            unsafe_allow_html=True
+                        )
 
-            self.view_jira.insert("end", f"🔷 STORY: {title}\n")
-            self.view_jira.insert(
-                "end",
-                f"   As a {as_a}, I want to {i_want} so that {so_that}.\n",
-            )
-            self.view_jira.insert("end", "   Acceptance Criteria:\n")
-            for ac in story.get("acceptance_criteria", []):
-                self.view_jira.insert("end", f"     [ ] {ac}\n")
-            self.view_jira.insert("end", "\n")
 
-    # --- WORD REPORT EXPORT ---
-    def _export_word_doc(self):
-        if not self.current_analysis_data:
-            messagebox.showwarning(
-                "Export Error", "Please generate scope analysis first!"
-            )
-            return
+                        st.success(
+                            "✅ Scope Successfully Extracted!"
+                        )
 
-        try:
-            doc = docx.Document()
 
-            for section in doc.sections:
-                section.top_margin = Inches(0.8)
-                section.bottom_margin = Inches(0.8)
-                section.left_margin = Inches(0.8)
-                section.right_margin = Inches(0.8)
+                        time.sleep(
+                            0.5
+                        )
 
-            # Title Header
-            p_title = doc.add_paragraph()
-            r_title = p_title.add_run("PITCH TO PROJECT — HANDOVER REPORT")
-            r_title.font.size = Pt(22)
-            r_title.font.bold = True
-            r_title.font.color.rgb = RGBColor(31, 78, 121)
 
-            p_sub = doc.add_paragraph()
-            r_sub = p_sub.add_run(
-                "Smart Scope Handover Analysis & Gap Audit"
-            )
-            r_sub.font.italic = True
-            r_sub.font.color.rgb = RGBColor(100, 100, 100)
+                        st.session_state[
+                            "analysis_data"
+                        ] = result
 
-            # Section 1: Scope
-            h1 = doc.add_heading(level=1)
-            h1.add_run("1. Extracted Functional Scope").font.color.rgb = (
-                RGBColor(31, 78, 121)
-            )
 
-            for item in self.current_analysis_data.get("extracted_scope", []):
-                p = doc.add_paragraph()
-                r_mod = p.add_run(f"Module: {item.get('module')}\n")
-                r_mod.bold = True
-                p.add_run(
-                    f"Source: {item.get('source_citation', 'N/A')}\n"
-                ).font.italic = True
-                for req in item.get("requirements", []):
-                    doc.add_paragraph(f"{req}", style="List Bullet")
+                        st.toast(
+                            "⚡ Live Gemini Extraction Complete!",
+                            icon="✅"
+                        )
 
-            # Section 2: Risks
-            h2 = doc.add_heading(level=1)
-            h2.add_run(
-                "2. Missing Items, Gaps & Risk Audit"
-            ).font.color.rgb = RGBColor(31, 78, 121)
 
-            for risk in self.current_analysis_data.get("risks_and_gaps", []):
-                p = doc.add_paragraph()
-                r_r = p.add_run(
-                    f"⚠️ [{risk.get('severity')}] {risk.get('type')}\n"
+                    else:
+
+                        st.error(
+                            "❌ Extraction Failed"
+                        )
+
+
+                progress_card.empty()
+
+
+    # =============================================================================
+    # 21. DEFAULT DATA
+    # =============================================================================
+
+    if "analysis_data" not in st.session_state:
+
+        st.session_state[
+            "analysis_data"
+        ] = MOCK_ANALYSIS
+
+
+    data = st.session_state[
+        "analysis_data"
+    ]
+
+
+    # =============================================================================
+    # 22. TABS
+    # =============================================================================
+
+    tab_scope, tab_risks, tab_jira = st.tabs(
+        [
+            "📌 Extracted Scope",
+            "🚨 Missing Items & Risks",
+            "🚀 Jira User Stories"
+        ]
+    )
+
+
+    # =============================================================================
+    # 23. SCOPE TAB
+    # =============================================================================
+
+    with tab_scope:
+
+        for item in data.get(
+            "extracted_scope",
+            []
+        ):
+
+            with st.container(
+                border=True
+            ):
+
+                st.markdown(
+                    f"### 📌 MODULE: "
+                    f"{item.get('module', 'General Scope')}"
                 )
-                r_r.bold = True
-                r_r.font.color.rgb = RGBColor(192, 57, 43)
-                p.add_run(f"{risk.get('description')}")
 
-            # Section 3: Stories
-            h3 = doc.add_heading(level=1)
-            h3.add_run("3. Jira User Stories").font.color.rgb = RGBColor(
-                31, 78, 121)
 
-            for story in self.current_analysis_data.get("user_stories", []):
-                p = doc.add_paragraph()
-                p.add_run(f"Story: {story.get('title')}\n").bold = True
-                clean_want = story.get('i_want', '').replace('to ', '', 1)
-                p.add_run(
-                    f"As a {story.get('as_a')}, I want to {clean_want} so that {story.get('so_that')}.\n"
+                st.caption(
+                    f"Source: "
+                    f"{item.get('source', 'Uploaded Files')}"
                 )
-                p.add_run("Acceptance Criteria:\n").font.italic = True
-                for ac in story.get("acceptance_criteria", []):
-                    doc.add_paragraph(f"☐ {ac}", style="List Bullet")
 
-            # Timestamped output file to prevent permission lock errors
-            timestamp = time.strftime("%Y%m%d_%H%M%S")
-            out_file = f"Pitch_To_Project_Handover_Report_{timestamp}.docx"
-            
-            doc.save(out_file)
-            abs_path = os.path.abspath(out_file)
 
-            messagebox.showinfo(
-                "Export Success", f"Word Document created at:\n{abs_path}"
+                st.caption(
+                    f"Confidence: "
+                    f"{item.get('confidence', 'UNKNOWN')}"
+                )
+
+
+                # -----------------------------------------------------
+                # New format
+                # -----------------------------------------------------
+
+                requirements = item.get(
+                    "requirements",
+                    []
+                )
+
+
+                if requirements:
+
+                    for req in requirements:
+
+                        st.markdown(
+                            f"**{req.get('requirement_id', '')}** "
+                            f"• {req.get('description', '')}"
+                        )
+
+                        st.markdown(
+                            f"`{req.get('type', '')}` "
+                            f"`{req.get('status', '')}`"
+                        )
+
+                        if req.get("source"):
+
+                            st.caption(
+                                f"Source: "
+                                f"{req.get('source')}"
+                            )
+
+
+                # -----------------------------------------------------
+                # Backward compatibility with old mock structure
+                # -----------------------------------------------------
+
+                for pt in item.get(
+                    "points",
+                    []
+                ):
+
+                    st.markdown(
+                        f"• {pt}"
+                    )
+
+
+    # =============================================================================
+    # 24. RISKS TAB
+    # =============================================================================
+
+    with tab_risks:
+
+        for risk in data.get(
+            "gaps_and_risks",
+            []
+        ):
+
+            with st.container(
+                border=True
+            ):
+
+                severity = (
+                    risk.get(
+                        "severity",
+                        "INFO"
+                    )
+                    .upper()
+                )
+
+
+                badge_color = (
+                    "🔴"
+                    if severity == "HIGH"
+                    else
+                    "🟡"
+                    if severity == "MEDIUM"
+                    else
+                    "🔵"
+                )
+
+
+                st.markdown(
+                    f"### {badge_color} "
+                    f"[{severity}] "
+                    f"{risk.get('type', 'Risk')}"
+                )
+
+
+                st.write(
+                    risk.get(
+                        "description",
+                        ""
+                    )
+                )
+
+
+                if risk.get("impact"):
+
+                    st.markdown(
+                        f"**Impact:** "
+                        f"{risk.get('impact')}"
+                    )
+
+
+                if risk.get("source"):
+
+                    st.caption(
+                        f"Source: "
+                        f"{risk.get('source')}"
+                    )
+
+
+                if risk.get(
+                    "recommended_action"
+                ):
+
+                    st.markdown(
+                        f"**Recommended Action:** "
+                        f"{risk.get('recommended_action')}"
+                    )
+
+
+        # -------------------------------------------------------------
+        # Client Questions
+        # -------------------------------------------------------------
+
+        questions = data.get(
+            "client_questions",
+            []
+        )
+
+
+        if questions:
+
+            st.markdown(
+                "### ❓ Client Clarification Questions"
             )
-            os.startfile(abs_path)
-
-        except Exception as e:
-            messagebox.showerror(
-                "Export Error", f"Failed to export Word document:\n{str(e)}"
-            )
 
 
-if __name__ == "__main__":
-    app = PitchToProjectApp()
-    app.mainloop()
+            for question in questions:
+
+                with st.container(
+                    border=True
+                ):
+
+                    st.markdown(
+                        f"**[{question.get('priority', 'MEDIUM')}]** "
+                        f"{question.get('question', '')}"
+                    )
+
+                    st.caption(
+                        f"Reason: "
+                        f"{question.get('reason', '')}"
+                    )
+
+
+    # =============================================================================
+    # 25. JIRA TAB
+    # =============================================================================
+
+    with tab_jira:
+
+        for story in data.get(
+            "jira_user_stories",
+            []
+        ):
+
+            with st.container(
+                border=True
+            ):
+
+                st.markdown(
+                    f"### 🚀 "
+                    f"{story.get('story_id', '')} "
+                    f"{story.get('title', 'User Story')}"
+                )
+
+
+                st.markdown(
+                    f"**As a** "
+                    f"`{story.get('user_role', 'User')}`, "
+                    f"**I want to** "
+                    f"{story.get('want_statement', '')} "
+                    f"**so that** "
+                    f"{story.get('so_that_statement', '')}."
+                )
+
+
+                if story.get("source"):
+
+                    st.caption(
+                        f"Source: "
+                        f"{story.get('source')}"
+                    )
+
+
+                st.markdown(
+                    "**Acceptance Criteria:**"
+                )
+
+
+                for ac in story.get(
+                    "acceptance_criteria",
+                    []
+                ):
+
+                    st.markdown(
+                        f"- `{ac}`"
+                    )
+
+
+    # =============================================================================
+    # 26. REPORT DOWNLOAD
+    # =============================================================================
+
+    st.divider()
+
+
+    docx_bytes = build_docx_report(
+        data
+    )
+
+
+    st.download_button(
+
+        label=
+            "📄 Export Handover Report (.docx)",
+
+        data=
+            docx_bytes,
+
+        file_name=
+            "Pitch_to_Project_Handover_Report.docx",
+
+        mime=
+            "application/vnd.openxmlformats-officedocument."
+            "wordprocessingml.document",
+
+        use_container_width=True
+    )

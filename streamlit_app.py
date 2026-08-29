@@ -26,9 +26,9 @@ st.set_page_config(
 css_code = """
 <style>
 
-/* -------------------------------------------------------------------------
+/* =========================================================
    GLOBAL APPLICATION BACKGROUND
-   ------------------------------------------------------------------------- */
+   ========================================================= */
 
 .stApp {
     background:
@@ -40,13 +40,13 @@ css_code = """
             #0284c7 100%
         ) !important;
 
-    background-attachment: fixed;
+    background-attachment: fixed !important;
 }
 
 
-/* -------------------------------------------------------------------------
+/* =========================================================
    LOGIN FORM
-   ------------------------------------------------------------------------- */
+   ========================================================= */
 
 div[data-testid="stForm"] {
     background: rgba(15, 23, 42, 0.95) !important;
@@ -57,11 +57,14 @@ div[data-testid="stForm"] {
 }
 
 
-/* LOGIN LABELS */
+/* =========================================================
+   LOGIN LABELS
+   ========================================================= */
 
 div[data-testid="stForm"] label,
 div[data-testid="stForm"] label p,
 div[data-testid="stTextInput"] label p {
+
     color: #38bdf8 !important;
     font-weight: 900 !important;
     font-size: 1.4rem !important;
@@ -73,7 +76,9 @@ div[data-testid="stTextInput"] label p {
 }
 
 
-/* LOGIN INPUTS */
+/* =========================================================
+   INPUT FIELDS
+   ========================================================= */
 
 div[data-testid="stForm"] div[data-testid="stTextInput"] input,
 div[data-testid="stTextInput"] input,
@@ -81,21 +86,16 @@ input[type="text"],
 input[type="password"] {
 
     background-color: #0f172a !important;
-
     color: #ffffff !important;
-
     -webkit-text-fill-color: #ffffff !important;
 
     border: 2.5px solid #38bdf8 !important;
-
     border-radius: 12px !important;
 
     font-weight: 800 !important;
-
     font-size: 1.35rem !important;
 
     padding: 16px 20px !important;
-
     text-align: left !important;
 
     box-shadow:
@@ -103,7 +103,9 @@ input[type="password"] {
 }
 
 
-/* AUTOFILL */
+/* =========================================================
+   AUTOFILL
+   ========================================================= */
 
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
@@ -114,48 +116,48 @@ input:-webkit-autofill:active {
         0 0 0 1000px #0f172a inset !important;
 
     -webkit-text-fill-color: #ffffff !important;
-
     caret-color: #ffffff !important;
 
     border: 2.5px solid #38bdf8 !important;
 }
 
 
-/* PLACEHOLDER */
+/* =========================================================
+   PLACEHOLDER
+   ========================================================= */
 
 div[data-testid="stTextInput"] input::placeholder,
 input::placeholder {
 
     color: #94a3b8 !important;
-
     -webkit-text-fill-color: #94a3b8 !important;
 
     font-weight: 700 !important;
-
     font-size: 1.25rem !important;
 
     opacity: 1 !important;
-
     text-align: left !important;
 }
 
 
-/* PASSWORD ICON */
+/* =========================================================
+   PASSWORD ICON
+   ========================================================= */
 
 div[data-testid="stTextInput"] button svg,
 div[data-testid="stForm"] svg {
 
     fill: #38bdf8 !important;
-
     stroke: #38bdf8 !important;
 
     width: 26px !important;
-
     height: 26px !important;
 }
 
 
-/* LOGIN BUTTON */
+/* =========================================================
+   LOGIN BUTTON
+   ========================================================= */
 
 div[data-testid="stForm"] button[type="submit"],
 div[data-testid="stForm"] button[data-testid="stFormSubmitButton"],
@@ -170,7 +172,6 @@ div[data-testid="stForm"] button {
         ) !important;
 
     border: none !important;
-
     border-radius: 14px !important;
 
     padding: 18px 32px !important;
@@ -191,24 +192,23 @@ div[data-testid="stForm"] button[type="submit"] p,
 div[data-testid="stForm"] button[type="submit"] span {
 
     color: #ffffff !important;
-
     -webkit-text-fill-color: #ffffff !important;
 
     font-weight: 900 !important;
-
     font-size: 1.5rem !important;
 
     letter-spacing: 1.2px !important;
 }
 
 
-/* -------------------------------------------------------------------------
+/* =========================================================
    SIDEBAR
-   ------------------------------------------------------------------------- */
+   ========================================================= */
 
 section[data-testid="stSidebar"] {
 
-    background: rgba(15, 23, 42, 0.95) !important;
+    background:
+        rgba(15, 23, 42, 0.95) !important;
 
     border-right:
         1.5px solid #a855f7 !important;
@@ -220,7 +220,6 @@ section[data-testid="stSidebar"] h3 {
     color: #38bdf8 !important;
 
     font-size: 1.3rem !important;
-
     font-weight: 800 !important;
 }
 
@@ -232,7 +231,6 @@ section[data-testid="stSidebar"] div {
     color: #f8fafc !important;
 
     font-size: 1.05rem !important;
-
     font-weight: 700 !important;
 
     background: transparent !important;
@@ -251,23 +249,21 @@ section[data-testid="stSidebar"] div.stButton > button {
     color: #ffffff !important;
 
     font-weight: 800 !important;
-
     font-size: 1.1rem !important;
 
     border-radius: 10px !important;
+    border: none !important;
 
     box-shadow:
         0 0 15px rgba(244, 63, 94, 0.5) !important;
-
-    border: none !important;
 
     margin-top: 10px !important;
 }
 
 
-/* -------------------------------------------------------------------------
+/* =========================================================
    HEADINGS
-   ------------------------------------------------------------------------- */
+   ========================================================= */
 
 h1,
 h2,
@@ -292,9 +288,9 @@ div[data-testid="stToggle"] span {
 }
 
 
-/* -------------------------------------------------------------------------
+/* =========================================================
    FILE UPLOADER
-   ------------------------------------------------------------------------- */
+   ========================================================= */
 
 div[data-testid="stFileUploader"] {
 
@@ -304,11 +300,9 @@ div[data-testid="stFileUploader"] {
     border:
         2px solid #a855f7 !important;
 
-    border-radius:
-        14px !important;
+    border-radius: 14px !important;
 
-    padding:
-        12px !important;
+    padding: 12px !important;
 }
 
 
@@ -317,14 +311,12 @@ div[data-testid="stFileUploaderDropzone"],
 div[data-testid="stFileUploader"]
 [data-testid="stFileUploaderDropzone"] {
 
-    background:
-        #1e1b4b !important;
+    background: #1e1b4b !important;
 
     border:
         2px dashed #38bdf8 !important;
 
-    border-radius:
-        10px !important;
+    border-radius: 10px !important;
 }
 
 
@@ -333,32 +325,26 @@ div[data-testid="stFileUploaderDropzone"] span,
 div[data-testid="stFileUploaderDropzone"] small,
 div[data-testid="stFileUploaderDropzone"] p {
 
-    color:
-        #ffffff !important;
+    color: #ffffff !important;
 
-    font-weight:
-        700 !important;
+    font-weight: 700 !important;
 }
 
 
-/* -------------------------------------------------------------------------
+/* =========================================================
    TOAST
-   ------------------------------------------------------------------------- */
+   ========================================================= */
 
 div[data-testid="stToast"],
 div[data-testid="stToast"] > div {
 
-    background-color:
-        #1e1b4b !important;
-
-    background:
-        #1e1b4b !important;
+    background-color: #1e1b4b !important;
+    background: #1e1b4b !important;
 
     border:
         2px solid #38bdf8 !important;
 
-    border-radius:
-        12px !important;
+    border-radius: 12px !important;
 
     box-shadow:
         0 0 20px rgba(56, 189, 248, 0.5) !important;
@@ -367,17 +353,15 @@ div[data-testid="stToast"] > div {
 
 div[data-testid="stToast"] * {
 
-    color:
-        #ffffff !important;
+    color: #ffffff !important;
 
-    font-weight:
-        800 !important;
+    font-weight: 800 !important;
 }
 
 
-/* -------------------------------------------------------------------------
+/* =========================================================
    DOWNLOAD BUTTON
-   ------------------------------------------------------------------------- */
+   ========================================================= */
 
 div[data-testid="stDownloadButton"] > button {
 
@@ -388,33 +372,28 @@ div[data-testid="stDownloadButton"] > button {
             #059669 100%
         ) !important;
 
-    border-radius:
-        12px !important;
+    border-radius: 12px !important;
 
-    border:
-        none !important;
+    border: none !important;
 
     box-shadow:
         0 0 18px rgba(16, 185, 129, 0.5) !important;
 
-    width:
-        100%;
+    width: 100%;
 }
 
 
 div[data-testid="stDownloadButton"] > button * {
 
-    color:
-        #ffffff !important;
+    color: #ffffff !important;
 
-    font-weight:
-        900 !important;
+    font-weight: 900 !important;
 }
 
 
-/* -------------------------------------------------------------------------
+/* =========================================================
    TEXT AREA
-   ------------------------------------------------------------------------- */
+   ========================================================= */
 
 div[data-testid="stTextArea"] textarea {
 
@@ -424,17 +403,15 @@ div[data-testid="stTextArea"] textarea {
     border:
         2px solid #a855f7 !important;
 
-    border-radius:
-        14px !important;
+    border-radius: 14px !important;
 
-    color:
-        #ffffff !important;
+    color: #ffffff !important;
 }
 
 
-/* -------------------------------------------------------------------------
-   NORMAL BUTTONS
-   ------------------------------------------------------------------------- */
+/* =========================================================
+   GENERAL BUTTON
+   ========================================================= */
 
 div.stButton > button {
 
@@ -446,29 +423,20 @@ div.stButton > button {
             #3b82f6 100%
         ) !important;
 
-    color:
-        #ffffff !important;
+    color: #ffffff !important;
 
-    font-weight:
-        800 !important;
+    font-weight: 800 !important;
+    font-size: 1.05rem !important;
 
-    font-size:
-        1.05rem !important;
+    border-radius: 12px !important;
+    border: none !important;
 
-    border-radius:
-        12px !important;
-
-    border:
-        none !important;
-
-    padding:
-        14px 28px !important;
+    padding: 14px 28px !important;
 
     box-shadow:
         0 0 20px rgba(139, 92, 246, 0.5) !important;
 
-    width:
-        100%;
+    width: 100%;
 }
 
 
@@ -481,14 +449,13 @@ button[aria-selected="true"] {
             #ec4899 100%
         ) !important;
 
-    color:
-        #ffffff !important;
+    color: #ffffff !important;
 }
 
 
-/* -------------------------------------------------------------------------
-   CONTAINER CARDS
-   ------------------------------------------------------------------------- */
+/* =========================================================
+   RESULT CARDS
+   ========================================================= */
 
 div[data-testid="stVerticalBlockBorderWrapper"] > div {
 
@@ -501,42 +468,35 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div {
     border-left:
         6px solid #06b6d4 !important;
 
-    border-radius:
-        14px !important;
+    border-radius: 14px !important;
 
-    padding:
-        20px !important;
+    padding: 20px !important;
 }
 
 
-/* -------------------------------------------------------------------------
+/* =========================================================
    CODE
-   ------------------------------------------------------------------------- */
+   ========================================================= */
 
 code {
 
     background-color:
         rgba(30, 27, 75, 0.95) !important;
 
-    color:
-        #38bdf8 !important;
+    color: #38bdf8 !important;
 
     border:
         1px solid #a855f7 !important;
 
-    border-radius:
-        6px !important;
+    border-radius: 6px !important;
 
-    padding:
-        3px 8px !important;
+    padding: 3px 8px !important;
 }
 
 
-/* -------------------------------------------------------------------------
-   SMART SCOPE ANIMATED BANNER
-   IMPORTANT:
-   No <marquee> is used.
-   ------------------------------------------------------------------------- */
+/* =========================================================
+   SMART TOP BANNER
+   ========================================================= */
 
 .smart-banner {
 
@@ -555,31 +515,31 @@ code {
 
     color: #ffffff;
 
+    border-radius: 10px;
+
     padding: 10px 0;
 
-    border-radius: 10px;
+    margin-bottom: 24px;
+
+    box-shadow:
+        0 0 20px rgba(139, 92, 246, 0.45);
 
     font-weight: 800;
 
     font-size: 1.05rem;
 
-    box-shadow:
-        0 0 20px rgba(139, 92, 246, 0.4);
-
-    margin-bottom: 24px;
-
     white-space: nowrap;
 }
 
 
-.smart-banner-track {
+.smart-banner-inner {
 
     display: inline-block;
 
     padding-left: 100%;
 
     animation:
-        smart-scroll 18s linear infinite;
+        smartBannerScroll 18s linear infinite;
 }
 
 
@@ -587,55 +547,23 @@ code {
 
     display: inline-block;
 
-    margin-right: 100px;
+    margin-right: 180px;
+
+    color: #ffffff;
+
+    font-weight: 800;
 }
 
 
-@keyframes smart-scroll {
+@keyframes smartBannerScroll {
 
     0% {
-        transform: translateX(0%);
+        transform: translateX(0);
     }
 
     100% {
         transform: translateX(-100%);
     }
-}
-
-
-/* -------------------------------------------------------------------------
-   ANALYSIS RESULT TEXT
-   ------------------------------------------------------------------------- */
-
-.scope-point {
-
-    color: #f8fafc;
-
-    font-size: 1.02rem;
-
-    line-height: 1.6;
-
-    margin: 6px 0;
-}
-
-
-.risk-description {
-
-    color: #e2e8f0;
-
-    font-size: 1.02rem;
-
-    line-height: 1.6;
-}
-
-
-.story-text {
-
-    color: #e2e8f0;
-
-    font-size: 1.02rem;
-
-    line-height: 1.6;
 }
 
 </style>
@@ -649,8 +577,7 @@ st.markdown(css_code, unsafe_allow_html=True)
 # =============================================================================
 
 def check_password():
-
-    """Returns True if the user has authenticated successfully."""
+    """Display login screen and return True after successful authentication."""
 
     if st.session_state.get("authenticated", False):
         return True
@@ -695,7 +622,7 @@ def check_password():
                         font-weight: 900;
                         margin-bottom: 6px;
                         text-shadow:
-                            0 3px 12px rgba(0, 0, 0, 0.8);
+                            0 3px 12px rgba(0,0,0,0.8);
                         letter-spacing: -0.5px;
                     ">
                         🔒 Pitch to Project
@@ -707,25 +634,25 @@ def check_password():
                         font-weight: 800;
                         letter-spacing: 1px;
                         text-shadow:
-                            0 2px 8px rgba(0, 0, 0, 0.8);
+                            0 2px 8px rgba(0,0,0,0.8);
                     ">
                         ⚡ Scope Intelligence Engine Access
                     </div>
 
                 </div>
                 """,
-                height=140
+                height=140,
             )
 
             username = st.text_input(
                 "Username",
-                placeholder="Enter username"
+                placeholder="Enter username",
             )
 
             password = st.text_input(
                 "Password",
                 type="password",
-                placeholder="Enter password"
+                placeholder="Enter password",
             )
 
             submit = st.form_submit_button(
@@ -766,10 +693,6 @@ def check_password():
 
     return False
 
-
-# =============================================================================
-# STOP IF NOT AUTHENTICATED
-# =============================================================================
 
 if not check_password():
     st.stop()
@@ -830,27 +753,29 @@ def render_stylish_progress(
 ):
 
     return f"""
-    <div style="margin: 10px 0 18px 0;">
+    <div style="
+        margin: 10px 0 18px 0;
+    ">
 
         <div style="
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            margin-bottom:6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
         ">
 
             <span style="
-                color:#06b6d4;
-                font-weight:800;
-                font-size:0.95rem;
+                color: #06b6d4;
+                font-weight: 800;
+                font-size: 0.95rem;
             ">
                 {status_text}
             </span>
 
             <span style="
-                color:#f59e0b;
-                font-weight:900;
-                font-size:1.05rem;
+                color: #f59e0b;
+                font-weight: 900;
+                font-size: 1.05rem;
                 text-shadow:
                     0 0 10px rgba(245,158,11,0.5);
             ">
@@ -859,21 +784,21 @@ def render_stylish_progress(
 
         </div>
 
-
         <div style="
-            background:rgba(15,23,42,0.9);
-            border:2px solid #10b981;
-            border-radius:12px;
-            padding:3px;
+            background: rgba(15,23,42,0.9);
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            padding: 3px;
             box-shadow:
                 0 0 15px rgba(16,185,129,0.3);
-            position:relative;
-            overflow:hidden;
+            position: relative;
+            overflow: hidden;
         ">
 
             <div style="
-                width:{percentage}%;
-                height:18px;
+                width: {percentage}%;
+                height: 18px;
+
                 background:
                     linear-gradient(
                         90deg,
@@ -881,9 +806,12 @@ def render_stylish_progress(
                         #3b82f6 50%,
                         #f59e0b 100%
                     );
-                border-radius:8px;
+
+                border-radius: 8px;
+
                 box-shadow:
                     0 0 20px rgba(245,158,11,0.8);
+
                 transition:
                     width 0.2s ease-in-out;
             ">
@@ -896,7 +824,7 @@ def render_stylish_progress(
 
 
 # =============================================================================
-# 7. DOCUMENT EXTRACTION
+# 7. FILE EXTRACTION
 # =============================================================================
 
 def extract_text_from_uploads(
@@ -904,12 +832,20 @@ def extract_text_from_uploads(
     notes_files,
     loose_notes
 ):
+    """
+    Extract textual content from uploaded documents.
+
+    Supports:
+        DOCX
+        TXT
+        pasted notes
+    """
 
     combined_text = ""
 
-    # -------------------------------------------------------------------------
-    # DOCX FILES
-    # -------------------------------------------------------------------------
+    # ---------------------------------------------------------
+    # DOCX
+    # ---------------------------------------------------------
 
     if sow_files:
 
@@ -923,22 +859,16 @@ def extract_text_from_uploads(
                     f"\n--- FILE: {file.name} ---\n"
                 )
 
-                for index, para in enumerate(
-                    doc.paragraphs,
-                    start=1
-                ):
+                for para in doc.paragraphs:
 
                     text = para.text.strip()
 
                     if text:
-
                         combined_text += (
-                            f"[Paragraph {index}] "
-                            f"{text}\n"
+                            text + "\n"
                         )
 
-                # Extract tables as well
-
+                # Extract table content
                 for table_index, table in enumerate(
                     doc.tables,
                     start=1
@@ -950,30 +880,26 @@ def extract_text_from_uploads(
 
                     for row in table.rows:
 
-                        row_values = []
-
-                        for cell in row.cells:
-
-                            row_values.append(
-                                cell.text.strip()
-                            )
+                        row_values = [
+                            cell.text.strip()
+                            for cell in row.cells
+                        ]
 
                         combined_text += (
                             " | ".join(row_values)
                             + "\n"
                         )
 
-            except Exception as e:
+            except Exception as exc:
 
                 combined_text += (
-                    f"\n--- FILE ERROR: {file.name} ---\n"
-                    f"{str(e)}\n"
+                    f"\n[ERROR READING {file.name}: "
+                    f"{exc}]\n"
                 )
 
-
-    # -------------------------------------------------------------------------
-    # TXT FILES
-    # -------------------------------------------------------------------------
+    # ---------------------------------------------------------
+    # TXT
+    # ---------------------------------------------------------
 
     if notes_files:
 
@@ -981,10 +907,11 @@ def extract_text_from_uploads(
 
             try:
 
+                file.seek(0)
+
                 content = file.read()
 
                 if isinstance(content, bytes):
-
                     content = content.decode(
                         "utf-8",
                         errors="replace"
@@ -998,29 +925,27 @@ def extract_text_from_uploads(
                     content + "\n"
                 )
 
-            except Exception as e:
+            except Exception as exc:
 
                 combined_text += (
-                    f"\n--- FILE ERROR: {file.name} ---\n"
-                    f"{str(e)}\n"
+                    f"\n[ERROR READING {file.name}: "
+                    f"{exc}]\n"
                 )
 
-
-    # -------------------------------------------------------------------------
-    # LOOSE NOTES
-    # -------------------------------------------------------------------------
+    # ---------------------------------------------------------
+    # Loose notes
+    # ---------------------------------------------------------
 
     if loose_notes and loose_notes.strip():
 
         combined_text += (
-            "\n--- LOOSE CLIENT EMAILS / NOTES ---\n"
+            "\n--- LOOSE NOTES / CLIENT EMAILS ---\n"
         )
 
         combined_text += (
             loose_notes.strip()
             + "\n"
         )
-
 
     return combined_text
 
@@ -1029,258 +954,272 @@ def extract_text_from_uploads(
 # 8. PROFESSIONAL SMART SCOPE ENGINE PROMPT
 # =============================================================================
 
-def build_scope_prompt(raw_text):
+SMART_SCOPE_PROMPT = """
+You are "Smart Scope Engine", an expert AI Delivery Lead,
+Business Analyst, Solution Analyst, and Project Handover Specialist.
 
-    return f"""
-You are an expert IT Delivery Lead, Business Analyst,
-Systems Analyst, Solution Architect and Project Handover Specialist.
+Your job is to transform unstructured project intake material
+into a professional, delivery-ready scope analysis.
 
-Your job is to transform raw project intake material into a
-professional, implementation-ready Smart Scope Analysis.
+The source material may contain:
 
-The input may contain:
-
-- Statements of Work
 - Proposals
-- Client emails
+- Statements of Work (SOW)
+- Requirements
 - Meeting notes
 - Kickoff transcripts
-- Requirements
-- Technical notes
-- Tables
-- Business requirements
+- Client emails
 - Functional requirements
-- Non-functional requirements
+- Technical requirements
+- Tables
 - Constraints
 - Assumptions
-- Dependencies
-- Risks
+- Deadlines
+- SLAs
+- Integrations
+- User roles
+- Business rules
 - Open questions
 
-IMPORTANT PRINCIPLES
-====================
+IMPORTANT OBJECTIVE:
 
-1. DO NOT invent requirements.
+Do NOT simply summarize the documents.
 
-2. Only extract information that is explicitly stated or can be
-   safely inferred from the provided material.
+Instead:
 
-3. Clearly identify ambiguity instead of guessing.
+1. Extract concrete requirements.
+2. Group requirements into meaningful functional modules.
+3. Preserve the source of every important requirement.
+4. Identify missing information that could block delivery.
+5. Identify contradictions between documents.
+6. Identify assumptions that have not been formally confirmed.
+7. Identify technical, operational, security, integration,
+   timeline, data, and dependency risks.
+8. Convert sufficiently defined requirements into Jira-ready
+   user stories.
+9. Write measurable acceptance criteria.
+10. Never invent project facts.
 
-4. Preserve conflicts between documents.
+SOURCE TRACEABILITY:
 
-5. Identify missing information that could affect development,
-   testing, deployment, cost, schedule or acceptance.
+For every extracted scope item, identify where it came from.
 
-6. Convert requirements into professional Jira-ready user stories.
+Use the filename and the closest available section,
+heading, paragraph, table, or line reference.
 
-7. Acceptance criteria must be testable.
+If exact location cannot be determined, use:
 
-8. Distinguish between:
-   - confirmed requirement
-   - assumption
-   - dependency
-   - risk
-   - missing information
-   - open question
+"Source file: <filename>"
 
-9. When multiple documents disagree, report the conflict rather
-   than selecting one arbitrarily.
+Do not fabricate page or paragraph numbers.
 
-10. Source references must identify the originating file whenever
-    possible.
+REQUIREMENT CLASSIFICATION:
 
-11. Do not generate marketing language.
+Think carefully about:
 
-12. Do not make unsupported technical decisions.
-
-13. Think like a senior delivery professional preparing a project
-    for estimation, development, QA, UAT and handover.
-
-ANALYSIS OBJECTIVES
-===================
-
-A. Extract the actual project scope.
-
-Group related requirements into logical modules.
-
-Examples:
-
-- Authentication & Security
-- User Management
-- Administration
-- Dashboard
+- Functional requirements
+- Non-functional requirements
+- Business rules
+- User roles
 - Workflow
-- Notifications
-- Reporting
+- Data requirements
 - Integrations
-- Data Management
-- API
-- UI/UX
-- Infrastructure
+- Security
+- Authentication
+- Authorization
+- Reporting
+- Notifications
+- Performance
+- Availability
+- Scalability
+- Audit/logging
+- Compliance
+- Migration
 - Deployment
-- Testing
+- Support
+- SLA
+- Dependencies
+- Assumptions
 
-Do not create modules that are unsupported by the input.
-
-B. Identify gaps and risks.
+GAP AND RISK ANALYSIS:
 
 Look specifically for:
 
 - Missing acceptance criteria
-- Missing SLA
-- Missing performance expectations
-- Missing security requirements
-- Missing roles/permissions
-- Missing data definitions
-- Missing integrations
-- Missing API details
-- Missing environments
-- Missing deployment requirements
-- Missing backup/recovery requirements
-- Missing monitoring requirements
-- Missing browser/device support
-- Missing accessibility requirements
-- Missing audit requirements
-- Missing reporting definitions
-- Missing notification rules
+- Missing business rules
+- Missing user roles
+- Missing permissions
+- Missing validation rules
 - Missing error handling
-- Missing authentication details
-- Missing retention requirements
+- Missing notification behavior
+- Missing integration details
+- Missing API specifications
+- Missing data definitions
+- Missing migration requirements
+- Missing security requirements
+- Missing performance targets
+- Missing SLA
+- Missing availability requirements
+- Missing backup/recovery requirements
+- Missing audit requirements
+- Missing reporting requirements
+- Missing deployment information
+- Missing support model
 - Missing ownership
-- Missing deadlines
-- Missing UAT criteria
+- Missing timelines
+- Missing dependencies
 - Conflicting requirements
 - Ambiguous requirements
-- Technical dependencies
-- External dependencies
+- Unsupported assumptions
 
-C. Generate Jira user stories.
+SEVERITY:
 
-Each story must:
+HIGH:
+Could significantly block delivery, cause major rework,
+create security/compliance exposure, or affect project viability.
 
-- Have a clear title.
-- Identify the correct user role.
-- Describe one meaningful capability.
-- Explain the business value.
-- Contain testable acceptance criteria.
-- Avoid combining unrelated capabilities into one story.
+MEDIUM:
+Important clarification or dependency that may cause rework
+or schedule impact.
 
-Acceptance criteria should preferably follow:
+LOW:
+Minor clarification, optimization, or documentation issue.
 
-Given ...
-When ...
-Then ...
+CONTRADICTIONS:
 
-D. Detect requirement conflicts.
+When two source documents disagree, explicitly identify:
 
-If one source says one thing and another source says something
-different, create a conflict risk and cite both sources.
+- What Document A says
+- What Document B says
+- Why the conflict matters
+- What decision/clarification is required
 
-E. Identify open questions.
+DO NOT decide which document is correct unless the source
+material explicitly establishes priority.
 
-These are questions the delivery team should ask the client before
-development or estimation.
+USER STORIES:
 
-OUTPUT FORMAT
-=============
+Create stories only when there is enough information.
+
+Use this conceptual format:
+
+As a <user role>,
+I want to <action>,
+so that <business value>.
+
+Acceptance criteria must be:
+
+- Specific
+- Testable
+- Observable
+- Business meaningful
+
+Prefer Given / When / Then style.
+
+Avoid vague acceptance criteria such as:
+
+"The system should work correctly."
+
+Instead provide measurable behavior.
+
+IMPORTANT:
+
+Do not invent:
+
+- Technologies
+- APIs
+- Databases
+- Cloud providers
+- SLAs
+- Deadlines
+- User roles
+- Business rules
+- Security requirements
+- Integrations
+
+If information is absent, classify it as a gap or assumption.
+
+OUTPUT:
 
 Return ONLY valid JSON.
 
-Do not return Markdown.
+Use exactly this structure:
 
-Do not return explanations outside JSON.
-
-Use EXACTLY this structure:
-
-{{
-  "project_summary": {{
+{
+  "project_summary": {
     "project_name": "",
-    "objective": "",
-    "primary_users": [],
-    "overall_scope_summary": ""
-  }},
+    "business_objective": "",
+    "overall_scope_summary": "",
+    "delivery_complexity": "LOW/MEDIUM/HIGH"
+  },
 
   "extracted_scope": [
-    {{
+    {
       "module": "",
+      "requirement_type": "FUNCTIONAL/NON_FUNCTIONAL/BUSINESS_RULE/DATA/INTEGRATION/SECURITY/OTHER",
       "source": "",
-      "confidence": "HIGH/MEDIUM/LOW",
-      "points": []
-    }}
-  ],
-
-  "functional_requirements": [
-    {{
-      "requirement_id": "FR-001",
-      "module": "",
-      "requirement": "",
-      "source": "",
-      "priority": "MUST/SHOULD/COULD/UNKNOWN"
-    }}
-  ],
-
-  "non_functional_requirements": [
-    {{
-      "category": "",
-      "requirement": "",
-      "source": "",
-      "priority": "MUST/SHOULD/COULD/UNKNOWN"
-    }}
-  ],
-
-  "assumptions": [
-    {{
-      "assumption": "",
-      "reason": "",
-      "impact": "HIGH/MEDIUM/LOW"
-    }}
-  ],
-
-  "dependencies": [
-    {{
-      "dependency": "",
-      "owner": "",
-      "impact": "HIGH/MEDIUM/LOW"
-    }}
+      "points": [
+        ""
+      ]
+    }
   ],
 
   "gaps_and_risks": [
-    {{
+    {
       "severity": "HIGH/MEDIUM/LOW",
       "type": "",
       "description": "",
       "impact": "",
       "recommended_action": "",
       "source": ""
-    }}
+    }
   ],
 
-  "open_questions": [
-    {{
+  "assumptions_and_dependencies": [
+    {
+      "category": "ASSUMPTION/DEPENDENCY",
+      "description": "",
+      "owner_or_dependency": "",
+      "status": "OPEN/CONFIRMED/UNKNOWN",
+      "source": ""
+    }
+  ],
+
+  "clarification_questions": [
+    {
+      "priority": "HIGH/MEDIUM/LOW",
       "question": "",
-      "reason": "",
-      "priority": "HIGH/MEDIUM/LOW"
-    }}
+      "reason": ""
+    }
   ],
 
   "jira_user_stories": [
-    {{
-      "story_id": "US-001",
+    {
       "title": "",
       "user_role": "",
       "want_statement": "",
       "so_that_statement": "",
-      "priority": "HIGH/MEDIUM/LOW",
-      "acceptance_criteria": []
-    }}
+      "acceptance_criteria": [
+        "Given ... When ... Then ..."
+      ],
+      "source": ""
+    }
   ]
-}}
+}
 
-INPUT MATERIALS
-===============
+QUALITY RULES:
 
-{raw_text}
+- Be precise.
+- Be professional.
+- Be conservative.
+- Maintain source traceability.
+- Do not hallucinate.
+- Do not duplicate requirements unnecessarily.
+- Combine closely related requirements into the same module.
+- Separate unrelated requirements.
+- Identify ambiguity instead of guessing.
+- Prefer actionable delivery language.
+- Return JSON only.
 """
 
 
@@ -1293,16 +1232,20 @@ def analyze_with_gemini(raw_text):
     if not client:
 
         st.error(
-            "GEMINI_API_KEY is missing in Streamlit Secrets."
+            "GEMINI_API_KEY is missing in "
+            "Streamlit Secrets!"
         )
 
         return None
 
-
-    prompt = build_scope_prompt(
-        raw_text
+    prompt = (
+        SMART_SCOPE_PROMPT
+        + "\n\n"
+        + "==============================\n"
+        + "PROJECT INTAKE MATERIALS\n"
+        + "==============================\n\n"
+        + raw_text
     )
-
 
     try:
 
@@ -1316,54 +1259,89 @@ def analyze_with_gemini(raw_text):
 
                 response_mime_type="application/json",
 
-                temperature=0.2
-            )
+                temperature=0.2,
+            ),
         )
-
 
         response_text = response.text.strip()
 
-
+        # -----------------------------------------------------
         # Remove accidental markdown fences
+        # -----------------------------------------------------
 
         if response_text.startswith("```"):
 
             response_text = (
                 response_text
-                .replace("```json", "")
+                .replace("```json", "", 1)
                 .replace("```", "")
                 .strip()
             )
 
+        data = json.loads(response_text)
 
-        data = json.loads(
-            response_text
+        # -----------------------------------------------------
+        # Ensure expected keys exist
+        # -----------------------------------------------------
+
+        data.setdefault(
+            "project_summary",
+            {
+                "project_name": "Unknown",
+                "business_objective": "",
+                "overall_scope_summary": "",
+                "delivery_complexity": "UNKNOWN",
+            },
         )
 
+        data.setdefault(
+            "extracted_scope",
+            []
+        )
+
+        data.setdefault(
+            "gaps_and_risks",
+            []
+        )
+
+        data.setdefault(
+            "assumptions_and_dependencies",
+            []
+        )
+
+        data.setdefault(
+            "clarification_questions",
+            []
+        )
+
+        data.setdefault(
+            "jira_user_stories",
+            []
+        )
 
         return data
 
-
-    except json.JSONDecodeError as e:
+    except json.JSONDecodeError as exc:
 
         st.error(
-            f"Gemini returned invalid JSON: {str(e)}"
+            "❌ Gemini returned invalid JSON."
         )
+
+        st.exception(exc)
 
         return None
 
-
-    except Exception as e:
+    except Exception as exc:
 
         st.error(
-            f"Gemini API Error: {str(e)}"
+            f"❌ Gemini API Error: {exc}"
         )
 
         return None
 
 
 # =============================================================================
-# 10. MOCK ANALYSIS
+# 10. DEMO DATA
 # =============================================================================
 
 MOCK_ANALYSIS = {
@@ -1371,21 +1349,20 @@ MOCK_ANALYSIS = {
     "project_summary": {
 
         "project_name":
-            "Smart Scope Handover Engine",
+            "Smart Scope Handover Platform",
 
-        "objective":
-            "Transform project intake materials into structured delivery scope.",
-
-        "primary_users": [
-            "Delivery Lead",
-            "Business Analyst",
-            "Project Manager"
-        ],
+        "business_objective":
+            "Convert project intake material into "
+            "delivery-ready scope and Jira stories.",
 
         "overall_scope_summary":
-            "AI-assisted extraction of project scope, risks, gaps and Jira-ready user stories."
-    },
+            "The platform analyzes project intake documents, "
+            "identifies scope, gaps, risks and creates "
+            "structured user stories.",
 
+        "delivery_complexity":
+            "MEDIUM",
+    },
 
     "extracted_scope": [
 
@@ -1394,31 +1371,32 @@ MOCK_ANALYSIS = {
             "module":
                 "AUTHENTICATION & SECURITY",
 
+            "requirement_type":
+                "SECURITY",
+
             "source":
                 "Proposal Page 4, Section 2",
 
-            "confidence":
-                "HIGH",
-
             "points": [
 
-                "Multi-factor authentication (MFA) via SMS/Email.",
+                "Multi-factor authentication "
+                "via SMS or email.",
 
-                "Role-based access control (RBAC) for Admin and Client roles."
-            ]
+                "Role-based access control for "
+                "Admin and Client roles.",
+            ],
         },
-
 
         {
 
             "module":
                 "HANDOVER INTELLIGENCE ENGINE",
 
+            "requirement_type":
+                "FUNCTIONAL",
+
             "source":
                 "Kickoff Transcript Lines 12-45",
-
-            "confidence":
-                "HIGH",
 
             "points": [
 
@@ -1426,42 +1404,12 @@ MOCK_ANALYSIS = {
 
                 "Automated gap auditing.",
 
-                "Structured requirement extraction."
-            ]
-        }
+                "Structured scope extraction.",
+
+                "Jira-ready user story generation.",
+            ],
+        },
     ],
-
-
-    "functional_requirements": [
-
-        {
-
-            "requirement_id":
-                "FR-001",
-
-            "module":
-                "Document Processing",
-
-            "requirement":
-                "The system shall ingest project intake documents.",
-
-            "source":
-                "Kickoff Transcript",
-
-            "priority":
-                "MUST"
-        }
-    ],
-
-
-    "non_functional_requirements": [],
-
-
-    "assumptions": [],
-
-
-    "dependencies": [],
-
 
     "gaps_and_risks": [
 
@@ -1474,18 +1422,19 @@ MOCK_ANALYSIS = {
                 "Missing SLA",
 
             "description":
-                "No operational SLA is defined for document processing.",
+                "No processing-time SLA has been defined.",
 
             "impact":
-                "Processing expectations cannot be validated.",
+                "Delivery and operational expectations "
+                "cannot be validated.",
 
             "recommended_action":
-                "Define maximum processing time and acceptable timeout behavior.",
+                "Define measurable processing-time targets "
+                "for supported document sizes.",
 
             "source":
-                "Project intake materials"
+                "Project intake materials",
         },
-
 
         {
 
@@ -1496,68 +1445,105 @@ MOCK_ANALYSIS = {
                 "Cross-Document Conflict",
 
             "description":
-                "Different document sources may specify different upload limits.",
+                "Different upload size limits are mentioned "
+                "in the intake material.",
 
             "impact":
-                "Implementation and infrastructure sizing may be affected.",
+                "Implementation and testing requirements "
+                "may conflict.",
 
             "recommended_action":
-                "Confirm the final supported upload size with the client.",
+                "Confirm the authoritative maximum "
+                "upload size.",
 
             "source":
-                "Project intake materials"
+                "SOW / Kickoff transcript",
+        },
+    ],
+
+    "assumptions_and_dependencies": [
+
+        {
+
+            "category":
+                "ASSUMPTION",
+
+            "description":
+                "Users are expected to provide "
+                "readable source documents.",
+
+            "owner_or_dependency":
+                "Project user",
+
+            "status":
+                "OPEN",
+
+            "source":
+                "Project intake materials",
         }
     ],
 
-
-    "open_questions": [
+    "clarification_questions": [
 
         {
+
+            "priority":
+                "HIGH",
 
             "question":
                 "What is the maximum supported document size?",
 
             "reason":
-                "Required for infrastructure and performance planning.",
+                "Different limits appear in the source material.",
+        },
+
+        {
 
             "priority":
-                "HIGH"
-        }
-    ],
+                "MEDIUM",
 
+            "question":
+                "What processing time is considered acceptable?",
+
+            "reason":
+                "No SLA target has been defined.",
+        },
+    ],
 
     "jira_user_stories": [
 
         {
 
-            "story_id":
-                "US-001",
-
             "title":
-                "Process Project Intake Documents",
+                "Configurable Document Processing Engine",
 
             "user_role":
                 "Delivery Lead",
 
             "want_statement":
-                "ingest project intake documents",
+                "ingest intake documents",
 
             "so_that_statement":
-                "I can automatically extract structured project requirements",
-
-            "priority":
-                "HIGH",
+                "I can automatically extract "
+                "delivery requirements",
 
             "acceptance_criteria": [
 
-                "Given a user uploads a supported project document",
+                "Given a user uploads a supported document, "
+                "When the user selects Generate Smart Scope, "
+                "Then the system extracts structured "
+                "scope information.",
 
-                "When the user clicks Generate Smart Scope",
+                "Given the document contains multiple modules, "
+                "When analysis completes, "
+                "Then requirements are grouped into "
+                "logical modules.",
+            ],
 
-                "Then the system processes the document and generates structured scope information."
-            ]
+            "source":
+                "Project intake materials",
         }
-    ]
+    ],
 }
 
 
@@ -1569,240 +1555,230 @@ def build_docx_report(data):
 
     doc = docx.Document()
 
-
-    # -------------------------------------------------------------------------
-    # TITLE
-    # -------------------------------------------------------------------------
-
     doc.add_heading(
         "Pitch to Project - Smart Scope Handover Analysis",
         0
     )
 
-
-    # -------------------------------------------------------------------------
-    # PROJECT SUMMARY
-    # -------------------------------------------------------------------------
-
-    summary = data.get(
-        "project_summary",
-        {}
-    )
+    # ---------------------------------------------------------
+    # Project Summary
+    # ---------------------------------------------------------
 
     doc.add_heading(
         "1. Project Summary",
         level=1
     )
 
+    summary = data.get(
+        "project_summary",
+        {}
+    )
+
     doc.add_paragraph(
         f"Project Name: "
-        f"{summary.get('project_name', '')}"
+        f"{summary.get('project_name', 'Unknown')}"
     )
 
     doc.add_paragraph(
-        f"Objective: "
-        f"{summary.get('objective', '')}"
+        f"Business Objective: "
+        f"{summary.get('business_objective', '')}"
     )
 
     doc.add_paragraph(
-        f"Scope Summary: "
+        f"Overall Scope: "
         f"{summary.get('overall_scope_summary', '')}"
     )
 
+    doc.add_paragraph(
+        f"Delivery Complexity: "
+        f"{summary.get('delivery_complexity', 'UNKNOWN')}"
+    )
 
-    # -------------------------------------------------------------------------
-    # EXTRACTED SCOPE
-    # -------------------------------------------------------------------------
+    # ---------------------------------------------------------
+    # Extracted Scope
+    # ---------------------------------------------------------
 
     doc.add_heading(
         "2. Extracted Scope",
         level=1
     )
 
-    for item in data.get(
+    for mod in data.get(
         "extracted_scope",
         []
     ):
 
         doc.add_heading(
-            f"Module: {item.get('module', 'General')}",
+            mod.get(
+                "module",
+                "General"
+            ),
             level=2
         )
 
         doc.add_paragraph(
-            f"Source: {item.get('source', '')}"
+            "Requirement Type: "
+            + mod.get(
+                "requirement_type",
+                "OTHER"
+            )
         )
 
         doc.add_paragraph(
-            f"Confidence: "
-            f"{item.get('confidence', '')}"
+            "Source: "
+            + mod.get(
+                "source",
+                "Uploaded Documents"
+            )
         )
 
-        for point in item.get(
+        for point in mod.get(
             "points",
             []
         ):
 
             doc.add_paragraph(
-                f"• {point}"
+                point,
+                style="List Bullet"
             )
 
-
-    # -------------------------------------------------------------------------
-    # FUNCTIONAL REQUIREMENTS
-    # -------------------------------------------------------------------------
+    # ---------------------------------------------------------
+    # Risks
+    # ---------------------------------------------------------
 
     doc.add_heading(
-        "3. Functional Requirements",
+        "3. Gaps & Risk Audit",
         level=1
     )
 
-    for item in data.get(
-        "functional_requirements",
+    for risk in data.get(
+        "gaps_and_risks",
         []
     ):
 
-        doc.add_paragraph(
-            f"{item.get('requirement_id', '')} - "
-            f"{item.get('requirement', '')}"
+        severity = risk.get(
+            "severity",
+            "INFO"
+        )
+
+        risk_type = risk.get(
+            "type",
+            "Risk"
+        )
+
+        doc.add_heading(
+            f"[{severity}] {risk_type}",
+            level=2
         )
 
         doc.add_paragraph(
-            f"Module: {item.get('module', '')}"
+            "Description: "
+            + risk.get(
+                "description",
+                ""
+            )
         )
 
         doc.add_paragraph(
-            f"Priority: {item.get('priority', '')}"
+            "Impact: "
+            + risk.get(
+                "impact",
+                ""
+            )
         )
 
         doc.add_paragraph(
-            f"Source: {item.get('source', '')}"
+            "Recommended Action: "
+            + risk.get(
+                "recommended_action",
+                ""
+            )
         )
 
+        doc.add_paragraph(
+            "Source: "
+            + risk.get(
+                "source",
+                ""
+            )
+        )
 
-    # -------------------------------------------------------------------------
-    # NON-FUNCTIONAL REQUIREMENTS
-    # -------------------------------------------------------------------------
+    # ---------------------------------------------------------
+    # Assumptions / Dependencies
+    # ---------------------------------------------------------
 
     doc.add_heading(
-        "4. Non-Functional Requirements",
+        "4. Assumptions & Dependencies",
         level=1
     )
 
     for item in data.get(
-        "non_functional_requirements",
+        "assumptions_and_dependencies",
         []
     ):
 
         doc.add_paragraph(
             f"[{item.get('category', '')}] "
-            f"{item.get('requirement', '')}"
+            f"{item.get('description', '')}"
         )
 
+        doc.add_paragraph(
+            "Owner / Dependency: "
+            + item.get(
+                "owner_or_dependency",
+                ""
+            )
+        )
 
-    # -------------------------------------------------------------------------
-    # ASSUMPTIONS
-    # -------------------------------------------------------------------------
+        doc.add_paragraph(
+            "Status: "
+            + item.get(
+                "status",
+                ""
+            )
+        )
+
+        doc.add_paragraph(
+            "Source: "
+            + item.get(
+                "source",
+                ""
+            )
+        )
+
+    # ---------------------------------------------------------
+    # Questions
+    # ---------------------------------------------------------
 
     doc.add_heading(
-        "5. Assumptions",
-        level=1
-    )
-
-    for item in data.get(
-        "assumptions",
-        []
-    ):
-
-        doc.add_paragraph(
-            f"{item.get('assumption', '')}"
-        )
-
-        doc.add_paragraph(
-            f"Reason: {item.get('reason', '')}"
-        )
-
-
-    # -------------------------------------------------------------------------
-    # DEPENDENCIES
-    # -------------------------------------------------------------------------
-
-    doc.add_heading(
-        "6. Dependencies",
-        level=1
-    )
-
-    for item in data.get(
-        "dependencies",
-        []
-    ):
-
-        doc.add_paragraph(
-            f"{item.get('dependency', '')}"
-        )
-
-
-    # -------------------------------------------------------------------------
-    # RISKS
-    # -------------------------------------------------------------------------
-
-    doc.add_heading(
-        "7. Gaps & Risk Audit",
-        level=1
-    )
-
-    for gap in data.get(
-        "gaps_and_risks",
-        []
-    ):
-
-        doc.add_paragraph(
-
-            f"[{gap.get('severity', 'INFO')}] "
-            f"{gap.get('type', 'Risk')}: "
-            f"{gap.get('description', '')}"
-        )
-
-        doc.add_paragraph(
-            f"Impact: {gap.get('impact', '')}"
-        )
-
-        doc.add_paragraph(
-            f"Recommended Action: "
-            f"{gap.get('recommended_action', '')}"
-        )
-
-
-    # -------------------------------------------------------------------------
-    # OPEN QUESTIONS
-    # -------------------------------------------------------------------------
-
-    doc.add_heading(
-        "8. Open Questions",
+        "5. Clarification Questions",
         level=1
     )
 
     for question in data.get(
-        "open_questions",
+        "clarification_questions",
         []
     ):
 
         doc.add_paragraph(
-            f"[{question.get('priority', '')}] "
+            f"[{question.get('priority', 'MEDIUM')}] "
             f"{question.get('question', '')}"
         )
 
         doc.add_paragraph(
-            f"Reason: {question.get('reason', '')}"
+            "Reason: "
+            + question.get(
+                "reason",
+                ""
+            )
         )
 
-
-    # -------------------------------------------------------------------------
-    # JIRA STORIES
-    # -------------------------------------------------------------------------
+    # ---------------------------------------------------------
+    # Jira Stories
+    # ---------------------------------------------------------
 
     doc.add_heading(
-        "9. Jira User Stories",
+        "6. Jira User Stories",
         level=1
     )
 
@@ -1812,24 +1788,20 @@ def build_docx_report(data):
     ):
 
         doc.add_heading(
-            f"{story.get('story_id', '')} - "
-            f"{story.get('title', 'User Story')}",
+            story.get(
+                "title",
+                "User Story"
+            ),
             level=2
         )
 
         doc.add_paragraph(
-
             f"As a "
             f"{story.get('user_role', 'User')}, "
             f"I want to "
             f"{story.get('want_statement', '')} "
             f"so that "
             f"{story.get('so_that_statement', '')}."
-        )
-
-        doc.add_paragraph(
-            f"Priority: "
-            f"{story.get('priority', '')}"
         )
 
         doc.add_paragraph(
@@ -1842,19 +1814,25 @@ def build_docx_report(data):
         ):
 
             doc.add_paragraph(
-                f"- {ac}"
+                ac,
+                style="List Bullet"
             )
 
+        doc.add_paragraph(
+            "Source: "
+            + story.get(
+                "source",
+                ""
+            )
+        )
 
-    # -------------------------------------------------------------------------
-    # SAVE IN MEMORY
-    # -------------------------------------------------------------------------
+    # ---------------------------------------------------------
+    # Save in memory
+    # ---------------------------------------------------------
 
     target_stream = io.BytesIO()
 
-    doc.save(
-        target_stream
-    )
+    doc.save(target_stream)
 
     target_stream.seek(0)
 
@@ -1862,14 +1840,22 @@ def build_docx_report(data):
 
 
 # =============================================================================
-# 12. MAIN ANIMATED BANNER
+# 12. TOP SMART BANNER
+# =============================================================================
+#
+# IMPORTANT:
+# We intentionally use ONLY st.markdown() here.
+#
+# The previous problem happened because the banner HTML was being
+# inserted/rendered incorrectly and appeared as literal HTML text.
+#
+# This version uses a single self-contained HTML block.
 # =============================================================================
 
 st.markdown(
     """
     <div class="smart-banner">
-
-        <div class="smart-banner-track">
+        <div class="smart-banner-inner">
 
             <span class="smart-banner-text">
                 ⚡ Smart Scope Handover Engine
@@ -1884,15 +1870,14 @@ st.markdown(
             </span>
 
         </div>
-
     </div>
     """,
-    unsafe_allow_html=True
+    unsafe_allow_html=True,
 )
 
 
 # =============================================================================
-# 13. MAIN HEADER
+# 13. MAIN TITLE
 # =============================================================================
 
 col_title, col_toggle = st.columns(
@@ -1912,11 +1897,11 @@ with col_title:
         ">
 
             <div style="
-                color:#ffffff;
-                font-size:2.8rem;
-                font-weight:900;
-                margin:0;
-                line-height:1.2;
+                color: #ffffff;
+                font-size: 2.8rem;
+                font-weight: 900;
+                margin: 0;
+                line-height: 1.2;
                 text-shadow:
                     0 0 15px rgba(56,189,248,0.6);
             ">
@@ -1924,18 +1909,18 @@ with col_title:
             </div>
 
             <div style="
-                color:#38bdf8;
-                font-size:1.05rem;
-                font-weight:700;
-                margin-top:6px;
-                line-height:1.3;
+                color: #38bdf8;
+                font-size: 1.05rem;
+                font-weight: 700;
+                margin-top: 6px;
+                line-height: 1.3;
             ">
                 🚀 AI-Powered Scope Intelligence & Handover Engine
             </div>
 
         </div>
         """,
-        height=120
+        height=120,
     )
 
 
@@ -1948,7 +1933,7 @@ with col_toggle:
 
 
 # =============================================================================
-# 14. TWO-COLUMN MAIN LAYOUT
+# 14. TWO-COLUMN MAIN APPLICATION
 # =============================================================================
 
 left_col, right_col = st.columns(
@@ -1958,7 +1943,7 @@ left_col, right_col = st.columns(
 
 
 # =============================================================================
-# LEFT COLUMN
+# LEFT SIDE - INTAKE
 # =============================================================================
 
 with left_col:
@@ -1967,20 +1952,17 @@ with left_col:
         "1. Intake Documents & Media"
     )
 
-
     sow_files = st.file_uploader(
         "Proposals / SOWs (.docx)",
         type=["docx"],
-        accept_multiple_files=True
+        accept_multiple_files=True,
     )
-
 
     notes_files = st.file_uploader(
         "Transcripts / Notes (.txt)",
         type=["txt"],
-        accept_multiple_files=True
+        accept_multiple_files=True,
     )
-
 
     media_files = st.file_uploader(
         "Diagrams & Media (.png, .jpg, .mp4, .mp3)",
@@ -1990,20 +1972,17 @@ with left_col:
             "mp4",
             "mp3"
         ],
-        accept_multiple_files=True
+        accept_multiple_files=True,
     )
-
 
     loose_notes = st.text_area(
-
         "Or Paste Loose Client Emails / Notes:",
-
         height=120,
-
-        placeholder=
-            "Paste kickoff notes or client requirements here..."
+        placeholder=(
+            "Paste kickoff notes or "
+            "client requirements here..."
+        ),
     )
-
 
     generate_btn = st.button(
         "⚡ GENERATE SMART SCOPE"
@@ -2011,7 +1990,7 @@ with left_col:
 
 
 # =============================================================================
-# RIGHT COLUMN
+# RIGHT SIDE - ANALYSIS
 # =============================================================================
 
 with right_col:
@@ -2020,19 +1999,17 @@ with right_col:
         "2. AI Scope & Handover Analysis"
     )
 
-
-    # -------------------------------------------------------------------------
+    # ---------------------------------------------------------
     # GENERATE
-    # -------------------------------------------------------------------------
+    # ---------------------------------------------------------
 
     if generate_btn:
 
         progress_card = st.empty()
 
-
-        # ---------------------------------------------------------------------
+        # =====================================================
         # DEMO MODE
-        # ---------------------------------------------------------------------
+        # =====================================================
 
         if demo_mode:
 
@@ -2046,70 +2023,52 @@ with right_col:
 
                 bar_ph = st.empty()
 
-
                 for i in range(101):
 
-                    time.sleep(
-                        0.01
-                    )
+                    time.sleep(0.01)
 
                     bar_ph.markdown(
-
                         render_stylish_progress(
-
                             i,
-
                             "⚙️ Processing intake materials & generating user stories..."
                         ),
-
-                        unsafe_allow_html=True
+                        unsafe_allow_html=True,
                     )
-
 
                 st.success(
                     "✅ Demo Analysis Loaded Successfully!"
                 )
 
-                time.sleep(
-                    0.4
-                )
-
+                time.sleep(0.4)
 
             progress_card.empty()
-
 
             st.session_state[
                 "analysis_data"
             ] = MOCK_ANALYSIS
-
 
             st.toast(
                 "⚡ Demo Analysis Loaded!",
                 icon="✅"
             )
 
-
-        # ---------------------------------------------------------------------
+        # =====================================================
         # LIVE GEMINI MODE
-        # ---------------------------------------------------------------------
+        # =====================================================
 
         else:
 
             raw_text = extract_text_from_uploads(
-
                 sow_files,
-
                 notes_files,
-
                 loose_notes
             )
-
 
             if not raw_text.strip():
 
                 st.warning(
-                    "Please upload at least one document "
-                    "or paste text before analyzing."
+                    "Please upload at least one "
+                    "document or paste text before analyzing."
                 )
 
             else:
@@ -2122,99 +2081,76 @@ with right_col:
                         "### 🧠 Live Gemini Scope Extraction"
                     )
 
-
                     bar_ph = st.empty()
 
+                    # -----------------------------------------
+                    # STEP 1
+                    # -----------------------------------------
 
                     bar_ph.markdown(
-
                         render_stylish_progress(
-
                             20,
-
-                            "📄 Step 1/3: Extracting requirements from intake documents..."
+                            "📄 Step 1/3: Extracting and structuring intake material..."
                         ),
-
-                        unsafe_allow_html=True
+                        unsafe_allow_html=True,
                     )
 
+                    time.sleep(0.3)
 
-                    time.sleep(
-                        0.3
-                    )
-
+                    # -----------------------------------------
+                    # STEP 2
+                    # -----------------------------------------
 
                     bar_ph.markdown(
-
                         render_stylish_progress(
-
                             50,
-
-                            "⚡ Step 2/3: Sending structured intake payload to Gemini..."
+                            "⚡ Step 2/3: Sending structured project context to Gemini..."
                         ),
-
-                        unsafe_allow_html=True
+                        unsafe_allow_html=True,
                     )
 
+                    time.sleep(0.3)
 
-                    time.sleep(
-                        0.3
-                    )
-
+                    # -----------------------------------------
+                    # STEP 3
+                    # -----------------------------------------
 
                     bar_ph.markdown(
-
                         render_stylish_progress(
-
                             80,
-
-                            "🔍 Step 3/3: Auditing scope, risks, gaps & Jira stories..."
+                            "🔍 Step 3/3: Auditing scope, gaps, risks & Jira stories..."
                         ),
-
-                        unsafe_allow_html=True
+                        unsafe_allow_html=True,
                     )
-
 
                     result = analyze_with_gemini(
                         raw_text
                     )
 
-
                     if result:
 
                         bar_ph.markdown(
-
                             render_stylish_progress(
-
                                 100,
-
                                 "✅ Smart Scope Handover Analysis Complete!"
                             ),
-
-                            unsafe_allow_html=True
+                            unsafe_allow_html=True,
                         )
-
 
                         st.success(
                             "✅ Scope Successfully Extracted!"
                         )
 
-
-                        time.sleep(
-                            0.5
-                        )
-
+                        time.sleep(0.5)
 
                         st.session_state[
                             "analysis_data"
                         ] = result
 
-
                         st.toast(
                             "⚡ Live Gemini Extraction Complete!",
                             icon="✅"
                         )
-
 
                     else:
 
@@ -2222,15 +2158,17 @@ with right_col:
                             "❌ Extraction Failed"
                         )
 
-
                 progress_card.empty()
 
 
-    # -------------------------------------------------------------------------
-    # DEFAULT DATA
-    # -------------------------------------------------------------------------
+    # =============================================================================
+    # 15. DEFAULT DATA
+    # =============================================================================
 
-    if "analysis_data" not in st.session_state:
+    if (
+        "analysis_data"
+        not in st.session_state
+    ):
 
         st.session_state[
             "analysis_data"
@@ -2243,166 +2181,144 @@ with right_col:
 
 
     # =============================================================================
-    # TABS
+    # 16. PROJECT SUMMARY
     # =============================================================================
 
-    tab_scope, tab_requirements, tab_risks, tab_questions, tab_jira = st.tabs(
+    summary = data.get(
+        "project_summary",
+        {}
+    )
 
+    with st.container(
+        border=True
+    ):
+
+        st.markdown(
+            "### 📊 Project Intelligence Summary"
+        )
+
+        project_name = summary.get(
+            "project_name",
+            "Unknown"
+        )
+
+        complexity = summary.get(
+            "delivery_complexity",
+            "UNKNOWN"
+        )
+
+        st.markdown(
+            f"**Project:** `{project_name}`"
+        )
+
+        st.markdown(
+            f"**Delivery Complexity:** `{complexity}`"
+        )
+
+        objective = summary.get(
+            "business_objective",
+            ""
+        )
+
+        if objective:
+
+            st.markdown(
+                f"**Business Objective:** {objective}"
+            )
+
+        scope_summary = summary.get(
+            "overall_scope_summary",
+            ""
+        )
+
+        if scope_summary:
+
+            st.markdown(
+                f"**Scope Summary:** {scope_summary}"
+            )
+
+
+    # =============================================================================
+    # 17. TABS
+    # =============================================================================
+
+    (
+        tab_scope,
+        tab_risks,
+        tab_questions,
+        tab_jira
+    ) = st.tabs(
         [
             "📌 Extracted Scope",
-            "📋 Requirements",
             "🚨 Missing Items & Risks",
-            "❓ Open Questions",
-            "🚀 Jira User Stories"
+            "❓ Clarifications",
+            "🚀 Jira User Stories",
         ]
     )
 
 
-    # =========================================================================
-    # SCOPE TAB
-    # =========================================================================
+    # =============================================================================
+    # TAB 1 - SCOPE
+    # =============================================================================
 
     with tab_scope:
 
-        summary = data.get(
-            "project_summary",
-            {}
+        scope_items = data.get(
+            "extracted_scope",
+            []
         )
 
-        if summary:
+        if not scope_items:
+
+            st.info(
+                "No scope items were extracted."
+            )
+
+        for item in scope_items:
 
             with st.container(
                 border=True
             ):
 
                 st.markdown(
-                    "### 🎯 Project Summary"
-                )
-
-                st.write(
-                    summary.get(
-                        "overall_scope_summary",
-                        ""
+                    "### 📌 MODULE: "
+                    + item.get(
+                        "module",
+                        "General Scope"
                     )
                 )
 
-
-        for item in data.get(
-            "extracted_scope",
-            []
-        ):
-
-            with st.container(
-                border=True
-            ):
-
-                st.markdown(
-                    f"### 📌 MODULE: "
-                    f"{item.get('module', 'General Scope')}"
+                requirement_type = item.get(
+                    "requirement_type",
+                    "OTHER"
                 )
-
 
                 st.caption(
-                    f"Source: "
-                    f"{item.get('source', 'Uploaded Files')} "
-                    f"| Confidence: "
-                    f"{item.get('confidence', 'UNKNOWN')}"
+                    "Requirement Type: "
+                    + requirement_type
                 )
 
+                st.caption(
+                    "Source: "
+                    + item.get(
+                        "source",
+                        "Uploaded Files"
+                    )
+                )
 
-                for pt in item.get(
+                for point in item.get(
                     "points",
                     []
                 ):
 
                     st.markdown(
-                        f"• {pt}"
+                        f"• {point}"
                     )
 
 
-    # =========================================================================
-    # REQUIREMENTS TAB
-    # =========================================================================
-
-    with tab_requirements:
-
-        st.markdown(
-            "### 📋 Functional Requirements"
-        )
-
-
-        for item in data.get(
-            "functional_requirements",
-            []
-        ):
-
-            with st.container(
-                border=True
-            ):
-
-                st.markdown(
-
-                    f"### "
-                    f"{item.get('requirement_id', '')} "
-                    f"| {item.get('module', '')}"
-                )
-
-
-                st.write(
-                    item.get(
-                        "requirement",
-                        ""
-                    )
-                )
-
-
-                st.caption(
-
-                    f"Priority: "
-                    f"{item.get('priority', '')} "
-                    f"| Source: "
-                    f"{item.get('source', '')}"
-                )
-
-
-        st.markdown(
-            "### ⚙️ Non-Functional Requirements"
-        )
-
-
-        for item in data.get(
-            "non_functional_requirements",
-            []
-        ):
-
-            with st.container(
-                border=True
-            ):
-
-                st.markdown(
-
-                    f"### "
-                    f"{item.get('category', 'General')}"
-                )
-
-                st.write(
-                    item.get(
-                        "requirement",
-                        ""
-                    )
-                )
-
-                st.caption(
-                    f"Priority: "
-                    f"{item.get('priority', '')} "
-                    f"| Source: "
-                    f"{item.get('source', '')}"
-                )
-
-
-    # =========================================================================
-    # RISKS TAB
-    # =========================================================================
+    # =============================================================================
+    # TAB 2 - RISKS
+    # =============================================================================
 
     with tab_risks:
 
@@ -2411,13 +2327,11 @@ with right_col:
             []
         )
 
-
         if not risks:
 
             st.success(
-                "✅ No major gaps or risks were identified."
+                "✅ No significant gaps or risks identified."
             )
-
 
         for risk in risks:
 
@@ -2430,27 +2344,20 @@ with right_col:
                     "INFO"
                 ).upper()
 
+                if severity == "HIGH":
+                    badge = "🔴"
 
-                badge_color = (
+                elif severity == "MEDIUM":
+                    badge = "🟡"
 
-                    "🔴"
-                    if severity == "HIGH"
-
-                    else "🟡"
-                    if severity == "MEDIUM"
-
-                    else "🔵"
-                )
-
+                else:
+                    badge = "🔵"
 
                 st.markdown(
-
-                    f"### "
-                    f"{badge_color} "
+                    f"### {badge} "
                     f"[{severity}] "
                     f"{risk.get('type', 'Risk')}"
                 )
-
 
                 st.write(
                     risk.get(
@@ -2459,55 +2366,57 @@ with right_col:
                     )
                 )
 
+                impact = risk.get(
+                    "impact",
+                    ""
+                )
 
-                if risk.get(
-                    "impact"
-                ):
+                if impact:
 
                     st.markdown(
-                        f"**Impact:** "
-                        f"{risk.get('impact')}"
+                        f"**Impact:** {impact}"
                     )
 
+                recommendation = risk.get(
+                    "recommended_action",
+                    ""
+                )
 
-                if risk.get(
-                    "recommended_action"
-                ):
+                if recommendation:
 
                     st.markdown(
                         f"**Recommended Action:** "
-                        f"{risk.get('recommended_action')}"
+                        f"{recommendation}"
                     )
 
+                source = risk.get(
+                    "source",
+                    ""
+                )
 
-                if risk.get(
-                    "source"
-                ):
+                if source:
 
                     st.caption(
-                        f"Source: "
-                        f"{risk.get('source')}"
+                        "Source: " + source
                     )
 
 
-    # =========================================================================
-    # QUESTIONS TAB
-    # =========================================================================
+    # =============================================================================
+    # TAB 3 - QUESTIONS
+    # =============================================================================
 
     with tab_questions:
 
         questions = data.get(
-            "open_questions",
+            "clarification_questions",
             []
         )
-
 
         if not questions:
 
             st.success(
-                "✅ No open questions were identified."
+                "✅ No clarification questions identified."
             )
-
 
         for question in questions:
 
@@ -2518,27 +2427,35 @@ with right_col:
                 priority = question.get(
                     "priority",
                     "MEDIUM"
+                ).upper()
+
+                icon = (
+                    "🔴"
+                    if priority == "HIGH"
+                    else "🟡"
+                    if priority == "MEDIUM"
+                    else "🔵"
                 )
 
+                st.markdown(
+                    f"### {icon} "
+                    f"[{priority}]"
+                )
 
                 st.markdown(
-                    f"### ❓ "
-                    f"[{priority}] "
+                    f"**Question:** "
                     f"{question.get('question', '')}"
                 )
 
-
-                st.write(
-                    question.get(
-                        "reason",
-                        ""
-                    )
+                st.markdown(
+                    f"**Why it matters:** "
+                    f"{question.get('reason', '')}"
                 )
 
 
-    # =========================================================================
-    # JIRA TAB
-    # =========================================================================
+    # =============================================================================
+    # TAB 4 - JIRA STORIES
+    # =============================================================================
 
     with tab_jira:
 
@@ -2547,13 +2464,12 @@ with right_col:
             []
         )
 
-
         if not stories:
 
             st.info(
-                "No Jira user stories were generated."
+                "No sufficiently defined Jira stories "
+                "were identified."
             )
-
 
         for story in stories:
 
@@ -2562,16 +2478,14 @@ with right_col:
             ):
 
                 st.markdown(
-
-                    f"### 🚀 "
-                    f"{story.get('story_id', '')} "
-                    f"| "
-                    f"{story.get('title', 'User Story')}"
+                    "### 🚀 "
+                    + story.get(
+                        "title",
+                        "User Story"
+                    )
                 )
 
-
                 st.markdown(
-
                     f"**As a** "
                     f"`{story.get('user_role', 'User')}`, "
                     f"**I want to** "
@@ -2580,18 +2494,9 @@ with right_col:
                     f"{story.get('so_that_statement', '')}."
                 )
 
-
-                st.caption(
-
-                    f"Priority: "
-                    f"{story.get('priority', 'UNKNOWN')}"
-                )
-
-
                 st.markdown(
                     "**Acceptance Criteria:**"
                 )
-
 
                 for ac in story.get(
                     "acceptance_criteria",
@@ -2602,18 +2507,63 @@ with right_col:
                         f"- `{ac}`"
                     )
 
+                source = story.get(
+                    "source",
+                    ""
+                )
+
+                if source:
+
+                    st.caption(
+                        "Source: " + source
+                    )
+
 
     # =============================================================================
-    # EXPORT REPORT
+    # 18. ASSUMPTIONS & DEPENDENCIES
+    # =============================================================================
+
+    assumptions = data.get(
+        "assumptions_and_dependencies",
+        []
+    )
+
+    if assumptions:
+
+        st.divider()
+
+        st.subheader(
+            "🔗 Assumptions & Dependencies"
+        )
+
+        for item in assumptions:
+
+            with st.container(
+                border=True
+            ):
+
+                st.markdown(
+                    f"**[{item.get('category', 'ITEM')}]** "
+                    f"{item.get('description', '')}"
+                )
+
+                st.caption(
+                    f"Status: "
+                    f"{item.get('status', 'UNKNOWN')} "
+                    f"| Owner/Dependency: "
+                    f"{item.get('owner_or_dependency', 'N/A')}"
+                )
+
+
+    # =============================================================================
+    # 19. EXPORT REPORT
     # =============================================================================
 
     st.divider()
 
-
     docx_bytes = build_docx_report(
         data
     )
-
 
     st.download_button(
 
@@ -2629,5 +2579,5 @@ with right_col:
         mime=
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 
-        use_container_width=True
+        use_container_width=True,
     )

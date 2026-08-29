@@ -1,4 +1,3 @@
-```python
 import json
 import time
 import io
@@ -3038,4 +3037,3 @@ with right_col:
 
         use_container_width=True
     )
-```

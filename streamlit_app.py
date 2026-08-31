@@ -613,7 +613,7 @@ def check_password():
 
                 valid_user = st.secrets.get(
                     "APP_USER",
-                    "admin"
+                    "adin"
                 )
 
                 valid_password = st.secrets.get(

@@ -1209,7 +1209,7 @@ components.html(
                 font-family: system-ui, -apple-system, sans-serif;
             }
             .track { display: flex; width: max-content; animation: scrollBanner 18s linear infinite; white-space: nowrap; }
-            .banner-text { color: #ffffff; font-size: 17px; font-weight: 800; padding-right: 90px; text-shadow: 0 2px 6px rgba(0,0,0,0.45); }
+            .banner-text { color: #ffffff; font-size: 25px; font-weight: 800; padding-right: 90px; text-shadow: 0 2px 6px rgba(0,0,0,0.45); }
             @keyframes scrollBanner { from { transform: translateX(0); } to { transform: translateX(-50%); } }
         </style>
     </head>

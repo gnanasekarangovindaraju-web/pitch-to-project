@@ -104,7 +104,7 @@ input[type="password"] {
 
 
 /* -------------------------------------------------------------------------
-   BROWSER AUTOFILL
+   BROWSER AUTOFILL FIX (Prevents white-on-white text on first load)
    ------------------------------------------------------------------------- */
 
 input:-webkit-autofill,
@@ -112,11 +112,13 @@ input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
 
-    -webkit-box-shadow:
-        0 0 0 1000px #0f172a inset !important;
+    -webkit-box-shadow: 0 0 0px 1000px #0f172a inset !important;
+    box-shadow: 0 0 0px 1000px #0f172a inset !important;
 
     -webkit-text-fill-color: #ffffff !important;
+    color: #ffffff !important;
 
+    transition: background-color 5000s ease-in-out 0s !important;
     caret-color: #ffffff !important;
 
     border: 2.5px solid #38bdf8 !important;

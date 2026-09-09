@@ -1218,10 +1218,10 @@ components.html(
     <body>
         <div class="banner">
             <div class="track">
-                <span class="banner-text">⚡ Smart Scope Handover Engine &nbsp; | &nbsp; Project Intelligence Layer</span>
-                <span class="banner-text">⚡ Smart Scope Handover Engine &nbsp; | &nbsp; Project Intelligence Layer</span>
-                <span class="banner-text">⚡ Smart Scope Handover Engine &nbsp; | &nbsp; Project Intelligence Layer</span>
-                <span class="banner-text">⚡ Smart Scope Handover Engine &nbsp; | &nbsp; Project Intelligence Layer</span>
+                <span class="banner-text">⚡ Hurix - Smart Scope Handover Engine &nbsp; | &nbsp; Project Intelligence Layer</span>
+                <span class="banner-text">⚡ Hurix - Smart Scope Handover Engine &nbsp; | &nbsp; Project Intelligence Layer</span>
+                <span class="banner-text">⚡ Hurix - Smart Scope Handover Engine &nbsp; | &nbsp; Project Intelligence Layer</span>
+                <span class="banner-text">⚡ Hurix - Smart Scope Handover Engine &nbsp; | &nbsp; Project Intelligence Layer</span>
             </div>
         </div>
     </body>

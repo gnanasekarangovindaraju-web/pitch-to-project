@@ -972,7 +972,7 @@ JSON SCHEMA
 
 
 # =============================================================================
-# 9. GEMINI ANALYSIS (UPDATED TO RETURN ERROR TUPLE)
+# 9. GEMINI ANALYSIS (UPDATED WITH RETRY LOGIC FOR HIGH DEMAND / 503)
 # =============================================================================
 
 def analyze_with_gemini(multimodal_payload):
@@ -983,26 +983,39 @@ def analyze_with_gemini(multimodal_payload):
     # Prepend system prompt to multimodal contents payload
     contents = [SYSTEM_INSTRUCTION_PROMPT] + multimodal_payload
 
-    try:
-        response = client.models.generate_content(
-            model="gemini-3.6-flash",
-            contents=contents,
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json",
-                temperature=0.15,
+    max_retries = 3
+    base_delay = 2  # Wait delay in seconds
+
+    for attempt in range(1, max_retries + 1):
+        try:
+            response = client.models.generate_content(
+                model="gemini-3.6-flash",
+                contents=contents,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    temperature=0.15,
+                )
             )
-        )
 
-        if not response.text:
-            return None, "Gemini returned an empty response."
+            if not response.text:
+                return None, "Gemini returned an empty response."
 
-        result = json.loads(response.text)
-        return result, None
+            result = json.loads(response.text)
+            return result, None  # Successful extraction
 
-    except json.JSONDecodeError as exc:
-        return None, f"Gemini returned invalid JSON: {exc}"
-    except Exception as exc:
-        return None, f"Gemini API Error: {exc}"
+        except json.JSONDecodeError as exc:
+            return None, f"Gemini returned invalid JSON: {exc}"
+
+        except Exception as exc:
+            err_msg = str(exc)
+            # Handle transient 503 High Demand or Server Busy errors with retries
+            if ("503" in err_msg or "UNAVAILABLE" in err_msg or "high demand" in err_msg.lower()) and attempt < max_retries:
+                time.sleep(base_delay * attempt)
+                continue
+
+            return None, f"Gemini API Error: {exc}"
+
+    return None, "Gemini API is currently overloaded. Please wait a few seconds and try again."
 
 
 # =============================================================================
@@ -1297,7 +1310,7 @@ with left_col:
 
 
 # =============================================================================
-# 16. RIGHT COLUMN - AI ANALYSIS (PERSISTENT ERROR DISPLAY INTEGRATED)
+# 16. RIGHT COLUMN - AI ANALYSIS
 # =============================================================================
 
 with right_col:

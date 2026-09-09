@@ -972,14 +972,13 @@ JSON SCHEMA
 
 
 # =============================================================================
-# 9. GEMINI ANALYSIS
+# 9. GEMINI ANALYSIS (UPDATED TO RETURN ERROR TUPLE)
 # =============================================================================
 
 def analyze_with_gemini(multimodal_payload):
 
     if not client:
-        st.error("GEMINI_API_KEY is missing in Streamlit Secrets.")
-        return None
+        return None, "GEMINI_API_KEY is missing in Streamlit Secrets."
 
     # Prepend system prompt to multimodal contents payload
     contents = [SYSTEM_INSTRUCTION_PROMPT] + multimodal_payload
@@ -995,18 +994,15 @@ def analyze_with_gemini(multimodal_payload):
         )
 
         if not response.text:
-            st.error("Gemini returned an empty response.")
-            return None
+            return None, "Gemini returned an empty response."
 
         result = json.loads(response.text)
-        return result
+        return result, None
 
     except json.JSONDecodeError as exc:
-        st.error(f"Gemini returned invalid JSON: {exc}")
-        return None
+        return None, f"Gemini returned invalid JSON: {exc}"
     except Exception as exc:
-        st.error(f"Gemini API Error: {exc}")
-        return None
+        return None, f"Gemini API Error: {exc}"
 
 
 # =============================================================================
@@ -1301,15 +1297,21 @@ with left_col:
 
 
 # =============================================================================
-# 16. RIGHT COLUMN - AI ANALYSIS (CONTAINER PERSISTENCE FIXED)
+# 16. RIGHT COLUMN - AI ANALYSIS (PERSISTENT ERROR DISPLAY INTEGRATED)
 # =============================================================================
 
 with right_col:
 
     st.header("2. AI Scope & Handover Analysis")
 
+    # Display any API error prominently so it doesn't auto-close
+    if "last_error" in st.session_state and st.session_state["last_error"]:
+        st.error(f"🚨 **Previous Request Failed:**\n\n{st.session_state['last_error']}")
+
     if generate_btn:
 
+        # Clear old error state on new generation attempt
+        st.session_state["last_error"] = None
         progress_card = st.empty()
 
         # DEMO MODE
@@ -1369,7 +1371,7 @@ with right_col:
                         unsafe_allow_html=True
                     )
 
-                    result = analyze_with_gemini(payload)
+                    result, error_msg = analyze_with_gemini(payload)
 
                     if result:
                         bar_ph.markdown(
@@ -1378,16 +1380,15 @@ with right_col:
                         )
                         st.session_state["analysis_data"] = result
                         
-                        # Retain completed 100% status state visible before clearing UI frame
                         time.sleep(1.5)
                         progress_card.empty()
                         
                         st.toast("⚡ Live Gemini Extraction Complete!", icon="✅")
                         st.rerun()
                     else:
-                        st.error("❌ Extraction Failed")
-                        time.sleep(2)
                         progress_card.empty()
+                        st.session_state["last_error"] = error_msg
+                        st.rerun()
 
     # DEFAULT DATA
     if "analysis_data" not in st.session_state:

@@ -2,6 +2,7 @@ import json
 import time
 import io
 import docx
+import pypdf
 import streamlit as st
 import streamlit.components.v1 as components
 from PIL import Image
@@ -813,20 +814,42 @@ def extract_docx_details(file):
     return extracted_text, extracted_images
 
 
+def extract_pdf_details(file):
+    """
+    Extract text from PDF pages sequentially.
+    """
+    extracted_text = ""
+    try:
+        file.seek(0)
+        reader = pypdf.PdfReader(file)
+        extracted_text += f"\n--- FILE: {file.name} ---\n"
+        for idx, page in enumerate(reader.pages, start=1):
+            text = page.extract_text()
+            if text and text.strip():
+                extracted_text += f"[Page {idx}] {text.strip()}\n"
+    except Exception as exc:
+        extracted_text += f"\n--- FILE: {file.name} ---\n[ERROR READING PDF: {exc}]\n"
+    return extracted_text
+
+
 def build_multimodal_payload(sow_files, notes_files, media_files, loose_notes):
     """
-    Consolidates DOCX text, tables, embedded images, TXT files, loose notes, 
+    Consolidates DOCX text/tables/images, PDF text, TXT files, loose notes, 
     and uploaded media files (png, jpg, mp3, mp4) into a multimodal payload.
     """
     payload_parts = []
     text_buffer = ""
 
-    # 1. Process DOCX Files
+    # 1. Process SOW / Proposal Documents (.docx and .pdf)
     if sow_files:
         for file in sow_files:
-            docx_text, embedded_imgs = extract_docx_details(file)
-            text_buffer += docx_text
-            payload_parts.extend(embedded_imgs)
+            if file.name.lower().endswith(".docx"):
+                docx_text, embedded_imgs = extract_docx_details(file)
+                text_buffer += docx_text
+                payload_parts.extend(embedded_imgs)
+            elif file.name.lower().endswith(".pdf"):
+                pdf_text = extract_pdf_details(file)
+                text_buffer += pdf_text
 
     # 2. Process TXT Files
     if notes_files:
@@ -972,7 +995,7 @@ JSON SCHEMA
 
 
 # =============================================================================
-# 9. GEMINI ANALYSIS (UPDATED WITH RETRY LOGIC FOR HIGH DEMAND / 503)
+# 9. GEMINI ANALYSIS (WITH AUTOMATIC RETRY LOGIC)
 # =============================================================================
 
 def analyze_with_gemini(multimodal_payload):
@@ -1283,8 +1306,8 @@ with left_col:
     st.header("1. Intake Documents & Media")
 
     sow_files = st.file_uploader(
-        "Proposals / SOWs (.docx)",
-        type=["docx"],
+        "Proposals / SOWs (.docx, .pdf)",
+        type=["docx", "pdf"],
         accept_multiple_files=True
     )
 
@@ -1355,7 +1378,7 @@ with right_col:
 
                 # Step 1: Processing
                 bar_ph.markdown(
-                    render_stylish_progress(20, "📄 Step 1/3: Extracting text, tables & embedded doc images..."),
+                    render_stylish_progress(20, "📄 Step 1/3: Extracting text, tables, PDFs & embedded doc images..."),
                     unsafe_allow_html=True
                 )
                 

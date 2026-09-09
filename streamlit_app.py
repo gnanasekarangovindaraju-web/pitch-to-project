@@ -985,7 +985,7 @@ def analyze_with_gemini(multimodal_payload):
 
     try:
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-3.6-flash",
             contents=contents,
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",

@@ -514,13 +514,12 @@ st.markdown(css_code, unsafe_allow_html=True)
 
 
 # =============================================================================
-# 3. AUTHENTICATION (DOMAIN SECURITY & MULTI-ACCOUNT)
+# 3. AUTHENTICATION
 # =============================================================================
 
 def check_password():
     """
-    Validates user authentication. Restricts access exclusively to @hurix.com
-    corporate email addresses and checks against registered accounts.
+    Returns True if the user enters valid credentials.
     """
 
     if st.session_state.get("authenticated", False):
@@ -537,19 +536,61 @@ def check_password():
             components.html(
                 """
                 <div style="
-                    background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%);
+                    background:
+                        linear-gradient(
+                            135deg,
+                            #ec4899 0%,
+                            #8b5cf6 50%,
+                            #06b6d4 100%
+                        );
+
                     border-radius: 14px;
+
                     padding: 24px 10px;
-                    box-shadow: 0 0 25px rgba(236, 72, 153, 0.6);
+
+                    box-shadow:
+                        0 0 25px rgba(236, 72, 153, 0.6);
+
                     text-align: center;
-                    font-family: system-ui, -apple-system, sans-serif;
+
+                    font-family:
+                        system-ui,
+                        -apple-system,
+                        sans-serif;
                 ">
-                    <div style="color: #ffffff; font-size: 2.8rem; font-weight: 900; margin-bottom: 6px; text-shadow: 0 3px 12px rgba(0, 0, 0, 0.8); letter-spacing: -0.5px;">
+
+                    <div style="
+                        color: #ffffff;
+
+                        font-size: 2.8rem;
+
+                        font-weight: 900;
+
+                        margin-bottom: 6px;
+
+                        text-shadow:
+                            0 3px 12px rgba(0, 0, 0, 0.8);
+
+                        letter-spacing: -0.5px;
+                    ">
                         🔒 Pitch to Project
                     </div>
-                    <div style="color: #ffffff; font-size: 1.35rem; font-weight: 800; letter-spacing: 1px; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);">
+
+                    <div style="
+                        color: #ffffff;
+
+                        font-size: 1.35rem;
+
+                        font-weight: 800;
+
+                        letter-spacing: 1px;
+
+                        text-shadow:
+                            0 2px 8px rgba(0, 0, 0, 0.8);
+                    ">
                         ⚡ Scope Intelligence Engine Access
                     </div>
+
                 </div>
                 """,
                 height=140,
@@ -557,8 +598,8 @@ def check_password():
             )
 
             username = st.text_input(
-                "Corporate Email Address",
-                placeholder="employee@hurix.com"
+                "Username",
+                placeholder="Enter username"
             )
 
             password = st.text_input(
@@ -572,33 +613,36 @@ def check_password():
             )
 
             if submit:
-                # Target domain configuration
-                allowed_domain = st.secrets.get("COMPANY_DOMAIN", "@hurix.com").lower().strip()
-                user_db = st.secrets.get("users", {})
 
-                clean_user = username.strip().lower()
+                valid_user = st.secrets.get(
+                    "APP_USER",
+                    "admin"
+                )
 
-                # Fallback dictionary if [users] in secrets.toml is not populated
-                if not user_db:
-                    user_db = {
-                        "admin@hurix.com": st.secrets.get("APP_PASSWORD", "project2026")
-                    }
+                valid_password = st.secrets.get(
+                    "APP_PASSWORD",
+                    "project2026"
+                )
 
-                # 1. Domain Restriction Check (@hurix.com only)
-                if not clean_user.endswith(allowed_domain):
-                    st.error(f"❌ Access Restricted: Only official {allowed_domain} users can log in; external domains such as @gmail.com are blocked.")
+                if (
+                    username == valid_user
+                    and password == valid_password
+                ):
 
-                # 2. Account Verification
-                elif clean_user in user_db and password == user_db[clean_user]:
                     st.session_state["authenticated"] = True
-                    st.session_state["current_user"] = clean_user
 
-                    display_name = clean_user.split("@")[0].capitalize()
-                    st.toast(f"⚡ Welcome back, {display_name}!", icon="✅")
+                    st.toast(
+                        "⚡ Login Successful!",
+                        icon="✅"
+                    )
+
                     st.rerun()
 
                 else:
-                    st.error("❌ Invalid Username or Password")
+
+                    st.error(
+                        "❌ Invalid Username or Password"
+                    )
 
     return False
 
@@ -609,15 +653,14 @@ if not check_password():
 
 
 # =============================================================================
-# 4. SIDEBAR SESSION (DYNAMIC SESSION AWARENESS)
+# 4. SIDEBAR SESSION
 # =============================================================================
 
 with st.sidebar:
 
     st.markdown("### 👤 User Session")
 
-    current_user = st.session_state.get("current_user", "admin@hurix.com")
-    st.write(f"Logged in as:\n**{current_user}**")
+    st.write("Logged in as **Admin**")
 
     if st.button(
         "🚪 Logout",
@@ -625,7 +668,6 @@ with st.sidebar:
     ):
 
         st.session_state["authenticated"] = False
-        st.session_state["current_user"] = None
 
         st.rerun()
 

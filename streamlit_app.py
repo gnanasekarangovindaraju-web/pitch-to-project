@@ -368,7 +368,7 @@ st.markdown(css_code, unsafe_allow_html=True)
 
 
 # =============================================================================
-# 3. AUTHENTICATION (GOOGLE WORKSPACE SSO / OAUTH 2.0)
+# 3. AUTHENTICATION (GOOGLE WORKSPACE SSO WITH SESSION PERSISTENCE)
 # =============================================================================
 
 def check_google_sso():
@@ -416,7 +416,6 @@ def check_google_sso():
             redirect_uri = st.secrets["oauth"]["redirect_uri"]
             allowed_domain = st.secrets.get("COMPANY_DOMAIN", "@hurix.com").lower().strip()
 
-            # Fixed OAuth2Component Initialization
             oauth2 = OAuth2Component(
                 client_id=client_id,
                 client_secret=client_secret,
@@ -450,7 +449,7 @@ def check_google_sso():
                     st.rerun()
 
                 else:
-                    st.error(f"❌ Access Restricted: Only official {allowed_domain} users can log in; external domains such as @gmail.com are blocked.")
+                    st.error(f"❌ Access Restricted: Only official {allowed_domain} users can log in; external domains are blocked.")
 
         except KeyError as err:
             st.warning(f"⚠️ Secrets configuration missing: {err}. Check `secrets.toml`.")
@@ -481,6 +480,7 @@ with st.sidebar:
 
         st.session_state["authenticated"] = False
         st.session_state["current_user"] = None
+        st.query_params.clear()
 
         st.rerun()
 

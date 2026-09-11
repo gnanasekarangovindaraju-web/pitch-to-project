@@ -410,20 +410,20 @@ def check_google_sso():
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-        # Retrieve OAuth credentials and configuration from st.secrets
         try:
             client_id = st.secrets["oauth"]["client_id"]
             client_secret = st.secrets["oauth"]["client_secret"]
             redirect_uri = st.secrets["oauth"]["redirect_uri"]
             allowed_domain = st.secrets.get("COMPANY_DOMAIN", "@hurix.com").lower().strip()
 
+            # Fixed OAuth2Component Initialization
             oauth2 = OAuth2Component(
                 client_id=client_id,
                 client_secret=client_secret,
                 authorize_endpoint="https://accounts.google.com/o/oauth2/v2/auth",
                 token_endpoint="https://oauth2.googleapis.com/token",
                 refresh_token_endpoint="https://oauth2.googleapis.com/token",
-                revoke_token_endpoint="https://oauth2.googleapis.com/revoke",
+                revoke_token_endpoint=None
             )
 
             # Render Google SSO Authorize Button
@@ -437,12 +437,10 @@ def check_google_sso():
             )
 
             if result and "token" in result:
-                # Decode ID token to get user profile details
                 id_token = result["token"]["id_token"]
                 user_info = jwt.decode(id_token, options={"verify_signature": False})
                 email = user_info.get("email", "").lower().strip()
 
-                # Domain Restriction Check
                 if email.endswith(allowed_domain):
                     st.session_state["authenticated"] = True
                     st.session_state["current_user"] = email
@@ -455,7 +453,7 @@ def check_google_sso():
                     st.error(f"❌ Access Restricted: Only official {allowed_domain} users can log in; external domains such as @gmail.com are blocked.")
 
         except KeyError as err:
-            st.warning(f"⚠️ OAuth secrets configuration missing key: {err}. Please ensure `[oauth]` section is properly set up in `secrets.toml`.")
+            st.warning(f"⚠️ Secrets configuration missing: {err}. Check `secrets.toml`.")
 
     return False
 

@@ -4,12 +4,12 @@ import io
 import docx
 import pypdf
 import jwt
+import requests
 import streamlit as st
 import streamlit.components.v1 as components
 from PIL import Image
 from google import genai
 from google.genai import types
-from streamlit_oauth import OAuth2Component
 
 
 # =============================================================================
@@ -276,7 +276,8 @@ div[data-testid="stTextArea"] textarea {
    NORMAL BUTTONS
    ------------------------------------------------------------------------- */
 
-div.stButton > button {
+div.stButton > button,
+a.sso-login-btn {
 
     background:
         linear-gradient(
@@ -302,63 +303,14 @@ div.stButton > button {
         0 0 20px rgba(139, 92, 246, 0.5) !important;
 
     width: 100%;
-}
 
+    text-align: center;
 
-/* -------------------------------------------------------------------------
-   SELECTED TABS
-   ------------------------------------------------------------------------- */
+    text-decoration: none;
 
-button[aria-selected="true"] {
+    display: block;
 
-    background:
-        linear-gradient(
-            135deg,
-            #8b5cf6 0%,
-            #ec4899 100%
-        ) !important;
-
-    color: #ffffff !important;
-}
-
-
-/* -------------------------------------------------------------------------
-   CARDS
-   ------------------------------------------------------------------------- */
-
-div[data-testid="stVerticalBlockBorderWrapper"] > div {
-
-    background:
-        rgba(15, 23, 42, 0.8) !important;
-
-    backdrop-filter: blur(10px) !important;
-
-    border-left:
-        6px solid #06b6d4 !important;
-
-    border-radius: 14px !important;
-
-    padding: 20px !important;
-}
-
-
-/* -------------------------------------------------------------------------
-   CODE
-   ------------------------------------------------------------------------- */
-
-code {
-
-    background-color:
-        rgba(30, 27, 75, 0.95) !important;
-
-    color: #38bdf8 !important;
-
-    border:
-        1px solid #a855f7 !important;
-
-    border-radius: 6px !important;
-
-    padding: 3px 8px !important;
+    box-sizing: border-box;
 }
 
 </style>
@@ -368,25 +320,79 @@ st.markdown(css_code, unsafe_allow_html=True)
 
 
 # =============================================================================
-# 3. AUTHENTICATION (GOOGLE WORKSPACE SSO WITH DIRECT REMOTION OF LOOP)
+# 3. AUTHENTICATION (NATIVE OAUTH WITH QUERY PARAMS PERSISTENCE)
 # =============================================================================
 
 def check_google_sso():
     """
-    Handles automatic OAuth 2.0 authentication for Hurix employees.
-    Decodes Google ID token directly upon query parameter redirect to prevent 
-    session state reset loops on Streamlit Cloud.
+    Handles native OAuth 2.0 authentication for Hurix employees without iframe loops.
+    Exchanges Google authorization codes directly using requests and validates domain.
     """
 
     if st.session_state.get("authenticated", False):
         return True
 
+    # 1. Read OAuth credentials from st.secrets
+    try:
+        client_id = st.secrets["oauth"]["client_id"].strip()
+        client_secret = st.secrets["oauth"]["client_secret"].strip()
+        redirect_uri = st.secrets["oauth"]["redirect_uri"].strip()
+        allowed_domain = st.secrets.get("COMPANY_DOMAIN", "@hurix.com").lower().strip()
+    except KeyError as err:
+        st.warning(f"⚠️ Secrets configuration missing: {err}. Check `secrets.toml`.")
+        return False
+
+    # 2. Check if returning from Google OAuth redirect with code parameter
+    query_params = st.query_params
+    auth_code = query_params.get("code")
+
+    if auth_code:
+        try:
+            token_url = "https://oauth2.googleapis.com/token"
+            payload = {
+                "code": auth_code,
+                "client_id": client_id,
+                "client_secret": client_secret,
+                "redirect_uri": redirect_uri,
+                "grant_type": "authorization_code"
+            }
+
+            response = requests.post(token_url, data=payload)
+            token_data = response.json()
+
+            if "id_token" in token_data:
+                id_token = token_data["id_token"]
+                user_info = jwt.decode(id_token, options={"verify_signature": False})
+                email = user_info.get("email", "").lower().strip()
+
+                if email.endswith(allowed_domain):
+                    st.session_state["authenticated"] = True
+                    st.session_state["current_user"] = email
+                    display_name = user_info.get("name", email.split("@")[0].capitalize())
+
+                    st.query_params.clear()
+                    st.toast(f"⚡ Welcome back, {display_name}!", icon="✅")
+                    st.rerun()
+                else:
+                    st.error(f"❌ Access Restricted: Only official {allowed_domain} users can log in.")
+                    st.query_params.clear()
+                    return False
+            else:
+                st.error("❌ Failed to verify Google authorization token.")
+                st.query_params.clear()
+                return False
+
+        except Exception as exc:
+            st.error(f"❌ Authorization Error: {exc}")
+            st.query_params.clear()
+            return False
+
+    # 3. Render Login Screen
     st.markdown("<br><br>", unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns([1, 2.4, 1])
 
     with col2:
-
         components.html(
             """
             <div style="
@@ -411,59 +417,30 @@ def check_google_sso():
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-        try:
-            client_id = st.secrets["oauth"]["client_id"].strip()
-            client_secret = st.secrets["oauth"]["client_secret"].strip()
-            redirect_uri = st.secrets["oauth"]["redirect_uri"].strip()
-            allowed_domain = st.secrets.get("COMPANY_DOMAIN", "@hurix.com").lower().strip()
+        google_auth_url = (
+            f"https://accounts.google.com/o/oauth2/v2/auth?"
+            f"client_id={client_id}&"
+            f"redirect_uri={redirect_uri}&"
+            f"response_type=code&"
+            f"scope=openid%20email%20profile&"
+            f"prompt=select_account"
+        )
 
-            oauth2 = OAuth2Component(
-                client_id=client_id,
-                client_secret=client_secret,
-                authorize_endpoint="https://accounts.google.com/o/oauth2/v2/auth",
-                token_endpoint="https://oauth2.googleapis.com/token",
-                refresh_token_endpoint="https://oauth2.googleapis.com/token",
-                revoke_token_endpoint=None
-            )
-
-            result = oauth2.authorize_button(
-                name="🔑 Login with Hurix Google Account",
-                redirect_uri=redirect_uri,
-                scope="openid email profile",
-                key="google_sso_component",
-                extras_params={"prompt": "select_account"},
-                use_container_width=True
-            )
-
-            if result and "token" in result:
-                id_token = result["token"]["id_token"]
-                user_info = jwt.decode(id_token, options={"verify_signature": False})
-                email = user_info.get("email", "").lower().strip()
-
-                if email.endswith(allowed_domain):
-                    st.session_state["authenticated"] = True
-                    st.session_state["current_user"] = email
-                    display_name = user_info.get("name", email.split("@")[0].capitalize())
-
-                    st.toast(f"⚡ Welcome back, {display_name}!", icon="✅")
-                    st.rerun()
-                else:
-                    st.error(f"❌ Access Restricted: Only official {allowed_domain} accounts can log in.")
-                    return False
-
-        except KeyError as err:
-            st.warning(f"⚠️ Secrets configuration missing key: {err}. Check `secrets.toml`.")
+        st.markdown(
+            f'<a href="{google_auth_url}" target="_self" class="sso-login-btn">🔑 Login with Hurix Google Account</a>',
+            unsafe_allow_html=True
+        )
 
     return False
 
 
-# Stop application execution until authenticated
+# Stop application execution until authenticated via SSO
 if not check_google_sso():
     st.stop()
 
 
 # =============================================================================
-# 4. SIDEBAR SESSION
+# 4. SIDEBAR SESSION (DYNAMIC USER DISPLAY)
 # =============================================================================
 
 with st.sidebar:

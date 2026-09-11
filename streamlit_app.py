@@ -368,25 +368,71 @@ st.markdown(css_code, unsafe_allow_html=True)
 
 
 # =============================================================================
-# 3. AUTHENTICATION (GOOGLE WORKSPACE SSO WITH REDIRECT LOOP FIX)
+# 3. AUTHENTICATION (GOOGLE WORKSPACE SSO WITH PERSISTENT LOGIN)
 # =============================================================================
 
 def check_google_sso():
     """
     Handles automatic OAuth 2.0 authentication for Hurix employees.
-    Validates that the logged-in email domain matches @hurix.com and clears
-    OAuth code query parameters from the URL bar to prevent redirect loops.
+    Validates that the logged-in email domain matches @hurix.com and uses query 
+    parameter state preservation to stop authorization loops in Streamlit Cloud.
     """
 
+    # Return immediately if session is already authenticated
     if st.session_state.get("authenticated", False):
         return True
 
-    st.markdown("<br><br>", unsafe_allow_html=True)
+    # Process query parameters if coming back from Google redirect
+    query_params = st.query_params
+    if "code" in query_params or "state" in query_params:
+        try:
+            client_id = st.secrets["oauth"]["client_id"].strip()
+            client_secret = st.secrets["oauth"]["client_secret"].strip()
+            redirect_uri = st.secrets["oauth"]["redirect_uri"].strip()
+            allowed_domain = st.secrets.get("COMPANY_DOMAIN", "@hurix.com").lower().strip()
 
+            oauth2 = OAuth2Component(
+                client_id=client_id,
+                client_secret=client_secret,
+                authorize_endpoint="https://accounts.google.com/o/oauth2/v2/auth",
+                token_endpoint="https://oauth2.googleapis.com/token",
+                refresh_token_endpoint="https://oauth2.googleapis.com/token",
+                revoke_token_endpoint=None
+            )
+
+            result = oauth2.authorize_button(
+                name="🔑 Complete Login",
+                redirect_uri=redirect_uri,
+                scope="openid email profile",
+                key="google_sso_process",
+                use_container_width=True
+            )
+
+            if result and "token" in result:
+                id_token = result["token"]["id_token"]
+                user_info = jwt.decode(id_token, options={"verify_signature": False})
+                email = user_info.get("email", "").lower().strip()
+
+                if email.endswith(allowed_domain):
+                    st.session_state["authenticated"] = True
+                    st.session_state["current_user"] = email
+                    display_name = user_info.get("name", email.split("@")[0].capitalize())
+
+                    st.query_params.clear()
+                    st.toast(f"⚡ Welcome back, {display_name}!", icon="✅")
+                    st.rerun()
+                else:
+                    st.error(f"❌ Access Restricted: Only official {allowed_domain} users can log in.")
+                    st.query_params.clear()
+                    return False
+        except Exception:
+            pass
+
+    # Primary Initial Login View
+    st.markdown("<br><br>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2.4, 1])
 
     with col2:
-
         components.html(
             """
             <div style="
@@ -412,9 +458,9 @@ def check_google_sso():
         st.markdown("<br>", unsafe_allow_html=True)
 
         try:
-            client_id = st.secrets["oauth"]["client_id"]
-            client_secret = st.secrets["oauth"]["client_secret"]
-            redirect_uri = st.secrets["oauth"]["redirect_uri"]
+            client_id = st.secrets["oauth"]["client_id"].strip()
+            client_secret = st.secrets["oauth"]["client_secret"].strip()
+            redirect_uri = st.secrets["oauth"]["redirect_uri"].strip()
             allowed_domain = st.secrets.get("COMPANY_DOMAIN", "@hurix.com").lower().strip()
 
             oauth2 = OAuth2Component(
@@ -426,12 +472,11 @@ def check_google_sso():
                 revoke_token_endpoint=None
             )
 
-            # Render Google SSO Authorize Button
             result = oauth2.authorize_button(
                 name="🔑 Login with Hurix Google Account",
                 redirect_uri=redirect_uri,
                 scope="openid email profile",
-                key="google_sso",
+                key="google_sso_button",
                 extras_params={"prompt": "select_account"},
                 use_container_width=True
             )
@@ -444,16 +489,13 @@ def check_google_sso():
                 if email.endswith(allowed_domain):
                     st.session_state["authenticated"] = True
                     st.session_state["current_user"] = email
-
                     display_name = user_info.get("name", email.split("@")[0].capitalize())
-                    st.toast(f"⚡ Welcome back, {display_name}!", icon="✅")
 
-                    # Clear OAuth state parameters from URL bar to finalize login state
                     st.query_params.clear()
+                    st.toast(f"⚡ Welcome back, {display_name}!", icon="✅")
                     st.rerun()
-
                 else:
-                    st.error(f"❌ Access Restricted: Only official {allowed_domain} users can log in; external domains are blocked.")
+                    st.error(f"❌ Access Restricted: Only official {allowed_domain} accounts can log in.")
 
         except KeyError as err:
             st.warning(f"⚠️ Secrets configuration missing: {err}. Check `secrets.toml`.")
@@ -461,31 +503,24 @@ def check_google_sso():
     return False
 
 
-# Stop application until authenticated via SSO
+# Stop application execution until authenticated
 if not check_google_sso():
     st.stop()
 
 
 # =============================================================================
-# 4. SIDEBAR SESSION (DYNAMIC SESSION AWARENESS)
+# 4. SIDEBAR SESSION (DYNAMIC USER DISPLAY)
 # =============================================================================
 
 with st.sidebar:
-
     st.markdown("### 👤 User Session")
-
     current_user = st.session_state.get("current_user", "Employee")
     st.write(f"Logged in as:\n**{current_user}**")
 
-    if st.button(
-        "🚪 Logout",
-        use_container_width=True
-    ):
-
+    if st.button("🚪 Logout", use_container_width=True):
         st.session_state["authenticated"] = False
         st.session_state["current_user"] = None
         st.query_params.clear()
-
         st.rerun()
 
 
@@ -497,15 +532,9 @@ with st.sidebar:
 def get_gemini_client():
 
     try:
-
         api_key = st.secrets["GEMINI_API_KEY"]
-
-        return genai.Client(
-            api_key=api_key
-        )
-
+        return genai.Client(api_key=api_key)
     except Exception:
-
         return None
 
 
@@ -513,7 +542,7 @@ client = get_gemini_client()
 
 
 # =============================================================================
-# 6. PROGRESS BAR (FIXED CSS CONTAINER COLLAPSE ISSUE)
+# 6. PROGRESS BAR
 # =============================================================================
 
 def render_stylish_progress(percentage, status_text):
@@ -652,7 +681,7 @@ def extract_pdf_details(file):
 def build_multimodal_payload(sow_files, notes_files, media_files, loose_notes):
     """
     Consolidates DOCX text/tables/images, PDF text, TXT files, loose notes, 
-    and uploaded media files (png, jpg, mp3, mp4) into a multimodal payload.
+    and uploaded media files into a multimodal payload.
     """
     payload_parts = []
     text_buffer = ""
@@ -812,7 +841,7 @@ JSON SCHEMA
 
 
 # =============================================================================
-# 9. GEMINI ANALYSIS (WITH AUTOMATIC RETRY LOGIC)
+# 9. GEMINI ANALYSIS
 # =============================================================================
 
 def analyze_with_gemini(multimodal_payload):
@@ -820,11 +849,10 @@ def analyze_with_gemini(multimodal_payload):
     if not client:
         return None, "GEMINI_API_KEY is missing in Streamlit Secrets."
 
-    # Prepend system prompt to multimodal contents payload
     contents = [SYSTEM_INSTRUCTION_PROMPT] + multimodal_payload
 
     max_retries = 3
-    base_delay = 2  # Wait delay in seconds
+    base_delay = 2
 
     for attempt in range(1, max_retries + 1):
         try:
@@ -841,14 +869,13 @@ def analyze_with_gemini(multimodal_payload):
                 return None, "Gemini returned an empty response."
 
             result = json.loads(response.text)
-            return result, None  # Successful extraction
+            return result, None
 
         except json.JSONDecodeError as exc:
             return None, f"Gemini returned invalid JSON: {exc}"
 
         except Exception as exc:
             err_msg = str(exc)
-            # Handle transient 503 High Demand or Server Busy errors with retries
             if ("503" in err_msg or "UNAVAILABLE" in err_msg or "high demand" in err_msg.lower()) and attempt < max_retries:
                 time.sleep(base_delay * attempt)
                 continue
@@ -1157,13 +1184,11 @@ with right_col:
 
     st.header("2. AI Scope & Handover Analysis")
 
-    # Display any API error prominently so it doesn't auto-close
     if "last_error" in st.session_state and st.session_state["last_error"]:
         st.error(f"🚨 **Previous Request Failed:**\n\n{st.session_state['last_error']}")
 
     if generate_btn:
 
-        # Clear old error state on new generation attempt
         st.session_state["last_error"] = None
         progress_card = st.empty()
 
@@ -1193,7 +1218,6 @@ with right_col:
                 st.markdown("### 🧠 Live Gemini Multimodal Scope Extraction")
                 bar_ph = st.empty()
 
-                # Step 1: Processing
                 bar_ph.markdown(
                     render_stylish_progress(20, "📄 Step 1/3: Extracting text, tables, PDFs & embedded doc images..."),
                     unsafe_allow_html=True
@@ -1211,14 +1235,12 @@ with right_col:
                     time.sleep(2)
                     progress_card.empty()
                 else:
-                    # Step 2: Transmitting
                     bar_ph.markdown(
                         render_stylish_progress(50, "⚡ Step 2/3: Transmitting multimodal payload to Gemini..."),
                         unsafe_allow_html=True
                     )
                     time.sleep(0.4)
 
-                    # Step 3: Auditing
                     bar_ph.markdown(
                         render_stylish_progress(80, "🔍 Step 3/3: Auditing scope, conflicts, media & Jira stories..."),
                         unsafe_allow_html=True

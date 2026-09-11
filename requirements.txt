@@ -3,3 +3,6 @@ python-docx
 google-genai
 python-dotenv
 pypdf
+pillow
+streamlit-oauth
+pyjwt

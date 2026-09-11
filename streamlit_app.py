@@ -437,23 +437,79 @@ def check_google_sso():
             )
 
             if result and "token" in result:
-                id_token = result["token"]["id_token"]
-                user_info = jwt.decode(id_token, options={"verify_signature": False})
-                email = user_info.get("email", "").lower().strip()
 
-                if email.endswith(allowed_domain):
-                    st.session_state["authenticated"] = True
-                    st.session_state["current_user"] = email
+    token = result["token"]
 
-                    display_name = user_info.get("name", email.split("@")[0].capitalize())
-                    st.toast(f"⚡ Welcome back, {display_name}!", icon="✅")
+    # Get ID token safely
+    id_token = token.get("id_token")
 
-                    # Clear OAuth state parameters from URL bar to finalize login state
-                    st.query_params.clear()
-                    st.rerun()
+    if not id_token:
+        st.error(
+            "❌ Google login failed: ID token was not returned by Google."
+        )
+        st.json(token)
 
-                else:
-                    st.error(f"❌ Access Restricted: Only official {allowed_domain} users can log in; external domains are blocked.")
+    else:
+
+        try:
+            # Decode Google ID token
+            user_info = jwt.decode(
+                id_token,
+                options={
+                    "verify_signature": False,
+                    "verify_aud": False
+                }
+            )
+
+            email = user_info.get(
+                "email",
+                ""
+            ).lower().strip()
+
+            display_name = user_info.get(
+                "name",
+                email.split("@")[0].capitalize()
+            )
+
+            # Normalize company domain
+            allowed_domain = (
+                st.secrets.get(
+                    "COMPANY_DOMAIN",
+                    "hurix.com"
+                )
+                .lower()
+                .strip()
+                .lstrip("@")
+            )
+
+            # Check Hurix email
+            if email.endswith("@" + allowed_domain):
+
+                st.session_state["authenticated"] = True
+                st.session_state["current_user"] = email
+
+                st.toast(
+                    f"⚡ Welcome back, {display_name}!",
+                    icon="✅"
+                )
+
+                # Clear Google OAuth parameters
+                st.query_params.clear()
+
+                st.rerun()
+
+            else:
+
+                st.error(
+                    f"❌ Access Restricted: "
+                    f"Only @{allowed_domain} users can log in."
+                )
+
+        except Exception as exc:
+
+            st.error(
+                f"❌ Error processing Google login: {exc}"
+            )
 
         except KeyError as err:
             st.warning(f"⚠️ Secrets configuration missing: {err}. Check `secrets.toml`.")

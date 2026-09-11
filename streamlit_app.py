@@ -3,8 +3,6 @@ import time
 import io
 import docx
 import pypdf
-import jwt
-import requests
 import streamlit as st
 import streamlit.components.v1 as components
 from PIL import Image
@@ -49,16 +47,164 @@ css_code = """
 
 
 /* -------------------------------------------------------------------------
-   LOGIN FORM & SSO CONTAINER
+   LOGIN FORM
    ------------------------------------------------------------------------- */
 
-div[data-testid="stForm"],
-div.sso-card-container {
+div[data-testid="stForm"] {
     background: rgba(15, 23, 42, 0.95) !important;
     border: 2.5px solid #a855f7 !important;
     border-radius: 18px !important;
     padding: 36px !important;
     box-shadow: 0 0 40px rgba(168, 85, 247, 0.5) !important;
+}
+
+
+/* -------------------------------------------------------------------------
+   LOGIN LABELS
+   ------------------------------------------------------------------------- */
+
+div[data-testid="stForm"] label,
+div[data-testid="stForm"] label p,
+div[data-testid="stTextInput"] label p {
+    color: #38bdf8 !important;
+    font-weight: 900 !important;
+    font-size: 1.4rem !important;
+    letter-spacing: 0.5px !important;
+    margin-bottom: 8px !important;
+    text-align: left !important;
+    width: 100% !important;
+    display: block !important;
+}
+
+
+/* -------------------------------------------------------------------------
+   INPUT FIELDS
+   ------------------------------------------------------------------------- */
+
+div[data-testid="stForm"] div[data-testid="stTextInput"] input,
+div[data-testid="stTextInput"] input,
+input[type="text"],
+input[type="password"] {
+
+    background-color: #0f172a !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+
+    border: 2.5px solid #38bdf8 !important;
+    border-radius: 12px !important;
+
+    font-weight: 800 !important;
+    font-size: 1.35rem !important;
+
+    padding: 16px 20px !important;
+    text-align: left !important;
+
+    box-shadow:
+        0 0 14px rgba(56, 189, 248, 0.3) !important;
+}
+
+
+/* -------------------------------------------------------------------------
+   BROWSER AUTOFILL FIX (Prevents white-on-white text on first load)
+   ------------------------------------------------------------------------- */
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+
+    -webkit-box-shadow: 0 0 0px 1000px #0f172a inset !important;
+    box-shadow: 0 0 0px 1000px #0f172a inset !important;
+
+    -webkit-text-fill-color: #ffffff !important;
+    color: #ffffff !important;
+
+    transition: background-color 5000s ease-in-out 0s !important;
+    caret-color: #ffffff !important;
+
+    border: 2.5px solid #38bdf8 !important;
+}
+
+
+/* -------------------------------------------------------------------------
+   PLACEHOLDER
+   ------------------------------------------------------------------------- */
+
+div[data-testid="stTextInput"] input::placeholder,
+input::placeholder {
+
+    color: #94a3b8 !important;
+    -webkit-text-fill-color: #94a3b8 !important;
+
+    font-weight: 700 !important;
+    font-size: 1.25rem !important;
+
+    opacity: 1 !important;
+    text-align: left !important;
+}
+
+
+/* -------------------------------------------------------------------------
+   PASSWORD EYE ICON
+   ------------------------------------------------------------------------- */
+
+div[data-testid="stTextInput"] button svg,
+div[data-testid="stForm"] svg {
+
+    fill: #38bdf8 !important;
+    stroke: #38bdf8 !important;
+
+    width: 26px !important;
+    height: 26px !important;
+}
+
+
+/* -------------------------------------------------------------------------
+   LOGIN BUTTON
+   ------------------------------------------------------------------------- */
+
+div[data-testid="stForm"] button[type="submit"],
+div[data-testid="stForm"] button[data-testid="stFormSubmitButton"],
+div[data-testid="stForm"] button {
+
+    background:
+        linear-gradient(
+            90deg,
+            #ec4899 0%,
+            #8b5cf6 50%,
+            #06b6d4 100%
+        ) !important;
+
+    border: none !important;
+    border-radius: 14px !important;
+
+    padding: 18px 32px !important;
+
+    box-shadow:
+        0 0 30px rgba(236, 72, 153, 0.7) !important;
+
+    transition: all 0.3s ease !important;
+
+    margin-top: 22px !important;
+
+    width: 100% !important;
+}
+
+
+div[data-testid="stForm"] button[type="submit"] *,
+div[data-testid="stForm"] button[type="submit"] p,
+div[data-testid="stForm"] button[type="submit"] span,
+div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] *,
+div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] p,
+div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] span {
+
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+
+    font-weight: 900 !important;
+    font-size: 1.5rem !important;
+
+    letter-spacing: 1.2px !important;
 }
 
 
@@ -276,8 +422,7 @@ div[data-testid="stTextArea"] textarea {
    NORMAL BUTTONS
    ------------------------------------------------------------------------- */
 
-div.stButton > button,
-a.sso-login-btn {
+div.stButton > button {
 
     background:
         linear-gradient(
@@ -303,14 +448,63 @@ a.sso-login-btn {
         0 0 20px rgba(139, 92, 246, 0.5) !important;
 
     width: 100%;
+}
 
-    text-align: center;
 
-    text-decoration: none;
+/* -------------------------------------------------------------------------
+   SELECTED TABS
+   ------------------------------------------------------------------------- */
 
-    display: block;
+button[aria-selected="true"] {
 
-    box-sizing: border-box;
+    background:
+        linear-gradient(
+            135deg,
+            #8b5cf6 0%,
+            #ec4899 100%
+        ) !important;
+
+    color: #ffffff !important;
+}
+
+
+/* -------------------------------------------------------------------------
+   CARDS
+   ------------------------------------------------------------------------- */
+
+div[data-testid="stVerticalBlockBorderWrapper"] > div {
+
+    background:
+        rgba(15, 23, 42, 0.8) !important;
+
+    backdrop-filter: blur(10px) !important;
+
+    border-left:
+        6px solid #06b6d4 !important;
+
+    border-radius: 14px !important;
+
+    padding: 20px !important;
+}
+
+
+/* -------------------------------------------------------------------------
+   CODE
+   ------------------------------------------------------------------------- */
+
+code {
+
+    background-color:
+        rgba(30, 27, 75, 0.95) !important;
+
+    color: #38bdf8 !important;
+
+    border:
+        1px solid #a855f7 !important;
+
+    border-radius: 6px !important;
+
+    padding: 3px 8px !important;
 }
 
 </style>
@@ -320,138 +514,161 @@ st.markdown(css_code, unsafe_allow_html=True)
 
 
 # =============================================================================
-# 3. AUTHENTICATION (NATIVE OAUTH WITH QUERY PARAMS PERSISTENCE)
+# 3. AUTHENTICATION
 # =============================================================================
 
-def check_google_sso():
+def check_password():
     """
-    Handles native OAuth 2.0 authentication for Hurix employees without iframe loops.
-    Exchanges Google authorization codes directly using requests and validates domain.
+    Returns True if the user enters valid credentials.
     """
 
     if st.session_state.get("authenticated", False):
         return True
 
-    # 1. Read OAuth credentials from st.secrets
-    try:
-        client_id = st.secrets["oauth"]["client_id"].strip()
-        client_secret = st.secrets["oauth"]["client_secret"].strip()
-        redirect_uri = st.secrets["oauth"]["redirect_uri"].strip()
-        allowed_domain = st.secrets.get("COMPANY_DOMAIN", "@hurix.com").lower().strip()
-    except KeyError as err:
-        st.warning(f"⚠️ Secrets configuration missing: {err}. Check `secrets.toml`.")
-        return False
-
-    # 2. Check if returning from Google OAuth redirect with code parameter
-    query_params = st.query_params
-    auth_code = query_params.get("code")
-
-    if auth_code:
-        try:
-            token_url = "https://oauth2.googleapis.com/token"
-            payload = {
-                "code": auth_code,
-                "client_id": client_id,
-                "client_secret": client_secret,
-                "redirect_uri": redirect_uri,
-                "grant_type": "authorization_code"
-            }
-
-            response = requests.post(token_url, data=payload)
-            token_data = response.json()
-
-            if "id_token" in token_data:
-                id_token = token_data["id_token"]
-                user_info = jwt.decode(id_token, options={"verify_signature": False})
-                email = user_info.get("email", "").lower().strip()
-
-                if email.endswith(allowed_domain):
-                    st.session_state["authenticated"] = True
-                    st.session_state["current_user"] = email
-                    display_name = user_info.get("name", email.split("@")[0].capitalize())
-
-                    st.query_params.clear()
-                    st.toast(f"⚡ Welcome back, {display_name}!", icon="✅")
-                    st.rerun()
-                else:
-                    st.error(f"❌ Access Restricted: Only official {allowed_domain} users can log in.")
-                    st.query_params.clear()
-                    return False
-            else:
-                st.error("❌ Failed to verify Google authorization token.")
-                st.query_params.clear()
-                return False
-
-        except Exception as exc:
-            st.error(f"❌ Authorization Error: {exc}")
-            st.query_params.clear()
-            return False
-
-    # 3. Render Login Screen
     st.markdown("<br><br>", unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns([1, 2.4, 1])
 
     with col2:
-        components.html(
-            """
-            <div style="
-                background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%);
-                border-radius: 14px;
-                padding: 24px 10px;
-                box-shadow: 0 0 25px rgba(236, 72, 153, 0.6);
-                text-align: center;
-                font-family: system-ui, -apple-system, sans-serif;
-            ">
-                <div style="color: #ffffff; font-size: 2.8rem; font-weight: 900; margin-bottom: 6px; text-shadow: 0 3px 12px rgba(0, 0, 0, 0.8); letter-spacing: -0.5px;">
-                    🔒 Pitch to Project
+
+        with st.form("login_form"):
+
+            components.html(
+                """
+                <div style="
+                    background:
+                        linear-gradient(
+                            135deg,
+                            #ec4899 0%,
+                            #8b5cf6 50%,
+                            #06b6d4 100%
+                        );
+
+                    border-radius: 14px;
+
+                    padding: 24px 10px;
+
+                    box-shadow:
+                        0 0 25px rgba(236, 72, 153, 0.6);
+
+                    text-align: center;
+
+                    font-family:
+                        system-ui,
+                        -apple-system,
+                        sans-serif;
+                ">
+
+                    <div style="
+                        color: #ffffff;
+
+                        font-size: 2.8rem;
+
+                        font-weight: 900;
+
+                        margin-bottom: 6px;
+
+                        text-shadow:
+                            0 3px 12px rgba(0, 0, 0, 0.8);
+
+                        letter-spacing: -0.5px;
+                    ">
+                        🔒 Pitch to Project
+                    </div>
+
+                    <div style="
+                        color: #ffffff;
+
+                        font-size: 1.35rem;
+
+                        font-weight: 800;
+
+                        letter-spacing: 1px;
+
+                        text-shadow:
+                            0 2px 8px rgba(0, 0, 0, 0.8);
+                    ">
+                        ⚡ Scope Intelligence Engine Access
+                    </div>
+
                 </div>
-                <div style="color: #ffffff; font-size: 1.35rem; font-weight: 800; letter-spacing: 1px; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);">
-                    ⚡ Hurix Google Workspace SSO Access
-                </div>
-            </div>
-            """,
-            height=140,
-            scrolling=False
-        )
+                """,
+                height=140,
+                scrolling=False
+            )
 
-        st.markdown("<br>", unsafe_allow_html=True)
+            username = st.text_input(
+                "Username",
+                placeholder="Enter username"
+            )
 
-        google_auth_url = (
-            f"https://accounts.google.com/o/oauth2/v2/auth?"
-            f"client_id={client_id}&"
-            f"redirect_uri={redirect_uri}&"
-            f"response_type=code&"
-            f"scope=openid%20email%20profile&"
-            f"prompt=select_account"
-        )
+            password = st.text_input(
+                "Password",
+                type="password",
+                placeholder="Enter password"
+            )
 
-        st.markdown(
-            f'<a href="{google_auth_url}" target="_self" class="sso-login-btn">🔑 Login with Hurix Google Account</a>',
-            unsafe_allow_html=True
-        )
+            submit = st.form_submit_button(
+                "🔑 LOGIN TO ENGINE"
+            )
+
+            if submit:
+
+                valid_user = st.secrets.get(
+                    "APP_USER",
+                    "admin"
+                )
+
+                valid_password = st.secrets.get(
+                    "APP_PASSWORD",
+                    "project@2026"
+                )
+
+                if (
+                    username == valid_user
+                    and password == valid_password
+                ):
+
+                    st.session_state["authenticated"] = True
+
+                    st.toast(
+                        "⚡ Login Successful!",
+                        icon="✅"
+                    )
+
+                    st.rerun()
+
+                else:
+
+                    st.error(
+                        "❌ Invalid Username or Password"
+                    )
 
     return False
 
 
-# Stop application execution until authenticated via SSO
-if not check_google_sso():
+# Stop application until authenticated
+if not check_password():
     st.stop()
 
 
 # =============================================================================
-# 4. SIDEBAR SESSION (DYNAMIC USER DISPLAY)
+# 4. SIDEBAR SESSION
 # =============================================================================
 
 with st.sidebar:
-    st.markdown("### 👤 User Session")
-    current_user = st.session_state.get("current_user", "Employee")
-    st.write(f"Logged in as:\n**{current_user}**")
 
-    if st.button("🚪 Logout", use_container_width=True):
+    st.markdown("### 👤 User Session")
+
+    st.write("Logged in as **Admin**")
+
+    if st.button(
+        "🚪 Logout",
+        use_container_width=True
+    ):
+
         st.session_state["authenticated"] = False
-        st.session_state["current_user"] = None
-        st.query_params.clear()
+
         st.rerun()
 
 
@@ -463,9 +680,15 @@ with st.sidebar:
 def get_gemini_client():
 
     try:
+
         api_key = st.secrets["GEMINI_API_KEY"]
-        return genai.Client(api_key=api_key)
+
+        return genai.Client(
+            api_key=api_key
+        )
+
     except Exception:
+
         return None
 
 
@@ -473,7 +696,7 @@ client = get_gemini_client()
 
 
 # =============================================================================
-# 6. PROGRESS BAR
+# 6. PROGRESS BAR (FIXED CSS CONTAINER COLLAPSE ISSUE)
 # =============================================================================
 
 def render_stylish_progress(percentage, status_text):
@@ -612,7 +835,7 @@ def extract_pdf_details(file):
 def build_multimodal_payload(sow_files, notes_files, media_files, loose_notes):
     """
     Consolidates DOCX text/tables/images, PDF text, TXT files, loose notes, 
-    and uploaded media files into a multimodal payload.
+    and uploaded media files (png, jpg, mp3, mp4) into a multimodal payload.
     """
     payload_parts = []
     text_buffer = ""
@@ -772,7 +995,7 @@ JSON SCHEMA
 
 
 # =============================================================================
-# 9. GEMINI ANALYSIS
+# 9. GEMINI ANALYSIS (WITH AUTOMATIC RETRY LOGIC)
 # =============================================================================
 
 def analyze_with_gemini(multimodal_payload):
@@ -780,10 +1003,11 @@ def analyze_with_gemini(multimodal_payload):
     if not client:
         return None, "GEMINI_API_KEY is missing in Streamlit Secrets."
 
+    # Prepend system prompt to multimodal contents payload
     contents = [SYSTEM_INSTRUCTION_PROMPT] + multimodal_payload
 
     max_retries = 3
-    base_delay = 2
+    base_delay = 2  # Wait delay in seconds
 
     for attempt in range(1, max_retries + 1):
         try:
@@ -800,13 +1024,14 @@ def analyze_with_gemini(multimodal_payload):
                 return None, "Gemini returned an empty response."
 
             result = json.loads(response.text)
-            return result, None
+            return result, None  # Successful extraction
 
         except json.JSONDecodeError as exc:
             return None, f"Gemini returned invalid JSON: {exc}"
 
         except Exception as exc:
             err_msg = str(exc)
+            # Handle transient 503 High Demand or Server Busy errors with retries
             if ("503" in err_msg or "UNAVAILABLE" in err_msg or "high demand" in err_msg.lower()) and attempt < max_retries:
                 time.sleep(base_delay * attempt)
                 continue
@@ -1115,11 +1340,13 @@ with right_col:
 
     st.header("2. AI Scope & Handover Analysis")
 
+    # Display any API error prominently so it doesn't auto-close
     if "last_error" in st.session_state and st.session_state["last_error"]:
         st.error(f"🚨 **Previous Request Failed:**\n\n{st.session_state['last_error']}")
 
     if generate_btn:
 
+        # Clear old error state on new generation attempt
         st.session_state["last_error"] = None
         progress_card = st.empty()
 
@@ -1149,6 +1376,7 @@ with right_col:
                 st.markdown("### 🧠 Live Gemini Multimodal Scope Extraction")
                 bar_ph = st.empty()
 
+                # Step 1: Processing
                 bar_ph.markdown(
                     render_stylish_progress(20, "📄 Step 1/3: Extracting text, tables, PDFs & embedded doc images..."),
                     unsafe_allow_html=True
@@ -1166,12 +1394,14 @@ with right_col:
                     time.sleep(2)
                     progress_card.empty()
                 else:
+                    # Step 2: Transmitting
                     bar_ph.markdown(
                         render_stylish_progress(50, "⚡ Step 2/3: Transmitting multimodal payload to Gemini..."),
                         unsafe_allow_html=True
                     )
                     time.sleep(0.4)
 
+                    # Step 3: Auditing
                     bar_ph.markdown(
                         render_stylish_progress(80, "🔍 Step 3/3: Auditing scope, conflicts, media & Jira stories..."),
                         unsafe_allow_html=True

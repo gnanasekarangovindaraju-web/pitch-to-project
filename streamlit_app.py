@@ -368,71 +368,25 @@ st.markdown(css_code, unsafe_allow_html=True)
 
 
 # =============================================================================
-# 3. AUTHENTICATION (GOOGLE WORKSPACE SSO WITH PERSISTENT LOGIN)
+# 3. AUTHENTICATION (GOOGLE WORKSPACE SSO WITH DIRECT REMOTION OF LOOP)
 # =============================================================================
 
 def check_google_sso():
     """
     Handles automatic OAuth 2.0 authentication for Hurix employees.
-    Validates that the logged-in email domain matches @hurix.com and uses query 
-    parameter state preservation to stop authorization loops in Streamlit Cloud.
+    Decodes Google ID token directly upon query parameter redirect to prevent 
+    session state reset loops on Streamlit Cloud.
     """
 
-    # Return immediately if session is already authenticated
     if st.session_state.get("authenticated", False):
         return True
 
-    # Process query parameters if coming back from Google redirect
-    query_params = st.query_params
-    if "code" in query_params or "state" in query_params:
-        try:
-            client_id = st.secrets["oauth"]["client_id"].strip()
-            client_secret = st.secrets["oauth"]["client_secret"].strip()
-            redirect_uri = st.secrets["oauth"]["redirect_uri"].strip()
-            allowed_domain = st.secrets.get("COMPANY_DOMAIN", "@hurix.com").lower().strip()
-
-            oauth2 = OAuth2Component(
-                client_id=client_id,
-                client_secret=client_secret,
-                authorize_endpoint="https://accounts.google.com/o/oauth2/v2/auth",
-                token_endpoint="https://oauth2.googleapis.com/token",
-                refresh_token_endpoint="https://oauth2.googleapis.com/token",
-                revoke_token_endpoint=None
-            )
-
-            result = oauth2.authorize_button(
-                name="🔑 Complete Login",
-                redirect_uri=redirect_uri,
-                scope="openid email profile",
-                key="google_sso_process",
-                use_container_width=True
-            )
-
-            if result and "token" in result:
-                id_token = result["token"]["id_token"]
-                user_info = jwt.decode(id_token, options={"verify_signature": False})
-                email = user_info.get("email", "").lower().strip()
-
-                if email.endswith(allowed_domain):
-                    st.session_state["authenticated"] = True
-                    st.session_state["current_user"] = email
-                    display_name = user_info.get("name", email.split("@")[0].capitalize())
-
-                    st.query_params.clear()
-                    st.toast(f"⚡ Welcome back, {display_name}!", icon="✅")
-                    st.rerun()
-                else:
-                    st.error(f"❌ Access Restricted: Only official {allowed_domain} users can log in.")
-                    st.query_params.clear()
-                    return False
-        except Exception:
-            pass
-
-    # Primary Initial Login View
     st.markdown("<br><br>", unsafe_allow_html=True)
+
     col1, col2, col3 = st.columns([1, 2.4, 1])
 
     with col2:
+
         components.html(
             """
             <div style="
@@ -476,7 +430,7 @@ def check_google_sso():
                 name="🔑 Login with Hurix Google Account",
                 redirect_uri=redirect_uri,
                 scope="openid email profile",
-                key="google_sso_button",
+                key="google_sso_component",
                 extras_params={"prompt": "select_account"},
                 use_container_width=True
             )
@@ -491,14 +445,14 @@ def check_google_sso():
                     st.session_state["current_user"] = email
                     display_name = user_info.get("name", email.split("@")[0].capitalize())
 
-                    st.query_params.clear()
                     st.toast(f"⚡ Welcome back, {display_name}!", icon="✅")
                     st.rerun()
                 else:
                     st.error(f"❌ Access Restricted: Only official {allowed_domain} accounts can log in.")
+                    return False
 
         except KeyError as err:
-            st.warning(f"⚠️ Secrets configuration missing: {err}. Check `secrets.toml`.")
+            st.warning(f"⚠️ Secrets configuration missing key: {err}. Check `secrets.toml`.")
 
     return False
 
@@ -509,7 +463,7 @@ if not check_google_sso():
 
 
 # =============================================================================
-# 4. SIDEBAR SESSION (DYNAMIC USER DISPLAY)
+# 4. SIDEBAR SESSION
 # =============================================================================
 
 with st.sidebar:

@@ -1,4 +1,4 @@
-impor json
+import json
 import time
 import io
 import docx
@@ -621,7 +621,7 @@ def check_password():
 
                 valid_password = st.secrets.get(
                     "APP_PASSWORD",
-                    "project2026"
+                    "project@2026"
                 )
 
                 if (

@@ -3,11 +3,13 @@ import time
 import io
 import docx
 import pypdf
+import jwt
 import streamlit as st
 import streamlit.components.v1 as components
 from PIL import Image
 from google import genai
 from google.genai import types
+from streamlit_oauth import OAuth2Component
 
 
 # =============================================================================
@@ -47,164 +49,16 @@ css_code = """
 
 
 /* -------------------------------------------------------------------------
-   LOGIN FORM
+   LOGIN FORM & SSO CONTAINER
    ------------------------------------------------------------------------- */
 
-div[data-testid="stForm"] {
+div[data-testid="stForm"],
+div.sso-card-container {
     background: rgba(15, 23, 42, 0.95) !important;
     border: 2.5px solid #a855f7 !important;
     border-radius: 18px !important;
     padding: 36px !important;
     box-shadow: 0 0 40px rgba(168, 85, 247, 0.5) !important;
-}
-
-
-/* -------------------------------------------------------------------------
-   LOGIN LABELS
-   ------------------------------------------------------------------------- */
-
-div[data-testid="stForm"] label,
-div[data-testid="stForm"] label p,
-div[data-testid="stTextInput"] label p {
-    color: #38bdf8 !important;
-    font-weight: 900 !important;
-    font-size: 1.4rem !important;
-    letter-spacing: 0.5px !important;
-    margin-bottom: 8px !important;
-    text-align: left !important;
-    width: 100% !important;
-    display: block !important;
-}
-
-
-/* -------------------------------------------------------------------------
-   INPUT FIELDS
-   ------------------------------------------------------------------------- */
-
-div[data-testid="stForm"] div[data-testid="stTextInput"] input,
-div[data-testid="stTextInput"] input,
-input[type="text"],
-input[type="password"] {
-
-    background-color: #0f172a !important;
-    color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
-
-    border: 2.5px solid #38bdf8 !important;
-    border-radius: 12px !important;
-
-    font-weight: 800 !important;
-    font-size: 1.35rem !important;
-
-    padding: 16px 20px !important;
-    text-align: left !important;
-
-    box-shadow:
-        0 0 14px rgba(56, 189, 248, 0.3) !important;
-}
-
-
-/* -------------------------------------------------------------------------
-   BROWSER AUTOFILL FIX (Prevents white-on-white text on first load)
-   ------------------------------------------------------------------------- */
-
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
-
-    -webkit-box-shadow: 0 0 0px 1000px #0f172a inset !important;
-    box-shadow: 0 0 0px 1000px #0f172a inset !important;
-
-    -webkit-text-fill-color: #ffffff !important;
-    color: #ffffff !important;
-
-    transition: background-color 5000s ease-in-out 0s !important;
-    caret-color: #ffffff !important;
-
-    border: 2.5px solid #38bdf8 !important;
-}
-
-
-/* -------------------------------------------------------------------------
-   PLACEHOLDER
-   ------------------------------------------------------------------------- */
-
-div[data-testid="stTextInput"] input::placeholder,
-input::placeholder {
-
-    color: #94a3b8 !important;
-    -webkit-text-fill-color: #94a3b8 !important;
-
-    font-weight: 700 !important;
-    font-size: 1.25rem !important;
-
-    opacity: 1 !important;
-    text-align: left !important;
-}
-
-
-/* -------------------------------------------------------------------------
-   PASSWORD EYE ICON
-   ------------------------------------------------------------------------- */
-
-div[data-testid="stTextInput"] button svg,
-div[data-testid="stForm"] svg {
-
-    fill: #38bdf8 !important;
-    stroke: #38bdf8 !important;
-
-    width: 26px !important;
-    height: 26px !important;
-}
-
-
-/* -------------------------------------------------------------------------
-   LOGIN BUTTON
-   ------------------------------------------------------------------------- */
-
-div[data-testid="stForm"] button[type="submit"],
-div[data-testid="stForm"] button[data-testid="stFormSubmitButton"],
-div[data-testid="stForm"] button {
-
-    background:
-        linear-gradient(
-            90deg,
-            #ec4899 0%,
-            #8b5cf6 50%,
-            #06b6d4 100%
-        ) !important;
-
-    border: none !important;
-    border-radius: 14px !important;
-
-    padding: 18px 32px !important;
-
-    box-shadow:
-        0 0 30px rgba(236, 72, 153, 0.7) !important;
-
-    transition: all 0.3s ease !important;
-
-    margin-top: 22px !important;
-
-    width: 100% !important;
-}
-
-
-div[data-testid="stForm"] button[type="submit"] *,
-div[data-testid="stForm"] button[type="submit"] p,
-div[data-testid="stForm"] button[type="submit"] span,
-div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] *,
-div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] p,
-div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] span {
-
-    color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
-
-    font-weight: 900 !important;
-    font-size: 1.5rem !important;
-
-    letter-spacing: 1.2px !important;
 }
 
 
@@ -514,12 +368,13 @@ st.markdown(css_code, unsafe_allow_html=True)
 
 
 # =============================================================================
-# 3. AUTHENTICATION
+# 3. AUTHENTICATION (GOOGLE WORKSPACE SSO / OAUTH 2.0)
 # =============================================================================
 
-def check_password():
+def check_google_sso():
     """
-    Returns True if the user enters valid credentials.
+    Handles automatic OAuth 2.0 authentication for Hurix employees.
+    Validates that the logged-in email domain matches @hurix.com.
     """
 
     if st.session_state.get("authenticated", False):
@@ -531,136 +386,95 @@ def check_password():
 
     with col2:
 
-        with st.form("login_form"):
-
-            components.html(
-                """
-                <div style="
-                    background:
-                        linear-gradient(
-                            135deg,
-                            #ec4899 0%,
-                            #8b5cf6 50%,
-                            #06b6d4 100%
-                        );
-
-                    border-radius: 14px;
-
-                    padding: 24px 10px;
-
-                    box-shadow:
-                        0 0 25px rgba(236, 72, 153, 0.6);
-
-                    text-align: center;
-
-                    font-family:
-                        system-ui,
-                        -apple-system,
-                        sans-serif;
-                ">
-
-                    <div style="
-                        color: #ffffff;
-
-                        font-size: 2.8rem;
-
-                        font-weight: 900;
-
-                        margin-bottom: 6px;
-
-                        text-shadow:
-                            0 3px 12px rgba(0, 0, 0, 0.8);
-
-                        letter-spacing: -0.5px;
-                    ">
-                        🔒 Pitch to Project
-                    </div>
-
-                    <div style="
-                        color: #ffffff;
-
-                        font-size: 1.35rem;
-
-                        font-weight: 800;
-
-                        letter-spacing: 1px;
-
-                        text-shadow:
-                            0 2px 8px rgba(0, 0, 0, 0.8);
-                    ">
-                        ⚡ Scope Intelligence Engine Access
-                    </div>
-
+        components.html(
+            """
+            <div style="
+                background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%);
+                border-radius: 14px;
+                padding: 24px 10px;
+                box-shadow: 0 0 25px rgba(236, 72, 153, 0.6);
+                text-align: center;
+                font-family: system-ui, -apple-system, sans-serif;
+            ">
+                <div style="color: #ffffff; font-size: 2.8rem; font-weight: 900; margin-bottom: 6px; text-shadow: 0 3px 12px rgba(0, 0, 0, 0.8); letter-spacing: -0.5px;">
+                    🔒 Pitch to Project
                 </div>
-                """,
-                height=140,
-                scrolling=False
+                <div style="color: #ffffff; font-size: 1.35rem; font-weight: 800; letter-spacing: 1px; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);">
+                    ⚡ Hurix Google Workspace SSO Access
+                </div>
+            </div>
+            """,
+            height=140,
+            scrolling=False
+        )
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        # Retrieve OAuth credentials and configuration from st.secrets
+        try:
+            client_id = st.secrets["oauth"]["client_id"]
+            client_secret = st.secrets["oauth"]["client_secret"]
+            redirect_uri = st.secrets["oauth"]["redirect_uri"]
+            allowed_domain = st.secrets.get("COMPANY_DOMAIN", "@hurix.com").lower().strip()
+
+            oauth2 = OAuth2Component(
+                client_id=client_id,
+                client_secret=client_secret,
+                authorize_endpoint="https://accounts.google.com/o/oauth2/v2/auth",
+                token_endpoint="https://oauth2.googleapis.com/token",
+                refresh_token_endpoint="https://oauth2.googleapis.com/token",
+                revoke_token_endpoint="https://oauth2.googleapis.com/revoke",
             )
 
-            username = st.text_input(
-                "Username",
-                placeholder="Enter username"
+            # Render Google SSO Authorize Button
+            result = oauth2.authorize_button(
+                name="🔑 Login with Hurix Google Account",
+                redirect_uri=redirect_uri,
+                scope="openid email profile",
+                key="google_sso",
+                extras_params={"prompt": "select_account"},
+                use_container_width=True
             )
 
-            password = st.text_input(
-                "Password",
-                type="password",
-                placeholder="Enter password"
-            )
+            if result and "token" in result:
+                # Decode ID token to get user profile details
+                id_token = result["token"]["id_token"]
+                user_info = jwt.decode(id_token, options={"verify_signature": False})
+                email = user_info.get("email", "").lower().strip()
 
-            submit = st.form_submit_button(
-                "🔑 LOGIN TO ENGINE"
-            )
-
-            if submit:
-
-                valid_user = st.secrets.get(
-                    "APP_USER",
-                    "admin"
-                )
-
-                valid_password = st.secrets.get(
-                    "APP_PASSWORD",
-                    "project@2026"
-                )
-
-                if (
-                    username == valid_user
-                    and password == valid_password
-                ):
-
+                # Domain Restriction Check
+                if email.endswith(allowed_domain):
                     st.session_state["authenticated"] = True
+                    st.session_state["current_user"] = email
 
-                    st.toast(
-                        "⚡ Login Successful!",
-                        icon="✅"
-                    )
-
+                    display_name = user_info.get("name", email.split("@")[0].capitalize())
+                    st.toast(f"⚡ Welcome back, {display_name}!", icon="✅")
                     st.rerun()
 
                 else:
+                    st.error(f"❌ Access Restricted: Only official {allowed_domain} users can log in; external domains such as @gmail.com are blocked.")
 
-                    st.error(
-                        "❌ Invalid Username or Password"
-                    )
+        except KeyError as err:
+            st.warning(f"⚠️ OAuth secrets configuration missing key: {err}. Please ensure `[oauth]` section is properly set up in `secrets.toml`.")
 
     return False
 
 
-# Stop application until authenticated
-if not check_password():
+# Stop application until authenticated via SSO
+if not check_google_sso():
     st.stop()
 
 
 # =============================================================================
-# 4. SIDEBAR SESSION
+# 4. SIDEBAR SESSION (DYNAMIC SESSION AWARENESS)
 # =============================================================================
 
 with st.sidebar:
 
     st.markdown("### 👤 User Session")
 
-    st.write("Logged in as **Admin**")
+    current_user = st.session_state.get("current_user", "Employee")
+    st.write(f"Logged in as:\n**{current_user}**")
 
     if st.button(
         "🚪 Logout",
@@ -668,6 +482,7 @@ with st.sidebar:
     ):
 
         st.session_state["authenticated"] = False
+        st.session_state["current_user"] = None
 
         st.rerun()
 

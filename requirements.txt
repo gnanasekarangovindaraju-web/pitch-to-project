@@ -6,3 +6,4 @@ pypdf
 pillow
 streamlit-oauth
 pyjwt
+requests

@@ -368,13 +368,14 @@ st.markdown(css_code, unsafe_allow_html=True)
 
 
 # =============================================================================
-# 3. AUTHENTICATION (GOOGLE WORKSPACE SSO WITH SESSION PERSISTENCE)
+# 3. AUTHENTICATION (GOOGLE WORKSPACE SSO WITH REDIRECT LOOP FIX)
 # =============================================================================
 
 def check_google_sso():
     """
     Handles automatic OAuth 2.0 authentication for Hurix employees.
-    Validates that the logged-in email domain matches @hurix.com.
+    Validates that the logged-in email domain matches @hurix.com and clears
+    OAuth code query parameters from the URL bar to prevent redirect loops.
     """
 
     if st.session_state.get("authenticated", False):
@@ -446,6 +447,9 @@ def check_google_sso():
 
                     display_name = user_info.get("name", email.split("@")[0].capitalize())
                     st.toast(f"⚡ Welcome back, {display_name}!", icon="✅")
+
+                    # Clear OAuth state parameters from URL bar to finalize login state
+                    st.query_params.clear()
                     st.rerun()
 
                 else:

@@ -415,7 +415,15 @@ def check_google_sso():
             client_id = st.secrets["oauth"]["client_id"]
             client_secret = st.secrets["oauth"]["client_secret"]
             redirect_uri = st.secrets["oauth"]["redirect_uri"]
-            allowed_domain = st.secrets.get("COMPANY_DOMAIN", "@hurix.com").lower().strip()
+            allowed_domain = (
+                st.secrets.get(
+                    "COMPANY_DOMAIN",
+                    "hurix.com"
+                )
+                .lower()
+                .strip()
+                .lstrip("@")
+            )
 
             oauth2 = OAuth2Component(
                 client_id=client_id,

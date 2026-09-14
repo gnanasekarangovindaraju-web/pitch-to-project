@@ -23,26 +23,77 @@ st.set_page_config(
 )
 
 # =============================================================================
-# 2. FIXED NEON CSS (HIGH-CONTRAST & RESPONSIVE LAYOUT)
+# 2. FIXED HIGH-CONTRAST NEON CSS (INCLUDES LOGIN BUTTON & INPUT FIXES)
 # =============================================================================
 
 css_code = """
 <style>
 
-/* Application Background */
+/* Global Application Background */
 .stApp {
     background: linear-gradient(125deg, #0f172a 0%, #1e1b4b 35%, #311042 70%, #0284c7 100%) !important;
     background-attachment: fixed;
 }
 
-/* Headings and Markdown Labels */
+/* Headings and Labels */
 h1, h2, h3, h4, label, label p, div[data-testid="stMarkdownContainer"] p {
-    color: #ffffff !important;
+    color: #38bdf8 !important;
     font-weight: 800 !important;
 }
 
 h1, h2, h3 {
+    color: #ffffff !important;
     text-shadow: 0 0 12px rgba(56, 189, 248, 0.4) !important;
+}
+
+/* Form Container */
+div[data-testid="stForm"] {
+    background: rgba(15, 23, 42, 0.95) !important;
+    border: 2.5px solid #a855f7 !important;
+    border-radius: 18px !important;
+    padding: 28px !important;
+    box-shadow: 0 0 40px rgba(168, 85, 247, 0.4) !important;
+}
+
+/* Form Text Inputs */
+div[data-testid="stForm"] input[type="text"],
+div[data-testid="stForm"] input[type="password"],
+div[data-testid="stTextInput"] input {
+    background-color: #0f172a !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    border: 2px solid #38bdf8 !important;
+    border-radius: 10px !important;
+    font-weight: 700 !important;
+    font-size: 1.1rem !important;
+    padding: 12px 16px !important;
+}
+
+/* Autofill Fix */
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px #0f172a inset !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Form Submit Button (Restores full visibility) */
+div[data-testid="stForm"] button[type="submit"],
+div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] {
+    background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 14px 24px !important;
+    box-shadow: 0 0 20px rgba(236, 72, 153, 0.6) !important;
+    width: 100% !important;
+    margin-top: 15px !important;
+}
+
+div[data-testid="stForm"] button[type="submit"] *,
+div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] * {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    font-weight: 900 !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 0.5px !important;
 }
 
 /* File Uploaders */
@@ -59,11 +110,7 @@ div[data-testid="stFileUploaderDropzone"] {
     border-radius: 8px !important;
 }
 
-div[data-testid="stFileUploaderDropzone"] *, 
-div[data-testid="stFileUploaderDropzone"] span, 
-div[data-testid="stFileUploaderDropzone"] small, 
-div[data-testid="stFileUploaderDropzone"] p,
-div[data-testid="stFileUploaderDropzone"] button {
+div[data-testid="stFileUploaderDropzone"] * {
     color: #ffffff !important;
     font-weight: 700 !important;
 }
@@ -74,7 +121,6 @@ div[data-testid="stTextArea"] textarea {
     color: #ffffff !important;
     border: 2px solid #a855f7 !important;
     border-radius: 10px !important;
-    font-weight: 600 !important;
 }
 
 /* Tabs */
@@ -83,7 +129,6 @@ button[data-baseweb="tab"] {
     border-radius: 8px 8px 0 0 !important;
     border: 1px solid #a855f7 !important;
     color: #38bdf8 !important;
-    padding: 8px 16px !important;
 }
 
 button[aria-selected="true"] {
@@ -96,10 +141,6 @@ button[aria-selected="true"] {
 section[data-testid="stSidebar"] {
     background: rgba(15, 23, 42, 0.95) !important;
     border-right: 1.5px solid #a855f7 !important;
-}
-
-section[data-testid="stSidebar"] h3 {
-    color: #38bdf8 !important;
 }
 
 /* General Buttons */
@@ -145,7 +186,7 @@ def check_authentication():
     redirect_uri = oauth_config.get("redirect_uri")
     required_domain = st.secrets.get("COMPANY_DOMAIN", "@hurix.com")
 
-    # Handle OAuth Callback Code
+    # Handle OAuth Callback Code from Query Parameters
     query_params = st.query_params
     auth_code = query_params.get("code")
 
@@ -196,13 +237,15 @@ def check_authentication():
             unsafe_allow_html=True
         )
 
+        # Standard Google Auth URL Construction
         google_auth_url = (
             "https://accounts.google.com/o/oauth2/v2/auth?"
             + urllib.parse.urlencode({
                 "client_id": client_id,
                 "redirect_uri": redirect_uri,
                 "response_type": "code",
-                "scope": "openid email profile",
+                "scope": "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid",
+                "access_type": "online",
                 "prompt": "select_account",
             })
         )

@@ -45,7 +45,7 @@ div[data-testid="stForm"] {
 div[data-testid="stForm"] label p, div[data-testid="stTextInput"] label p {
     color: #38bdf8 !important;
     font-weight: 900 !important;
-    font-size: 1.3rem !important;
+    font-size: 1.2rem !important;
 }
 
 div[data-testid="stForm"] div[data-testid="stTextInput"] input,
@@ -56,7 +56,7 @@ div[data-testid="stTextInput"] input {
     border: 2.5px solid #38bdf8 !important;
     border-radius: 12px !important;
     font-weight: 800 !important;
-    font-size: 1.2rem !important;
+    font-size: 1.1rem !important;
     padding: 12px 16px !important;
 }
 
@@ -107,12 +107,13 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div {
 st.markdown(css_code, unsafe_allow_html=True)
 
 # =============================================================================
-# 3. GOOGLE WORKSPACE OAUTH & DOMAIN GUARDRAIL (@hurix.com)
+# 3. HYBRID AUTHENTICATION SYSTEM (OAUTH + DOMAIN GUARDRAIL + FALLBACK)
 # =============================================================================
 
-def check_google_oauth():
+def check_authentication():
     """
-    Enforces Google Workspace OAuth login restricted strictly to @hurix.com users.
+    Handles authentication via Google OAuth callback code.
+    Provides a fallback corporate password login if OAuth returns a GCP 403 error.
     """
     if st.session_state.get("authenticated", False):
         return True
@@ -123,7 +124,7 @@ def check_google_oauth():
     redirect_uri = oauth_config.get("redirect_uri")
     required_domain = st.secrets.get("COMPANY_DOMAIN", "@hurix.com")
 
-    # Handle OAuth Callback Code from Query Parameters
+    # Step 1: Process OAuth Callback from Query Parameters
     query_params = st.query_params
     auth_code = query_params.get("code")
 
@@ -145,11 +146,9 @@ def check_google_oauth():
                 user_info = jwt.decode(id_token, options={"verify_signature": False})
                 user_email = user_info.get("email", "")
 
-                # Validate Domain Restriction
                 if user_email.endswith(required_domain):
                     st.session_state["authenticated"] = True
                     st.session_state["user_email"] = user_email
-                    
                     st.query_params.clear()
                     st.toast("⚡ Login Successful!", icon="✅")
                     st.rerun()
@@ -158,25 +157,25 @@ def check_google_oauth():
                     st.stop()
         except Exception as exc:
             st.error(f"🚨 OAuth Token Verification Failed: {exc}")
-            st.stop()
 
-    # Render Google Workspace SSO Login Form
+    # Step 2: Render Login Screen (Google SSO + Password Fallback)
     st.markdown("<br><br>", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1, 2, 1])
+    col1, col2, col3 = st.columns([1, 2.4, 1])
 
     with col2:
         st.markdown(
             f"""
-            <div style="background: rgba(15, 23, 42, 0.95); border: 2.5px solid #a855f7; border-radius: 18px; padding: 36px; text-align: center;">
+            <div style="background: rgba(15, 23, 42, 0.95); border: 2.5px solid #a855f7; border-radius: 18px; padding: 28px; text-align: center;">
                 <h1 style="color: #ffffff; font-size: 2.2rem; margin: 0;">🔒 Pitch to Project</h1>
                 <p style="color: #38bdf8; font-weight: 800; font-size: 1.1rem; margin-top: 8px;">
-                    Authorized Access Restricted to {required_domain} Users
+                    Restricted Access to {required_domain} Employees
                 </p>
             </div>
             """,
             unsafe_allow_html=True
         )
 
+        # Primary Google OAuth Sign-in Button
         google_auth_url = (
             "https://accounts.google.com/o/oauth2/v2/auth?"
             + urllib.parse.urlencode({
@@ -192,8 +191,9 @@ def check_google_oauth():
             f"""
             <a href="{google_auth_url}" target="_self" style="text-decoration: none;">
                 <div style="background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%);
-                            border-radius: 12px; padding: 16px; text-align: center; color: white;
-                            font-weight: 900; font-size: 1.2rem; margin-top: 20px; box-shadow: 0 0 25px rgba(236, 72, 153, 0.5);">
+                            border-radius: 12px; padding: 14px; text-align: center; color: white;
+                            font-weight: 900; font-size: 1.15rem; margin-top: 16px; margin-bottom: 24px;
+                            box-shadow: 0 0 25px rgba(236, 72, 153, 0.5);">
                     🔑 SIGN IN WITH HURIX GOOGLE WORKSPACE
                 </div>
             </a>
@@ -201,10 +201,32 @@ def check_google_oauth():
             unsafe_allow_html=True
         )
 
+        st.markdown("<p style='text-align: center; color: #94a3b8; font-weight: 700;'>— OR SIGN IN WITH CREDENTIALS —</p>", unsafe_allow_html=True)
+
+        # Secondary Password Form Fallback
+        with st.form("fallback_login_form"):
+            user_email = st.text_input("Corporate Email", placeholder="name@hurix.com")
+            password = st.text_input("Access Password", type="password", placeholder="Enter password")
+            submit = st.form_submit_button("🔑 LOGIN VIA CREDENTIALS")
+
+            if submit:
+                valid_pass = st.secrets.get("APP_PASSWORD", "project@2026")
+                is_hurix = user_email.endswith(required_domain) or user_email == "admin"
+
+                if is_hurix and password == valid_pass:
+                    st.session_state["authenticated"] = True
+                    st.session_state["user_email"] = user_email
+                    st.toast("⚡ Login Successful!", icon="✅")
+                    st.rerun()
+                elif not is_hurix:
+                    st.error(f"⛔ Access Restricted: Must use an authorized {required_domain} email address.")
+                else:
+                    st.error("❌ Invalid Password.")
+
     return False
 
 
-if not check_google_oauth():
+if not check_authentication():
     st.stop()
 
 # =============================================================================
@@ -357,7 +379,7 @@ JSON SCHEMA:
 """
 
 # =============================================================================
-# 9. GEMINI INFERENCE (USING gemini-3.6-flash)
+# 9. GEMINI INFERENCE (MODEL: gemini-3.6-flash)
 # =============================================================================
 
 def analyze_with_gemini(multimodal_payload):

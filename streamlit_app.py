@@ -107,13 +107,13 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div {
 st.markdown(css_code, unsafe_allow_html=True)
 
 # =============================================================================
-# 3. GOOGLE WORKSPACE OAUTH AUTHENTICATION & DOMAIN GUARDRAIL
+# 3. INTERNAL GOOGLE WORKSPACE OAUTH & DOMAIN GUARDRAIL (@hurix.com)
 # =============================================================================
 
 def check_google_oauth():
     """
     Enforces Google Workspace OAuth login restricted strictly to @hurix.com users.
-    Handles callback authorization code parsing via st.query_params.
+    Passes hd="hurix.com" to lock auth selection to the organization tenant.
     """
     if st.session_state.get("authenticated", False):
         return True
@@ -124,7 +124,7 @@ def check_google_oauth():
     redirect_uri = oauth_config.get("redirect_uri")
     required_domain = st.secrets.get("COMPANY_DOMAIN", "@hurix.com")
 
-    # Step 1: Handle OAuth Callback Code from Query Parameters
+    # Handle OAuth Callback Code from Query Parameters
     query_params = st.query_params
     auth_code = query_params.get("code")
 
@@ -146,7 +146,7 @@ def check_google_oauth():
                 user_info = jwt.decode(id_token, options={"verify_signature": False})
                 user_email = user_info.get("email", "")
 
-                # Step 2: Validate Domain Restriction
+                # Validate Domain Restriction
                 if user_email.endswith(required_domain):
                     st.session_state["authenticated"] = True
                     st.session_state["user_email"] = user_email
@@ -161,7 +161,7 @@ def check_google_oauth():
             st.error(f"🚨 OAuth Token Verification Failed: {exc}")
             st.stop()
 
-    # Step 3: Render Google Workspace SSO Login Form
+    # Render Internal Google Workspace SSO Login Form
     st.markdown("<br><br>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
 
@@ -171,13 +171,14 @@ def check_google_oauth():
             <div style="background: rgba(15, 23, 42, 0.95); border: 2.5px solid #a855f7; border-radius: 18px; padding: 36px; text-align: center;">
                 <h1 style="color: #ffffff; font-size: 2.2rem; margin: 0;">🔒 Pitch to Project</h1>
                 <p style="color: #38bdf8; font-weight: 800; font-size: 1.1rem; margin-top: 8px;">
-                    Restricted Access to {required_domain} Employees
+                    Internal Access Restricted to {required_domain} Organization
                 </p>
             </div>
             """,
             unsafe_allow_html=True
         )
 
+        # hd="hurix.com" restricts authentication tenant directly to Hurix Workspace
         google_auth_url = (
             "https://accounts.google.com/o/oauth2/v2/auth?"
             + urllib.parse.urlencode({
@@ -186,6 +187,7 @@ def check_google_oauth():
                 "response_type": "code",
                 "scope": "openid email profile",
                 "prompt": "select_account",
+                "hd": "hurix.com",
             })
         )
 
@@ -358,7 +360,7 @@ JSON SCHEMA:
 """
 
 # =============================================================================
-# 9. GEMINI INFERENCE
+# 9. GEMINI INFERENCE (USING gemini-3.6-flash)
 # =============================================================================
 
 def analyze_with_gemini(multimodal_payload):
@@ -369,7 +371,7 @@ def analyze_with_gemini(multimodal_payload):
 
     try:
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-3.6-flash",
             contents=contents,
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",

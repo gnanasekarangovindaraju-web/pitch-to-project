@@ -23,43 +23,76 @@ st.set_page_config(
 )
 
 # =============================================================================
-# 2. GLOBAL NEON CSS
+# 2. FIXED NEON CSS (HIGH-CONTRAST & RESPONSIVE LAYOUT)
 # =============================================================================
 
 css_code = """
 <style>
 
+/* Application Background */
 .stApp {
     background: linear-gradient(125deg, #0f172a 0%, #1e1b4b 35%, #311042 70%, #0284c7 100%) !important;
     background-attachment: fixed;
 }
 
-div[data-testid="stForm"] {
-    background: rgba(15, 23, 42, 0.95) !important;
-    border: 2.5px solid #a855f7 !important;
-    border-radius: 18px !important;
-    padding: 36px !important;
-    box-shadow: 0 0 40px rgba(168, 85, 247, 0.5) !important;
-}
-
-div[data-testid="stForm"] label p, div[data-testid="stTextInput"] label p {
-    color: #38bdf8 !important;
-    font-weight: 900 !important;
-    font-size: 1.2rem !important;
-}
-
-div[data-testid="stForm"] div[data-testid="stTextInput"] input,
-div[data-testid="stTextInput"] input {
-    background-color: #0f172a !important;
+/* Headings and Markdown Labels */
+h1, h2, h3, h4, label, label p, div[data-testid="stMarkdownContainer"] p {
     color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
-    border: 2.5px solid #38bdf8 !important;
-    border-radius: 12px !important;
     font-weight: 800 !important;
-    font-size: 1.1rem !important;
-    padding: 12px 16px !important;
 }
 
+h1, h2, h3 {
+    text-shadow: 0 0 12px rgba(56, 189, 248, 0.4) !important;
+}
+
+/* File Uploaders */
+div[data-testid="stFileUploader"] {
+    background: rgba(15, 23, 42, 0.85) !important;
+    border: 2px dashed #a855f7 !important;
+    border-radius: 12px !important;
+    padding: 10px !important;
+}
+
+div[data-testid="stFileUploaderDropzone"] {
+    background: #1e293b !important;
+    border: 1.5px dashed #38bdf8 !important;
+    border-radius: 8px !important;
+}
+
+div[data-testid="stFileUploaderDropzone"] *, 
+div[data-testid="stFileUploaderDropzone"] span, 
+div[data-testid="stFileUploaderDropzone"] small, 
+div[data-testid="stFileUploaderDropzone"] p,
+div[data-testid="stFileUploaderDropzone"] button {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+}
+
+/* Text Area */
+div[data-testid="stTextArea"] textarea {
+    background: #0f172a !important;
+    color: #ffffff !important;
+    border: 2px solid #a855f7 !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+}
+
+/* Tabs */
+button[data-baseweb="tab"] {
+    background-color: rgba(15, 23, 42, 0.7) !important;
+    border-radius: 8px 8px 0 0 !important;
+    border: 1px solid #a855f7 !important;
+    color: #38bdf8 !important;
+    padding: 8px 16px !important;
+}
+
+button[aria-selected="true"] {
+    background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%) !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+}
+
+/* Sidebar */
 section[data-testid="stSidebar"] {
     background: rgba(15, 23, 42, 0.95) !important;
     border-right: 1.5px solid #a855f7 !important;
@@ -67,19 +100,13 @@ section[data-testid="stSidebar"] {
 
 section[data-testid="stSidebar"] h3 {
     color: #38bdf8 !important;
-    font-size: 1.3rem !important;
-    font-weight: 800 !important;
 }
 
-section[data-testid="stSidebar"] p, section[data-testid="stSidebar"] span {
-    color: #f8fafc !important;
-    font-weight: 700 !important;
-}
-
+/* General Buttons */
 div.stButton > button {
     background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #3b82f6 100%) !important;
     color: #ffffff !important;
-    font-weight: 800 !important;
+    font-weight: 900 !important;
     font-size: 1.05rem !important;
     border-radius: 12px !important;
     border: none !important;
@@ -88,17 +115,15 @@ div.stButton > button {
     width: 100%;
 }
 
-button[aria-selected="true"] {
-    background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%) !important;
+/* Download Button */
+div[data-testid="stDownloadButton"] > button {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    border-radius: 12px !important;
+    border: none !important;
+    box-shadow: 0 0 18px rgba(16, 185, 129, 0.5) !important;
     color: #ffffff !important;
-}
-
-div[data-testid="stVerticalBlockBorderWrapper"] > div {
-    background: rgba(15, 23, 42, 0.8) !important;
-    backdrop-filter: blur(10px) !important;
-    border-left: 6px solid #06b6d4 !important;
-    border-radius: 14px !important;
-    padding: 20px !important;
+    font-weight: 900 !important;
+    width: 100%;
 }
 
 </style>
@@ -107,14 +132,10 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div {
 st.markdown(css_code, unsafe_allow_html=True)
 
 # =============================================================================
-# 3. HYBRID AUTHENTICATION SYSTEM (OAUTH + DOMAIN GUARDRAIL + FALLBACK)
+# 3. HYBRID AUTHENTICATION SYSTEM
 # =============================================================================
 
 def check_authentication():
-    """
-    Handles authentication via Google OAuth callback code.
-    Provides a fallback corporate password login if OAuth returns a GCP 403 error.
-    """
     if st.session_state.get("authenticated", False):
         return True
 
@@ -124,7 +145,7 @@ def check_authentication():
     redirect_uri = oauth_config.get("redirect_uri")
     required_domain = st.secrets.get("COMPANY_DOMAIN", "@hurix.com")
 
-    # Step 1: Process OAuth Callback from Query Parameters
+    # Handle OAuth Callback Code
     query_params = st.query_params
     auth_code = query_params.get("code")
 
@@ -158,7 +179,7 @@ def check_authentication():
         except Exception as exc:
             st.error(f"🚨 OAuth Token Verification Failed: {exc}")
 
-    # Step 2: Render Login Screen (Google SSO + Password Fallback)
+    # Render Login Page
     st.markdown("<br><br>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2.4, 1])
 
@@ -175,7 +196,6 @@ def check_authentication():
             unsafe_allow_html=True
         )
 
-        # Primary Google OAuth Sign-in Button
         google_auth_url = (
             "https://accounts.google.com/o/oauth2/v2/auth?"
             + urllib.parse.urlencode({
@@ -203,7 +223,6 @@ def check_authentication():
 
         st.markdown("<p style='text-align: center; color: #94a3b8; font-weight: 700;'>— OR SIGN IN WITH CREDENTIALS —</p>", unsafe_allow_html=True)
 
-        # Secondary Password Form Fallback
         with st.form("fallback_login_form"):
             user_email = st.text_input("Corporate Email", placeholder="name@hurix.com")
             password = st.text_input("Access Password", type="password", placeholder="Enter password")
@@ -258,24 +277,7 @@ def get_gemini_client():
 client = get_gemini_client()
 
 # =============================================================================
-# 6. STYLISH PROGRESS BAR
-# =============================================================================
-
-def render_stylish_progress(percentage, status_text):
-    return f"""
-    <div style="margin: 10px 0 18px 0; width: 100%;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <span style="color: #06b6d4; font-weight: 800; font-size: 0.95rem;">{status_text}</span>
-            <span style="color: #f59e0b; font-weight: 900; font-size: 1.05rem;">{percentage}%</span>
-        </div>
-        <div style="background: rgba(15, 23, 42, 0.9); border: 2px solid #10b981; border-radius: 12px; padding: 3px; height: 24px;">
-            <div style="width: {percentage}%; height: 18px; background: linear-gradient(90deg, #10b981 0%, #3b82f6 50%, #f59e0b 100%); border-radius: 8px; transition: width 0.3s ease-in-out;"></div>
-        </div>
-    </div>
-    """
-
-# =============================================================================
-# 7. MULTIMODAL EXTRACTION PIPELINE
+# 6. MULTIMODAL EXTRACTION PIPELINE
 # =============================================================================
 
 def extract_docx_details(file):
@@ -354,7 +356,7 @@ def build_multimodal_payload(sow_files, notes_files, media_files, loose_notes):
     return payload_parts
 
 # =============================================================================
-# 8. SYSTEM PROMPT
+# 7. SYSTEM PROMPT
 # =============================================================================
 
 SYSTEM_INSTRUCTION_PROMPT = """
@@ -379,7 +381,7 @@ JSON SCHEMA:
 """
 
 # =============================================================================
-# 9. GEMINI INFERENCE (MODEL: gemini-3.6-flash)
+# 8. GEMINI INFERENCE (MODEL: gemini-3.6-flash)
 # =============================================================================
 
 def analyze_with_gemini(multimodal_payload):
@@ -402,7 +404,7 @@ def analyze_with_gemini(multimodal_payload):
         return None, f"Gemini API Error: {exc}"
 
 # =============================================================================
-# 10. MOCK DATA
+# 9. MOCK DATA
 # =============================================================================
 
 MOCK_ANALYSIS = {
@@ -447,7 +449,7 @@ MOCK_ANALYSIS = {
 }
 
 # =============================================================================
-# 11. DOCX EXPORT GENERATOR
+# 10. DOCX EXPORT GENERATOR
 # =============================================================================
 
 def build_docx_report(data):
@@ -478,11 +480,20 @@ def build_docx_report(data):
     return target_stream.getvalue()
 
 # =============================================================================
-# 12. UI & MAIN LAYOUT
+# 11. MAIN HEADER & APP LAYOUT
 # =============================================================================
 
+components.html(
+    """
+    <div style="width: 100%; padding: 10px; background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%); border-radius: 10px; text-align: center;">
+        <span style="color: white; font-size: 20px; font-weight: 900; font-family: sans-serif;">⚡ Hurix - Smart Scope Handover Engine &nbsp; | &nbsp; Project Intelligence Layer</span>
+    </div>
+    """,
+    height=55
+)
+
 st.title("Pitch to Project")
-st.subheader("🚀 AI-Powered Scope Intelligence & Handover Engine")
+st.markdown("### 🚀 AI-Powered Scope Intelligence & Handover Engine")
 
 demo_mode = st.toggle("Demo Mode (Safe Pitch)", value=True)
 
@@ -521,23 +532,23 @@ with right_col:
 
     with tab1:
         s = data.get("project_summary", {})
-        st.write(f"**Objective:** {s.get('project_objective')}")
-        st.write(f"**Goal:** {s.get('business_goal')}")
+        st.write(f"**Objective:** {s.get('project_objective', 'N/A')}")
+        st.write(f"**Goal:** {s.get('business_goal', 'N/A')}")
 
     with tab2:
         for item in data.get("extracted_scope", []):
-            st.markdown(f"### {item.get('module')}")
-            st.caption(f"Source: {item.get('source')}")
+            st.markdown(f"### {item.get('module', 'Module')}")
+            st.caption(f"Source: {item.get('source', 'Uploaded Files')}")
             for p in item.get("points", []):
                 st.write(f"• {p}")
 
     with tab3:
         for r in data.get("gaps_and_risks", []):
-            st.error(f"[{r.get('severity')}] {r.get('description')}")
+            st.error(f"[{r.get('severity', 'INFO')}] {r.get('description', '')}")
 
     with tab4:
         for story in data.get("jira_user_stories", []):
-            st.markdown(f"### 🚀 {story.get('title')}")
+            st.markdown(f"### 🚀 {story.get('title', 'User Story')}")
             st.write(f"**As a** `{story.get('user_role')}`, **I want to** {story.get('want_statement')} **so that** {story.get('so_that_statement')}.")
             for ac in story.get("acceptance_criteria", []):
                 st.code(ac)

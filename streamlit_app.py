@@ -107,13 +107,12 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div {
 st.markdown(css_code, unsafe_allow_html=True)
 
 # =============================================================================
-# 3. INTERNAL GOOGLE WORKSPACE OAUTH & DOMAIN GUARDRAIL (@hurix.com)
+# 3. GOOGLE WORKSPACE OAUTH & DOMAIN GUARDRAIL (@hurix.com)
 # =============================================================================
 
 def check_google_oauth():
     """
     Enforces Google Workspace OAuth login restricted strictly to @hurix.com users.
-    Passes hd="hurix.com" to lock auth selection to the organization tenant.
     """
     if st.session_state.get("authenticated", False):
         return True
@@ -161,7 +160,7 @@ def check_google_oauth():
             st.error(f"🚨 OAuth Token Verification Failed: {exc}")
             st.stop()
 
-    # Render Internal Google Workspace SSO Login Form
+    # Render Google Workspace SSO Login Form
     st.markdown("<br><br>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
 
@@ -171,14 +170,13 @@ def check_google_oauth():
             <div style="background: rgba(15, 23, 42, 0.95); border: 2.5px solid #a855f7; border-radius: 18px; padding: 36px; text-align: center;">
                 <h1 style="color: #ffffff; font-size: 2.2rem; margin: 0;">🔒 Pitch to Project</h1>
                 <p style="color: #38bdf8; font-weight: 800; font-size: 1.1rem; margin-top: 8px;">
-                    Internal Access Restricted to {required_domain} Organization
+                    Authorized Access Restricted to {required_domain} Users
                 </p>
             </div>
             """,
             unsafe_allow_html=True
         )
 
-        # hd="hurix.com" restricts authentication tenant directly to Hurix Workspace
         google_auth_url = (
             "https://accounts.google.com/o/oauth2/v2/auth?"
             + urllib.parse.urlencode({
@@ -187,7 +185,6 @@ def check_google_oauth():
                 "response_type": "code",
                 "scope": "openid email profile",
                 "prompt": "select_account",
-                "hd": "hurix.com",
             })
         )
 

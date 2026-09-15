@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # =============================================================================
-# 2. GLOBAL NEON CSS
+# 2. GLOBAL NEON CSS (WITH HIGH-CONTRAST CAPTION & TEXT FIXES)
 # =============================================================================
 
 css_code = """
@@ -167,6 +167,17 @@ label[data-testid="stWidgetLabel"] p,
 div[data-testid="stToggle"] span {
     color: #f8fafc !important;
     font-weight: 700 !important;
+}
+
+/* FIX: Force st.caption and secondary small text to render in high-contrast cyan */
+div[data-testid="stCaptionContainer"] p,
+div[data-testid="stCaptionContainer"] *,
+small,
+.stCaption {
+    color: #38bdf8 !important;
+    font-weight: 700 !important;
+    font-size: 0.98rem !important;
+    opacity: 1 !important;
 }
 
 div[data-testid="stFileUploader"] {
@@ -547,7 +558,6 @@ def analyze_with_gemini(multimodal_payload):
         except Exception as exc:
             err_msg = str(exc)
             
-            # Catch transient traffic capacity errors (503, UNAVAILABLE, etc.)
             is_transient = any(
                 indicator in err_msg.lower()
                 for indicator in ["503", "unavailable", "high demand", "overloaded", "resource_exhausted"]
@@ -610,8 +620,13 @@ MOCK_ANALYSIS = {
     ],
     "assumptions": [
         {
-            "assumption": "Admin and Client are the initial supported roles.",
-            "reason": "These roles are explicitly mentioned in the project material.",
+            "assumption": "Acme will provide complete brand assets (logo, color palette, fonts) by September 1, 2026.",
+            "reason": "Explicitly stated in SOW Paragraph 20 to enable UI/UX design deliverables.",
+            "validation_required": True
+        },
+        {
+            "assumption": "Stripe production credentials will be provided before UAT begins.",
+            "reason": "Explicitly stated in SOW Paragraph 21 to enable payment integration.",
             "validation_required": True
         }
     ],
@@ -949,7 +964,8 @@ with right_col:
                 with st.container(border=True):
                     st.markdown(f"**{item.get('assumption', '')}**")
                     if item.get("reason"):
-                        st.caption(f"Reason: {item.get('reason')}")
+                        # Fixed contrast for assumption reasons
+                        st.markdown(f"<span style='color: #38bdf8; font-weight: 700;'>Reason: {item.get('reason')}</span>", unsafe_allow_html=True)
         else:
             st.info("No assumptions identified.")
 
@@ -960,8 +976,8 @@ with right_col:
         for item in scope_items:
             with st.container(border=True):
                 st.markdown(f"### 📌 MODULE: {item.get('module', 'General Scope')}")
-                st.caption(f"Source: {item.get('source', 'Uploaded Files')}")
-                st.caption(f"Type: {item.get('scope_type', 'FUNCTIONAL')}")
+                st.markdown(f"<span style='color: #38bdf8; font-weight: 700;'>Source: {item.get('source', 'Uploaded Files')}</span>", unsafe_allow_html=True)
+                st.markdown(f"<span style='color: #a855f7; font-weight: 700;'>Type: {item.get('scope_type', 'FUNCTIONAL')}</span>", unsafe_allow_html=True)
                 for pt in item.get("points", []):
                     st.markdown(f"• {pt}")
 
@@ -987,7 +1003,7 @@ with right_col:
                 with st.container(border=True):
                     st.markdown(f"**{dep.get('dependency', '')}**")
                     if dep.get("owner"):
-                        st.caption(f"Owner: {dep.get('owner')}")
+                        st.markdown(f"<span style='color: #38bdf8; font-weight: 700;'>Owner: {dep.get('owner')}</span>", unsafe_allow_html=True)
                     if dep.get("impact"):
                         st.write(dep.get("impact"))
         else:

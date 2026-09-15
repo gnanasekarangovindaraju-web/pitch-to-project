@@ -9,7 +9,6 @@ from PIL import Image
 from google import genai
 from google.genai import types
 
-
 # =============================================================================
 # 1. PAGE CONFIGURATION
 # =============================================================================
@@ -20,7 +19,6 @@ st.set_page_config(
     layout="wide",
 )
 
-
 # =============================================================================
 # 2. GLOBAL NEON CSS
 # =============================================================================
@@ -28,27 +26,10 @@ st.set_page_config(
 css_code = """
 <style>
 
-/* -------------------------------------------------------------------------
-   GLOBAL APPLICATION BACKGROUND
-   ------------------------------------------------------------------------- */
-
 .stApp {
-    background:
-        linear-gradient(
-            125deg,
-            #0f172a 0%,
-            #1e1b4b 35%,
-            #311042 70%,
-            #0284c7 100%
-        ) !important;
-
+    background: linear-gradient(125deg, #0f172a 0%, #1e1b4b 35%, #311042 70%, #0284c7 100%) !important;
     background-attachment: fixed;
 }
-
-
-/* -------------------------------------------------------------------------
-   LOGIN FORM
-   ------------------------------------------------------------------------- */
 
 div[data-testid="stForm"] {
     background: rgba(15, 23, 42, 0.95) !important;
@@ -57,11 +38,6 @@ div[data-testid="stForm"] {
     padding: 36px !important;
     box-shadow: 0 0 40px rgba(168, 85, 247, 0.5) !important;
 }
-
-
-/* -------------------------------------------------------------------------
-   LOGIN LABELS
-   ------------------------------------------------------------------------- */
 
 div[data-testid="stForm"] label,
 div[data-testid="stForm"] label p,
@@ -76,120 +52,65 @@ div[data-testid="stTextInput"] label p {
     display: block !important;
 }
 
-
-/* -------------------------------------------------------------------------
-   INPUT FIELDS
-   ------------------------------------------------------------------------- */
-
 div[data-testid="stForm"] div[data-testid="stTextInput"] input,
 div[data-testid="stTextInput"] input,
 input[type="text"],
 input[type="password"] {
-
     background-color: #0f172a !important;
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
-
     border: 2.5px solid #38bdf8 !important;
     border-radius: 12px !important;
-
     font-weight: 800 !important;
     font-size: 1.35rem !important;
-
     padding: 16px 20px !important;
     text-align: left !important;
-
-    box-shadow:
-        0 0 14px rgba(56, 189, 248, 0.3) !important;
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.3) !important;
 }
-
-
-/* -------------------------------------------------------------------------
-   BROWSER AUTOFILL FIX (Prevents white-on-white text on first load)
-   ------------------------------------------------------------------------- */
 
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-
     -webkit-box-shadow: 0 0 0px 1000px #0f172a inset !important;
     box-shadow: 0 0 0px 1000px #0f172a inset !important;
-
     -webkit-text-fill-color: #ffffff !important;
     color: #ffffff !important;
-
     transition: background-color 5000s ease-in-out 0s !important;
     caret-color: #ffffff !important;
-
     border: 2.5px solid #38bdf8 !important;
 }
 
-
-/* -------------------------------------------------------------------------
-   PLACEHOLDER
-   ------------------------------------------------------------------------- */
-
 div[data-testid="stTextInput"] input::placeholder,
 input::placeholder {
-
     color: #94a3b8 !important;
     -webkit-text-fill-color: #94a3b8 !important;
-
     font-weight: 700 !important;
     font-size: 1.25rem !important;
-
     opacity: 1 !important;
     text-align: left !important;
 }
 
-
-/* -------------------------------------------------------------------------
-   PASSWORD EYE ICON
-   ------------------------------------------------------------------------- */
-
 div[data-testid="stTextInput"] button svg,
 div[data-testid="stForm"] svg {
-
     fill: #38bdf8 !important;
     stroke: #38bdf8 !important;
-
     width: 26px !important;
     height: 26px !important;
 }
 
-
-/* -------------------------------------------------------------------------
-   LOGIN BUTTON
-   ------------------------------------------------------------------------- */
-
 div[data-testid="stForm"] button[type="submit"],
 div[data-testid="stForm"] button[data-testid="stFormSubmitButton"],
 div[data-testid="stForm"] button {
-
-    background:
-        linear-gradient(
-            90deg,
-            #ec4899 0%,
-            #8b5cf6 50%,
-            #06b6d4 100%
-        ) !important;
-
+    background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%) !important;
     border: none !important;
     border-radius: 14px !important;
-
     padding: 18px 32px !important;
-
-    box-shadow:
-        0 0 30px rgba(236, 72, 153, 0.7) !important;
-
+    box-shadow: 0 0 30px rgba(236, 72, 153, 0.7) !important;
     transition: all 0.3s ease !important;
-
     margin-top: 22px !important;
-
     width: 100% !important;
 }
-
 
 div[data-testid="stForm"] button[type="submit"] *,
 div[data-testid="stForm"] button[type="submit"] p,
@@ -197,313 +118,144 @@ div[data-testid="stForm"] button[type="submit"] span,
 div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] *,
 div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] p,
 div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] span {
-
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
-
     font-weight: 900 !important;
     font-size: 1.5rem !important;
-
     letter-spacing: 1.2px !important;
 }
 
-
-/* -------------------------------------------------------------------------
-   SIDEBAR
-   ------------------------------------------------------------------------- */
-
 section[data-testid="stSidebar"] {
-
     background: rgba(15, 23, 42, 0.95) !important;
-
-    border-right:
-        1.5px solid #a855f7 !important;
+    border-right: 1.5px solid #a855f7 !important;
 }
-
 
 section[data-testid="stSidebar"] h3 {
-
     color: #38bdf8 !important;
-
     font-size: 1.3rem !important;
-
     font-weight: 800 !important;
 }
-
 
 section[data-testid="stSidebar"] p,
 section[data-testid="stSidebar"] span,
 section[data-testid="stSidebar"] div {
-
     color: #f8fafc !important;
-
     font-size: 1.05rem !important;
-
     font-weight: 700 !important;
-
     background: transparent !important;
 }
 
-
 section[data-testid="stSidebar"] div.stButton > button {
-
-    background:
-        linear-gradient(
-            90deg,
-            #ec4899 0%,
-            #f43f5e 100%
-        ) !important;
-
+    background: linear-gradient(90deg, #ec4899 0%, #f43f5e 100%) !important;
     color: #ffffff !important;
-
     font-weight: 800 !important;
-
     font-size: 1.1rem !important;
-
     border-radius: 10px !important;
-
-    box-shadow:
-        0 0 15px rgba(244, 63, 94, 0.5) !important;
-
+    box-shadow: 0 0 15px rgba(244, 63, 94, 0.5) !important;
     border: none !important;
-
     margin-top: 10px !important;
 }
 
-
-/* -------------------------------------------------------------------------
-   HEADINGS
-   ------------------------------------------------------------------------- */
-
-h2,
-h3 {
-
+h2, h3 {
     color: #f8fafc !important;
-
     font-weight: 800 !important;
-
-    text-shadow:
-        0 0 10px rgba(168, 85, 247, 0.3) !important;
+    text-shadow: 0 0 10px rgba(168, 85, 247, 0.3) !important;
 }
-
 
 div[data-testid="stMarkdownContainer"] p,
 label[data-testid="stWidgetLabel"] p,
 div[data-testid="stToggle"] span {
-
     color: #f8fafc !important;
-
     font-weight: 700 !important;
 }
 
-
-/* -------------------------------------------------------------------------
-   FILE UPLOADER
-   ------------------------------------------------------------------------- */
-
 div[data-testid="stFileUploader"] {
-
-    background:
-        rgba(15, 23, 42, 0.95) !important;
-
-    border:
-        2px solid #a855f7 !important;
-
+    background: rgba(15, 23, 42, 0.95) !important;
+    border: 2px solid #a855f7 !important;
     border-radius: 14px !important;
-
     padding: 12px !important;
 }
 
-
 div[data-testid="stFileUploader"] section,
 div[data-testid="stFileUploaderDropzone"],
-div[data-testid="stFileUploader"]
-[data-testid="stFileUploaderDropzone"] {
-
+div[data-testid="stFileUploader"] [data-testid="stFileUploaderDropzone"] {
     background: #1e1b4b !important;
-
-    border:
-        2px dashed #38bdf8 !important;
-
+    border: 2px dashed #38bdf8 !important;
     border-radius: 10px !important;
 }
-
 
 div[data-testid="stFileUploaderDropzone"] *,
 div[data-testid="stFileUploaderDropzone"] span,
 div[data-testid="stFileUploaderDropzone"] small,
 div[data-testid="stFileUploaderDropzone"] p {
-
     color: #ffffff !important;
-
     font-weight: 700 !important;
 }
 
-
-/* -------------------------------------------------------------------------
-   TOAST
-   ------------------------------------------------------------------------- */
-
 div[data-testid="stToast"],
 div[data-testid="stToast"] > div {
-
     background-color: #1e1b4b !important;
     background: #1e1b4b !important;
-
-    border:
-        2px solid #38bdf8 !important;
-
+    border: 2px solid #38bdf8 !important;
     border-radius: 12px !important;
-
-    box-shadow:
-        0 0 20px rgba(56, 189, 248, 0.5) !important;
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.5) !important;
 }
 
-
 div[data-testid="stToast"] * {
-
     color: #ffffff !important;
-
     font-weight: 800 !important;
 }
 
-
-/* -------------------------------------------------------------------------
-   DOWNLOAD BUTTON
-   ------------------------------------------------------------------------- */
-
 div[data-testid="stDownloadButton"] > button {
-
-    background:
-        linear-gradient(
-            135deg,
-            #10b981 0%,
-            #059669 100%
-        ) !important;
-
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
     border-radius: 12px !important;
-
     border: none !important;
-
-    box-shadow:
-        0 0 18px rgba(16, 185, 129, 0.5) !important;
-
+    box-shadow: 0 0 18px rgba(16, 185, 129, 0.5) !important;
     width: 100%;
 }
 
-
 div[data-testid="stDownloadButton"] > button * {
-
     color: #ffffff !important;
-
     font-weight: 900 !important;
 }
 
-
-/* -------------------------------------------------------------------------
-   TEXT AREA
-   ------------------------------------------------------------------------- */
-
 div[data-testid="stTextArea"] textarea {
-
-    background:
-        rgba(15, 23, 42, 0.85) !important;
-
-    border:
-        2px solid #a855f7 !important;
-
+    background: rgba(15, 23, 42, 0.85) !important;
+    border: 2px solid #a855f7 !important;
     border-radius: 14px !important;
-
     color: #ffffff !important;
 }
 
-
-/* -------------------------------------------------------------------------
-   NORMAL BUTTONS
-   ------------------------------------------------------------------------- */
-
 div.stButton > button {
-
-    background:
-        linear-gradient(
-            90deg,
-            #ec4899 0%,
-            #8b5cf6 50%,
-            #3b82f6 100%
-        ) !important;
-
+    background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #3b82f6 100%) !important;
     color: #ffffff !important;
-
     font-weight: 800 !important;
-
     font-size: 1.05rem !important;
-
     border-radius: 12px !important;
-
     border: none !important;
-
     padding: 14px 28px !important;
-
-    box-shadow:
-        0 0 20px rgba(139, 92, 246, 0.5) !important;
-
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.5) !important;
     width: 100%;
 }
 
-
-/* -------------------------------------------------------------------------
-   SELECTED TABS
-   ------------------------------------------------------------------------- */
-
 button[aria-selected="true"] {
-
-    background:
-        linear-gradient(
-            135deg,
-            #8b5cf6 0%,
-            #ec4899 100%
-        ) !important;
-
+    background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%) !important;
     color: #ffffff !important;
 }
 
-
-/* -------------------------------------------------------------------------
-   CARDS
-   ------------------------------------------------------------------------- */
-
 div[data-testid="stVerticalBlockBorderWrapper"] > div {
-
-    background:
-        rgba(15, 23, 42, 0.8) !important;
-
+    background: rgba(15, 23, 42, 0.8) !important;
     backdrop-filter: blur(10px) !important;
-
-    border-left:
-        6px solid #06b6d4 !important;
-
+    border-left: 6px solid #06b6d4 !important;
     border-radius: 14px !important;
-
     padding: 20px !important;
 }
 
-
-/* -------------------------------------------------------------------------
-   CODE
-   ------------------------------------------------------------------------- */
-
 code {
-
-    background-color:
-        rgba(30, 27, 75, 0.95) !important;
-
+    background-color: rgba(30, 27, 75, 0.95) !important;
     color: #38bdf8 !important;
-
-    border:
-        1px solid #a855f7 !important;
-
+    border: 1px solid #a855f7 !important;
     border-radius: 6px !important;
-
     padding: 3px 8px !important;
 }
 
@@ -512,165 +264,72 @@ code {
 
 st.markdown(css_code, unsafe_allow_html=True)
 
-
 # =============================================================================
 # 3. AUTHENTICATION
 # =============================================================================
 
 def check_password():
-    """
-    Returns True if the user enters valid credentials.
-    """
-
     if st.session_state.get("authenticated", False):
         return True
 
     st.markdown("<br><br>", unsafe_allow_html=True)
-
     col1, col2, col3 = st.columns([1, 2.4, 1])
 
     with col2:
-
         with st.form("login_form"):
-
             components.html(
                 """
                 <div style="
-                    background:
-                        linear-gradient(
-                            135deg,
-                            #ec4899 0%,
-                            #8b5cf6 50%,
-                            #06b6d4 100%
-                        );
-
+                    background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%);
                     border-radius: 14px;
-
                     padding: 24px 10px;
-
-                    box-shadow:
-                        0 0 25px rgba(236, 72, 153, 0.6);
-
+                    box-shadow: 0 0 25px rgba(236, 72, 153, 0.6);
                     text-align: center;
-
-                    font-family:
-                        system-ui,
-                        -apple-system,
-                        sans-serif;
+                    font-family: system-ui, -apple-system, sans-serif;
                 ">
-
-                    <div style="
-                        color: #ffffff;
-
-                        font-size: 2.8rem;
-
-                        font-weight: 900;
-
-                        margin-bottom: 6px;
-
-                        text-shadow:
-                            0 3px 12px rgba(0, 0, 0, 0.8);
-
-                        letter-spacing: -0.5px;
-                    ">
+                    <div style="color: #ffffff; font-size: 2.8rem; font-weight: 900; margin-bottom: 6px; text-shadow: 0 3px 12px rgba(0, 0, 0, 0.8); letter-spacing: -0.5px;">
                         🔒 Pitch to Project
                     </div>
-
-                    <div style="
-                        color: #ffffff;
-
-                        font-size: 1.35rem;
-
-                        font-weight: 800;
-
-                        letter-spacing: 1px;
-
-                        text-shadow:
-                            0 2px 8px rgba(0, 0, 0, 0.8);
-                    ">
+                    <div style="color: #ffffff; font-size: 1.35rem; font-weight: 800; letter-spacing: 1px; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);">
                         ⚡ Scope Intelligence Engine Access
                     </div>
-
                 </div>
                 """,
                 height=140,
                 scrolling=False
             )
 
-            username = st.text_input(
-                "Username",
-                placeholder="Enter username"
-            )
-
-            password = st.text_input(
-                "Password",
-                type="password",
-                placeholder="Enter password"
-            )
-
-            submit = st.form_submit_button(
-                "🔑 LOGIN TO ENGINE"
-            )
+            username = st.text_input("Username", placeholder="Enter username")
+            password = st.text_input("Password", type="password", placeholder="Enter password")
+            submit = st.form_submit_button("🔑 LOGIN TO ENGINE")
 
             if submit:
+                valid_user = st.secrets.get("APP_USER", "admin")
+                valid_password = st.secrets.get("APP_PASSWORD", "project@2026")
 
-                valid_user = st.secrets.get(
-                    "APP_USER",
-                    "admin"
-                )
-
-                valid_password = st.secrets.get(
-                    "APP_PASSWORD",
-                    "project@2026"
-                )
-
-                if (
-                    username == valid_user
-                    and password == valid_password
-                ):
-
+                if username == valid_user and password == valid_password:
                     st.session_state["authenticated"] = True
-
-                    st.toast(
-                        "⚡ Login Successful!",
-                        icon="✅"
-                    )
-
+                    st.toast("⚡ Login Successful!", icon="✅")
                     st.rerun()
-
                 else:
-
-                    st.error(
-                        "❌ Invalid Username or Password"
-                    )
+                    st.error("❌ Invalid Username or Password")
 
     return False
 
 
-# Stop application until authenticated
 if not check_password():
     st.stop()
-
 
 # =============================================================================
 # 4. SIDEBAR SESSION
 # =============================================================================
 
 with st.sidebar:
-
     st.markdown("### 👤 User Session")
-
     st.write("Logged in as **Admin**")
-
-    if st.button(
-        "🚪 Logout",
-        use_container_width=True
-    ):
-
+    if st.button("🚪 Logout", use_container_width=True):
         st.session_state["authenticated"] = False
-
         st.rerun()
-
 
 # =============================================================================
 # 5. GEMINI CLIENT
@@ -678,100 +337,46 @@ with st.sidebar:
 
 @st.cache_resource
 def get_gemini_client():
-
     try:
-
-        api_key = st.secrets["GEMINI_API_KEY"]
-
-        return genai.Client(
-            api_key=api_key
-        )
-
+        api_key = st.secrets.get("GEMINI_API_KEY", "")
+        if not api_key:
+            return None
+        return genai.Client(api_key=api_key)
     except Exception:
-
         return None
-
 
 client = get_gemini_client()
 
-
 # =============================================================================
-# 6. PROGRESS BAR (FIXED CSS CONTAINER COLLAPSE ISSUE)
+# 6. PROGRESS BAR
 # =============================================================================
 
 def render_stylish_progress(percentage, status_text):
     return f"""
     <div style="margin: 10px 0 18px 0; width: 100%;">
-        <div style="
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-        ">
-            <span style="
-                color: #06b6d4;
-                font-weight: 800;
-                font-size: 0.95rem;
-            ">
-                {status_text}
-            </span>
-            <span style="
-                color: #f59e0b;
-                font-weight: 900;
-                font-size: 1.05rem;
-                text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
-            ">
-                {percentage}%
-            </span>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="color: #06b6d4; font-weight: 800; font-size: 0.95rem;">{status_text}</span>
+            <span style="color: #f59e0b; font-weight: 900; font-size: 1.05rem; text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);">{percentage}%</span>
         </div>
-        <div style="
-            background: rgba(15, 23, 42, 0.9);
-            border: 2px solid #10b981;
-            border-radius: 12px;
-            padding: 3px;
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
-            position: relative;
-            overflow: hidden;
-            height: 24px;
-        ">
-            <div style="
-                width: {percentage}%;
-                height: 18px;
-                background: linear-gradient(
-                    90deg,
-                    #10b981 0%,
-                    #3b82f6 50%,
-                    #f59e0b 100%
-                );
-                border-radius: 8px;
-                box-shadow: 0 0 20px rgba(245, 158, 11, 0.8);
-                transition: width 0.3s ease-in-out;
-            ">
-            </div>
+        <div style="background: rgba(15, 23, 42, 0.9); border: 2px solid #10b981; border-radius: 12px; padding: 3px; box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); position: relative; overflow: hidden; height: 24px;">
+            <div style="width: {percentage}%; height: 18px; background: linear-gradient(90deg, #10b981 0%, #3b82f6 50%, #f59e0b 100%); border-radius: 8px; box-shadow: 0 0 20px rgba(245, 158, 11, 0.8); transition: width 0.3s ease-in-out;"></div>
         </div>
     </div>
     """
-
 
 # =============================================================================
 # 7. MULTIMODAL PAYLOAD EXTRACTION
 # =============================================================================
 
 def extract_docx_details(file):
-    """
-    Extract text from DOCX paragraphs, tables, headers/footers,
-    and extract embedded images.
-    """
     extracted_text = ""
     extracted_images = []
 
     try:
         file.seek(0)
         doc = docx.Document(file)
-
         extracted_text += f"\n--- FILE: {file.name} ---\n"
 
-        # Headers & Footers
         for section in doc.sections:
             for header_p in section.header.paragraphs:
                 if header_p.text.strip():
@@ -780,7 +385,6 @@ def extract_docx_details(file):
                 if footer_p.text.strip():
                     extracted_text += f"[Footer] {footer_p.text.strip()}\n"
 
-        # Paragraphs
         para_num = 0
         for para in doc.paragraphs:
             text = para.text.strip()
@@ -788,14 +392,12 @@ def extract_docx_details(file):
                 para_num += 1
                 extracted_text += f"[Paragraph {para_num}] {text}\n"
 
-        # Tables
         for t_idx, table in enumerate(doc.tables, start=1):
             extracted_text += f"\n[TABLE {t_idx}]\n"
             for row in table.rows:
                 cells = [cell.text.strip() for cell in row.cells]
                 extracted_text += " | ".join(cells) + "\n"
 
-        # Embedded Images
         for rel in doc.part.rels.values():
             if "image" in rel.target_ref:
                 img_part = rel.target_part
@@ -815,9 +417,6 @@ def extract_docx_details(file):
 
 
 def extract_pdf_details(file):
-    """
-    Extract text from PDF pages sequentially.
-    """
     extracted_text = ""
     try:
         file.seek(0)
@@ -833,14 +432,9 @@ def extract_pdf_details(file):
 
 
 def build_multimodal_payload(sow_files, notes_files, media_files, loose_notes):
-    """
-    Consolidates DOCX text/tables/images, PDF text, TXT files, loose notes, 
-    and uploaded media files (png, jpg, mp3, mp4) into a multimodal payload.
-    """
     payload_parts = []
     text_buffer = ""
 
-    # 1. Process SOW / Proposal Documents (.docx and .pdf)
     if sow_files:
         for file in sow_files:
             if file.name.lower().endswith(".docx"):
@@ -851,7 +445,6 @@ def build_multimodal_payload(sow_files, notes_files, media_files, loose_notes):
                 pdf_text = extract_pdf_details(file)
                 text_buffer += pdf_text
 
-    # 2. Process TXT Files
     if notes_files:
         for file in notes_files:
             try:
@@ -862,15 +455,12 @@ def build_multimodal_payload(sow_files, notes_files, media_files, loose_notes):
             except Exception as exc:
                 text_buffer += f"\n--- FILE: {file.name} ---\n[ERROR READING TXT: {exc}]\n"
 
-    # 3. Process Loose Notes
     if loose_notes and loose_notes.strip():
         text_buffer += f"\n--- LOOSE NOTES / CLIENT EMAILS ---\n{loose_notes.strip()}\n"
 
-    # Insert combined text buffer as the initial text block
     if text_buffer.strip():
         payload_parts.insert(0, text_buffer)
 
-    # 4. Process Direct Uploaded Media Files (.png, .jpg, .mp3, .mp4)
     if media_files:
         for m_file in media_files:
             try:
@@ -892,110 +482,36 @@ def build_multimodal_payload(sow_files, notes_files, media_files, loose_notes):
 
     return payload_parts
 
-
 # =============================================================================
 # 8. SMART SCOPE ANALYSIS PROMPT
 # =============================================================================
 
 SYSTEM_INSTRUCTION_PROMPT = """
-You are a senior IT Delivery Lead, Business Analyst,
-Product Owner and Solution Architect.
+You are a senior IT Delivery Lead, Business Analyst, Product Owner and Solution Architect.
 
 Your task is to transform messy project-intake information (documents, tables, diagrams, video, audio)
 into a professional delivery-ready Smart Scope Analysis.
 
 IMPORTANT:
 Do NOT invent requirements.
-Only extract requirements that are explicitly stated
-or strongly implied by the supplied material.
+Only extract requirements that are explicitly stated or strongly implied by the supplied material.
 
-If information is missing, classify it as a gap,
-assumption, dependency or risk rather than inventing an answer.
+If information is missing, classify it as a gap, assumption, dependency or risk rather than inventing an answer.
 
-============================================================
-PRIMARY OBJECTIVE
-============================================================
-Produce a professional scope-handover analysis identifying:
-1. What is actually requested.
-2. Which module/functionality it belongs to.
-3. Where the requirement came from.
-4. What is missing or ambiguous.
-5. Conflicts between documents.
-6. Risks and dependencies.
-7. Requirements suitable for Jira.
-8. Testable acceptance criteria.
-
-============================================================
-QUALITY RULES
-============================================================
-Return ONLY valid JSON matching the exact schema provided.
-No Markdown wrapping. No explanations outside JSON. Do not use trailing commas.
-
-============================================================
-JSON SCHEMA
-============================================================
+JSON SCHEMA:
 {
-  "project_summary": {
-    "project_objective": "",
-    "business_goal": "",
-    "overall_scope_summary": ""
-  },
-  "extracted_scope": [
-    {
-      "module": "",
-      "source": "",
-      "scope_type": "FUNCTIONAL/NON-FUNCTIONAL/TECHNICAL/BUSINESS",
-      "points": [ "" ]
-    }
-  ],
-  "gaps_and_risks": [
-    {
-      "severity": "HIGH/MEDIUM/LOW",
-      "type": "",
-      "description": "",
-      "impact": "",
-      "recommended_action": ""
-    }
-  ],
-  "assumptions": [
-    {
-      "assumption": "",
-      "reason": "",
-      "validation_required": true
-    }
-  ],
-  "dependencies": [
-    {
-      "dependency": "",
-      "owner": "",
-      "impact": ""
-    }
-  ],
-  "conflicts": [
-    {
-      "topic": "",
-      "source_a": "",
-      "statement_a": "",
-      "source_b": "",
-      "statement_b": "",
-      "resolution_needed": ""
-    }
-  ],
-  "jira_user_stories": [
-    {
-      "title": "",
-      "user_role": "",
-      "want_statement": "",
-      "so_that_statement": "",
-      "acceptance_criteria": [ "" ]
-    }
-  ]
+  "project_summary": { "project_objective": "", "business_goal": "", "overall_scope_summary": "" },
+  "extracted_scope": [ { "module": "", "source": "", "scope_type": "FUNCTIONAL/NON-FUNCTIONAL/TECHNICAL/BUSINESS", "points": [ "" ] } ],
+  "gaps_and_risks": [ { "severity": "HIGH/MEDIUM/LOW", "type": "", "description": "", "impact": "", "recommended_action": "" } ],
+  "assumptions": [ { "assumption": "", "reason": "", "validation_required": true } ],
+  "dependencies": [ { "dependency": "", "owner": "", "impact": "" } ],
+  "conflicts": [ { "topic": "", "source_a": "", "statement_a": "", "source_b": "", "statement_b": "", "resolution_needed": "" } ],
+  "jira_user_stories": [ { "title": "", "user_role": "", "want_statement": "", "so_that_statement": "", "acceptance_criteria": [ "" ] } ]
 }
 """
 
-
 # =============================================================================
-# 9. GEMINI ANALYSIS (WITH AUTOMATIC RETRY LOGIC & FALLBACK MODEL CHAIN)
+# 9. GEMINI ANALYSIS (GEMINI 3.6 FLASH WITH HIGH-RESILIENCE EXPONENTIAL BACKOFF)
 # =============================================================================
 
 def analyze_with_gemini(multimodal_payload):
@@ -1003,54 +519,47 @@ def analyze_with_gemini(multimodal_payload):
         return None, "GEMINI_API_KEY is missing in Streamlit Secrets."
 
     contents = [SYSTEM_INSTRUCTION_PROMPT] + multimodal_payload
-
-    # Fallback model chain to bypass 503 high-demand errors
-    model_chain = [
-        "gemini-3.6-flash",
-        "gemini-2.5-flash",
-        "gemini-1.5-flash",
-    ]
-
-    max_retries_per_model = 2
+    model_name = "gemini-3.6-flash"
+    
+    max_retries = 5
     base_delay = 2.0  # seconds
 
-    for model_name in model_chain:
-        for attempt in range(1, max_retries_per_model + 1):
-            try:
-                response = client.models.generate_content(
-                    model=model_name,
-                    contents=contents,
-                    config=types.GenerateContentConfig(
-                        response_mime_type="application/json",
-                        temperature=0.15,
-                    )
+    for attempt in range(1, max_retries + 1):
+        try:
+            response = client.models.generate_content(
+                model=model_name,
+                contents=contents,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    temperature=0.15,
                 )
+            )
 
-                if not response.text:
-                    return None, f"Model {model_name} returned an empty response."
+            if not response.text:
+                return None, f"Model {model_name} returned an empty response."
 
-                result = json.loads(response.text)
-                return result, None  # Success!
+            result = json.loads(response.text)
+            return result, None  # Success!
 
-            except json.JSONDecodeError as exc:
-                return None, f"Model {model_name} returned invalid JSON: {exc}"
+        except json.JSONDecodeError as exc:
+            return None, f"Model {model_name} returned invalid JSON: {exc}"
 
-            except Exception as exc:
-                err_msg = str(exc)
-                is_overloaded = any(
-                    indicator in err_msg.lower()
-                    for indicator in ["503", "unavailable", "high demand", "overloaded"]
-                )
+        except Exception as exc:
+            err_msg = str(exc)
+            
+            # Catch transient traffic capacity errors (503, UNAVAILABLE, etc.)
+            is_transient = any(
+                indicator in err_msg.lower()
+                for indicator in ["503", "unavailable", "high demand", "overloaded", "resource_exhausted"]
+            )
 
-                if is_overloaded:
-                    if attempt < max_retries_per_model:
-                        time.sleep(base_delay * attempt)
-                        continue
-                else:
-                    return None, f"Gemini API Error ({model_name}): {exc}"
+            if is_transient and attempt < max_retries:
+                time.sleep(base_delay * attempt)
+                continue
+            else:
+                return None, f"Gemini API Error ({model_name}): {exc}"
 
-    return None, "All Gemini models are currently experiencing heavy traffic. Please wait a few seconds and try again."
-
+    return None, "Gemini 3.6 Flash is currently experiencing peak demand. Please wait 5 seconds and click 'GENERATE SMART SCOPE' again."
 
 # =============================================================================
 # 10. MOCK ANALYSIS
@@ -1141,28 +650,20 @@ MOCK_ANALYSIS = {
     ]
 }
 
-
 # =============================================================================
 # 11. DOCX REPORT GENERATOR
 # =============================================================================
 
 def build_docx_report(data):
-
     doc = docx.Document()
+    doc.add_heading("Pitch to Project - Handover Scope Analysis", 0)
 
-    doc.add_heading(
-        "Pitch to Project - Handover Scope Analysis",
-        0
-    )
-
-    # Project Summary
     summary = data.get("project_summary", {})
     doc.add_heading("Project Summary", level=1)
     doc.add_paragraph(f"Project Objective: {summary.get('project_objective', '')}")
     doc.add_paragraph(f"Business Goal: {summary.get('business_goal', '')}")
     doc.add_paragraph(f"Overall Scope: {summary.get('overall_scope_summary', '')}")
 
-    # Extracted Scope
     doc.add_heading("1. Extracted Scope", level=1)
     for mod in data.get("extracted_scope", []):
         doc.add_heading(f"Module: {mod.get('module', 'General')}", level=2)
@@ -1171,7 +672,6 @@ def build_docx_report(data):
         for point in mod.get("points", []):
             doc.add_paragraph(f"• {point}")
 
-    # Risks
     doc.add_heading("2. Gaps & Risk Audit", level=1)
     for gap in data.get("gaps_and_risks", []):
         doc.add_paragraph(f"[{gap.get('severity', 'INFO')}] {gap.get('type', 'Risk')}: {gap.get('description', '')}")
@@ -1180,7 +680,6 @@ def build_docx_report(data):
         if gap.get("recommended_action"):
             doc.add_paragraph(f"Recommended Action: {gap.get('recommended_action')}")
 
-    # Assumptions
     doc.add_heading("3. Assumptions", level=1)
     assumptions = data.get("assumptions", [])
     if assumptions:
@@ -1191,7 +690,6 @@ def build_docx_report(data):
     else:
         doc.add_paragraph("No explicit assumptions identified.")
 
-    # Dependencies
     doc.add_heading("4. Dependencies", level=1)
     dependencies = data.get("dependencies", [])
     if dependencies:
@@ -1204,7 +702,6 @@ def build_docx_report(data):
     else:
         doc.add_paragraph("No dependencies identified.")
 
-    # Conflicts
     doc.add_heading("5. Requirement Conflicts", level=1)
     conflicts = data.get("conflicts", [])
     if conflicts:
@@ -1218,14 +715,10 @@ def build_docx_report(data):
     else:
         doc.add_paragraph("No conflicts identified.")
 
-    # Jira Stories
     doc.add_heading("6. Jira User Stories", level=1)
     for story in data.get("jira_user_stories", []):
         doc.add_heading(story.get("title", "User Story"), level=2)
-        doc.add_paragraph(
-            f"As a {story.get('user_role', 'User')}, I want to {story.get('want_statement', '')} "
-            f"so that {story.get('so_that_statement', '')}."
-        )
+        doc.add_paragraph(f"As a {story.get('user_role', 'User')}, I want to {story.get('want_statement', '')} so that {story.get('so_that_statement', '')}.")
         doc.add_paragraph("Acceptance Criteria:")
         for ac in story.get("acceptance_criteria", []):
             doc.add_paragraph(f"  - {ac}")
@@ -1234,7 +727,6 @@ def build_docx_report(data):
     doc.save(target_stream)
     target_stream.seek(0)
     return target_stream.getvalue()
-
 
 # =============================================================================
 # 12. MAIN ANIMATED HEADER BANNER
@@ -1274,7 +766,6 @@ components.html(
     scrolling=False
 )
 
-
 # =============================================================================
 # 13. APPLICATION TITLE
 # =============================================================================
@@ -1300,20 +791,17 @@ with col_title:
 with col_toggle:
     demo_mode = st.toggle("Demo Mode (Safe Pitch)", value=True)
 
-
 # =============================================================================
 # 14. MAIN TWO-COLUMN LAYOUT
 # =============================================================================
 
 left_col, right_col = st.columns([1, 1], gap="medium")
 
-
 # =============================================================================
 # 15. LEFT COLUMN - INPUT
 # =============================================================================
 
 with left_col:
-
     st.header("1. Intake Documents & Media")
 
     sow_files = st.file_uploader(
@@ -1342,26 +830,20 @@ with left_col:
 
     generate_btn = st.button("⚡ GENERATE SMART SCOPE")
 
-
 # =============================================================================
 # 16. RIGHT COLUMN - AI ANALYSIS
 # =============================================================================
 
 with right_col:
-
     st.header("2. AI Scope & Handover Analysis")
 
-    # Display any API error prominently so it doesn't auto-close
     if "last_error" in st.session_state and st.session_state["last_error"]:
         st.error(f"🚨 **Previous Request Failed:**\n\n{st.session_state['last_error']}")
 
     if generate_btn:
-
-        # Clear old error state on new generation attempt
         st.session_state["last_error"] = None
         progress_card = st.empty()
 
-        # DEMO MODE
         if demo_mode:
             with progress_card.container(border=True):
                 st.markdown("### 🧠 Running Scope Analysis")
@@ -1381,13 +863,11 @@ with right_col:
             st.session_state["analysis_data"] = MOCK_ANALYSIS
             st.toast("⚡ Demo Analysis Loaded!", icon="✅")
 
-        # LIVE GEMINI MODE
         else:
             with progress_card.container(border=True):
                 st.markdown("### 🧠 Live Gemini Multimodal Scope Extraction")
                 bar_ph = st.empty()
 
-                # Step 1: Processing
                 bar_ph.markdown(
                     render_stylish_progress(20, "📄 Step 1/3: Extracting text, tables, PDFs & embedded doc images..."),
                     unsafe_allow_html=True
@@ -1405,14 +885,12 @@ with right_col:
                     time.sleep(2)
                     progress_card.empty()
                 else:
-                    # Step 2: Transmitting
                     bar_ph.markdown(
-                        render_stylish_progress(50, "⚡ Step 2/3: Transmitting multimodal payload to Gemini..."),
+                        render_stylish_progress(50, "⚡ Step 2/3: Transmitting multimodal payload to Gemini 3.6 Flash..."),
                         unsafe_allow_html=True
                     )
                     time.sleep(0.4)
 
-                    # Step 3: Auditing
                     bar_ph.markdown(
                         render_stylish_progress(80, "🔍 Step 3/3: Auditing scope, conflicts, media & Jira stories..."),
                         unsafe_allow_html=True
@@ -1437,13 +915,11 @@ with right_col:
                         st.session_state["last_error"] = error_msg
                         st.rerun()
 
-    # DEFAULT DATA
     if "analysis_data" not in st.session_state:
         st.session_state["analysis_data"] = MOCK_ANALYSIS
 
     data = st.session_state["analysis_data"]
 
-    # TABS
     tab_summary, tab_scope, tab_risks, tab_jira = st.tabs([
         "📊 Project Summary",
         "📌 Extracted Scope",
@@ -1451,7 +927,6 @@ with right_col:
         "🚀 Jira User Stories"
     ])
 
-    # TAB 1: SUMMARY
     with tab_summary:
         summary = data.get("project_summary", {})
 
@@ -1478,7 +953,6 @@ with right_col:
         else:
             st.info("No assumptions identified.")
 
-    # TAB 2: EXTRACTED SCOPE
     with tab_scope:
         scope_items = data.get("extracted_scope", [])
         if not scope_items:
@@ -1491,7 +965,6 @@ with right_col:
                 for pt in item.get("points", []):
                     st.markdown(f"• {pt}")
 
-    # TAB 3: RISKS & CONFLICTS
     with tab_risks:
         risks = data.get("gaps_and_risks", [])
         if not risks:
@@ -1534,7 +1007,6 @@ with right_col:
         else:
             st.success("✅ No requirement conflicts identified.")
 
-    # TAB 4: JIRA STORIES
     with tab_jira:
         stories = data.get("jira_user_stories", [])
         if not stories:
@@ -1551,7 +1023,6 @@ with right_col:
                 for ac in story.get("acceptance_criteria", []):
                     st.markdown(f"- `{ac}`")
 
-    # EXPORT
     st.divider()
     docx_bytes = build_docx_report(data)
     st.download_button(

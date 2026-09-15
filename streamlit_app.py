@@ -995,50 +995,61 @@ JSON SCHEMA
 
 
 # =============================================================================
-# 9. GEMINI ANALYSIS (WITH AUTOMATIC RETRY LOGIC)
+# 9. GEMINI ANALYSIS (WITH AUTOMATIC RETRY LOGIC & FALLBACK MODEL CHAIN)
 # =============================================================================
 
 def analyze_with_gemini(multimodal_payload):
-
     if not client:
         return None, "GEMINI_API_KEY is missing in Streamlit Secrets."
 
-    # Prepend system prompt to multimodal contents payload
     contents = [SYSTEM_INSTRUCTION_PROMPT] + multimodal_payload
 
-    max_retries = 3
-    base_delay = 2  # Wait delay in seconds
+    # Fallback model chain to bypass 503 high-demand errors
+    model_chain = [
+        "gemini-3.6-flash",
+        "gemini-2.5-flash",
+        "gemini-1.5-flash",
+    ]
 
-    for attempt in range(1, max_retries + 1):
-        try:
-            response = client.models.generate_content(
-                model="gemini-3.6-flash",
-                contents=contents,
-                config=types.GenerateContentConfig(
-                    response_mime_type="application/json",
-                    temperature=0.15,
+    max_retries_per_model = 2
+    base_delay = 2.0  # seconds
+
+    for model_name in model_chain:
+        for attempt in range(1, max_retries_per_model + 1):
+            try:
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=contents,
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                        temperature=0.15,
+                    )
                 )
-            )
 
-            if not response.text:
-                return None, "Gemini returned an empty response."
+                if not response.text:
+                    return None, f"Model {model_name} returned an empty response."
 
-            result = json.loads(response.text)
-            return result, None  # Successful extraction
+                result = json.loads(response.text)
+                return result, None  # Success!
 
-        except json.JSONDecodeError as exc:
-            return None, f"Gemini returned invalid JSON: {exc}"
+            except json.JSONDecodeError as exc:
+                return None, f"Model {model_name} returned invalid JSON: {exc}"
 
-        except Exception as exc:
-            err_msg = str(exc)
-            # Handle transient 503 High Demand or Server Busy errors with retries
-            if ("503" in err_msg or "UNAVAILABLE" in err_msg or "high demand" in err_msg.lower()) and attempt < max_retries:
-                time.sleep(base_delay * attempt)
-                continue
+            except Exception as exc:
+                err_msg = str(exc)
+                is_overloaded = any(
+                    indicator in err_msg.lower()
+                    for indicator in ["503", "unavailable", "high demand", "overloaded"]
+                )
 
-            return None, f"Gemini API Error: {exc}"
+                if is_overloaded:
+                    if attempt < max_retries_per_model:
+                        time.sleep(base_delay * attempt)
+                        continue
+                else:
+                    return None, f"Gemini API Error ({model_name}): {exc}"
 
-    return None, "Gemini API is currently overloaded. Please wait a few seconds and try again."
+    return None, "All Gemini models are currently experiencing heavy traffic. Please wait a few seconds and try again."
 
 
 # =============================================================================

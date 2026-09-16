@@ -3,6 +3,9 @@ import time
 import io
 import docx
 import pypdf
+import requests
+import urllib.parse
+import jwt
 import streamlit as st
 import streamlit.components.v1 as components
 from PIL import Image
@@ -20,17 +23,41 @@ st.set_page_config(
 )
 
 # =============================================================================
-# 2. GLOBAL NEON CSS (WITH HIGH-CONTRAST CAPTION & TEXT FIXES)
+# 2. GLOBAL NEON CSS (HIGH-CONTRAST DARK THEME + BUTTON FIXES)
 # =============================================================================
 
 css_code = """
 <style>
 
+/* Application Background */
 .stApp {
     background: linear-gradient(125deg, #0f172a 0%, #1e1b4b 35%, #311042 70%, #0284c7 100%) !important;
     background-attachment: fixed;
 }
 
+/* Headings and Base Typography */
+h1, h2, h3, h4, label, label p, div[data-testid="stMarkdownContainer"] p {
+    color: #38bdf8 !important;
+    font-weight: 800 !important;
+}
+
+h1, h2, h3 {
+    color: #ffffff !important;
+    text-shadow: 0 0 12px rgba(56, 189, 248, 0.4) !important;
+}
+
+/* Force Captions, Subtext, and Small Labels to Render High-Contrast Cyan */
+div[data-testid="stCaptionContainer"] p,
+div[data-testid="stCaptionContainer"] *,
+small,
+.stCaption {
+    color: #38bdf8 !important;
+    font-weight: 700 !important;
+    font-size: 0.98rem !important;
+    opacity: 1 !important;
+}
+
+/* Login Form & Inputs */
 div[data-testid="stForm"] {
     background: rgba(15, 23, 42, 0.95) !important;
     border: 2.5px solid #a855f7 !important;
@@ -44,11 +71,9 @@ div[data-testid="stForm"] label p,
 div[data-testid="stTextInput"] label p {
     color: #38bdf8 !important;
     font-weight: 900 !important;
-    font-size: 1.4rem !important;
+    font-size: 1.2rem !important;
     letter-spacing: 0.5px !important;
-    margin-bottom: 8px !important;
-    text-align: left !important;
-    width: 100% !important;
+    margin-bottom: 6px !important;
     display: block !important;
 }
 
@@ -59,12 +84,11 @@ input[type="password"] {
     background-color: #0f172a !important;
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
-    border: 2.5px solid #38bdf8 !important;
-    border-radius: 12px !important;
-    font-weight: 800 !important;
-    font-size: 1.35rem !important;
-    padding: 16px 20px !important;
-    text-align: left !important;
+    border: 2px solid #38bdf8 !important;
+    border-radius: 10px !important;
+    font-weight: 700 !important;
+    font-size: 1.1rem !important;
+    padding: 12px 16px !important;
     box-shadow: 0 0 14px rgba(56, 189, 248, 0.3) !important;
 }
 
@@ -78,7 +102,7 @@ input:-webkit-autofill:active {
     color: #ffffff !important;
     transition: background-color 5000s ease-in-out 0s !important;
     caret-color: #ffffff !important;
-    border: 2.5px solid #38bdf8 !important;
+    border: 2px solid #38bdf8 !important;
 }
 
 div[data-testid="stTextInput"] input::placeholder,
@@ -86,100 +110,20 @@ input::placeholder {
     color: #94a3b8 !important;
     -webkit-text-fill-color: #94a3b8 !important;
     font-weight: 700 !important;
-    font-size: 1.25rem !important;
+    font-size: 1rem !important;
     opacity: 1 !important;
-    text-align: left !important;
 }
 
+/* Password Eye Icon */
 div[data-testid="stTextInput"] button svg,
 div[data-testid="stForm"] svg {
     fill: #38bdf8 !important;
     stroke: #38bdf8 !important;
-    width: 26px !important;
-    height: 26px !important;
+    width: 22px !important;
+    height: 22px !important;
 }
 
-div[data-testid="stForm"] button[type="submit"],
-div[data-testid="stForm"] button[data-testid="stFormSubmitButton"],
-div[data-testid="stForm"] button {
-    background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%) !important;
-    border: none !important;
-    border-radius: 14px !important;
-    padding: 18px 32px !important;
-    box-shadow: 0 0 30px rgba(236, 72, 153, 0.7) !important;
-    transition: all 0.3s ease !important;
-    margin-top: 22px !important;
-    width: 100% !important;
-}
-
-div[data-testid="stForm"] button[type="submit"] *,
-div[data-testid="stForm"] button[type="submit"] p,
-div[data-testid="stForm"] button[type="submit"] span,
-div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] *,
-div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] p,
-div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] span {
-    color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
-    font-weight: 900 !important;
-    font-size: 1.5rem !important;
-    letter-spacing: 1.2px !important;
-}
-
-section[data-testid="stSidebar"] {
-    background: rgba(15, 23, 42, 0.95) !important;
-    border-right: 1.5px solid #a855f7 !important;
-}
-
-section[data-testid="stSidebar"] h3 {
-    color: #38bdf8 !important;
-    font-size: 1.3rem !important;
-    font-weight: 800 !important;
-}
-
-section[data-testid="stSidebar"] p,
-section[data-testid="stSidebar"] span,
-section[data-testid="stSidebar"] div {
-    color: #f8fafc !important;
-    font-size: 1.05rem !important;
-    font-weight: 700 !important;
-    background: transparent !important;
-}
-
-section[data-testid="stSidebar"] div.stButton > button {
-    background: linear-gradient(90deg, #ec4899 0%, #f43f5e 100%) !important;
-    color: #ffffff !important;
-    font-weight: 800 !important;
-    font-size: 1.1rem !important;
-    border-radius: 10px !important;
-    box-shadow: 0 0 15px rgba(244, 63, 94, 0.5) !important;
-    border: none !important;
-    margin-top: 10px !important;
-}
-
-h2, h3 {
-    color: #f8fafc !important;
-    font-weight: 800 !important;
-    text-shadow: 0 0 10px rgba(168, 85, 247, 0.3) !important;
-}
-
-div[data-testid="stMarkdownContainer"] p,
-label[data-testid="stWidgetLabel"] p,
-div[data-testid="stToggle"] span {
-    color: #f8fafc !important;
-    font-weight: 700 !important;
-}
-
-/* FIX: Force st.caption and secondary small text to render in high-contrast cyan */
-div[data-testid="stCaptionContainer"] p,
-div[data-testid="stCaptionContainer"] *,
-small,
-.stCaption {
-    color: #38bdf8 !important;
-    font-weight: 700 !important;
-    font-size: 0.98rem !important;
-    opacity: 1 !important;
-}
-
+/* File Uploaders */
 div[data-testid="stFileUploader"] {
     background: rgba(15, 23, 42, 0.95) !important;
     border: 2px solid #a855f7 !important;
@@ -203,18 +147,61 @@ div[data-testid="stFileUploaderDropzone"] p {
     font-weight: 700 !important;
 }
 
-div[data-testid="stToast"],
-div[data-testid="stToast"] > div {
-    background-color: #1e1b4b !important;
-    background: #1e1b4b !important;
-    border: 2px solid #38bdf8 !important;
-    border-radius: 12px !important;
-    box-shadow: 0 0 20px rgba(56, 189, 248, 0.5) !important;
+/* Sidebar */
+section[data-testid="stSidebar"] {
+    background: rgba(15, 23, 42, 0.95) !important;
+    border-right: 1.5px solid #a855f7 !important;
 }
 
-div[data-testid="stToast"] * {
+section[data-testid="stSidebar"] h3 {
+    color: #38bdf8 !important;
+    font-size: 1.3rem !important;
+    font-weight: 800 !important;
+}
+
+section[data-testid="stSidebar"] p,
+section[data-testid="stSidebar"] span,
+section[data-testid="stSidebar"] div {
+    color: #f8fafc !important;
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    background: transparent !important;
+}
+
+/* Primary Action Buttons */
+div.stButton > button {
+    background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #3b82f6 100%) !important;
     color: #ffffff !important;
     font-weight: 800 !important;
+    font-size: 1.05rem !important;
+    border-radius: 12px !important;
+    border: none !important;
+    padding: 14px 28px !important;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.5) !important;
+    width: 100%;
+}
+
+/* Full-width Neon Styling for Login Form Submit Buttons */
+div[data-testid="stFormSubmitButton"] button,
+div[data-testid="stFormSubmitButton"] > button,
+div[data-testid="stForm"] button[type="submit"] {
+    background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 14px 24px !important;
+    box-shadow: 0 0 20px rgba(236, 72, 153, 0.6) !important;
+    width: 100% !important;
+    margin-top: 15px !important;
+}
+
+div[data-testid="stFormSubmitButton"] button *,
+div[data-testid="stFormSubmitButton"] p,
+div[data-testid="stFormSubmitButton"] span {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    font-weight: 900 !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
 }
 
 div[data-testid="stDownloadButton"] > button {
@@ -230,25 +217,7 @@ div[data-testid="stDownloadButton"] > button * {
     font-weight: 900 !important;
 }
 
-div[data-testid="stTextArea"] textarea {
-    background: rgba(15, 23, 42, 0.85) !important;
-    border: 2px solid #a855f7 !important;
-    border-radius: 14px !important;
-    color: #ffffff !important;
-}
-
-div.stButton > button {
-    background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #3b82f6 100%) !important;
-    color: #ffffff !important;
-    font-weight: 800 !important;
-    font-size: 1.05rem !important;
-    border-radius: 12px !important;
-    border: none !important;
-    padding: 14px 28px !important;
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.5) !important;
-    width: 100%;
-}
-
+/* Tabs & Cards */
 button[aria-selected="true"] {
     background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%) !important;
     color: #ffffff !important;
@@ -260,6 +229,13 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div {
     border-left: 6px solid #06b6d4 !important;
     border-radius: 14px !important;
     padding: 20px !important;
+}
+
+div[data-testid="stTextArea"] textarea {
+    background: rgba(15, 23, 42, 0.85) !important;
+    border: 2px solid #a855f7 !important;
+    border-radius: 14px !important;
+    color: #ffffff !important;
 }
 
 code {
@@ -276,59 +252,121 @@ code {
 st.markdown(css_code, unsafe_allow_html=True)
 
 # =============================================================================
-# 3. AUTHENTICATION
+# 3. HYBRID AUTHENTICATION SYSTEM (GOOGLE SSO + CORPORATE FALLBACK)
 # =============================================================================
 
-def check_password():
+def check_authentication():
     if st.session_state.get("authenticated", False):
         return True
 
+    oauth_config = st.secrets.get("oauth", {})
+    client_id = oauth_config.get("client_id")
+    client_secret = oauth_config.get("client_secret")
+    redirect_uri = oauth_config.get("redirect_uri")
+    required_domain = st.secrets.get("COMPANY_DOMAIN", "@hurix.com")
+
+    # Step 1: Process OAuth Redirect Callback Code
+    query_params = st.query_params
+    auth_code = query_params.get("code")
+
+    if auth_code:
+        token_url = "https://oauth2.googleapis.com/token"
+        data = {
+            "code": auth_code,
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "redirect_uri": redirect_uri,
+            "grant_type": "authorization_code",
+        }
+
+        try:
+            token_response = requests.post(token_url, data=data).json()
+            id_token = token_response.get("id_token")
+
+            if id_token:
+                user_info = jwt.decode(id_token, options={"verify_signature": False})
+                user_email = user_info.get("email", "").lower()
+
+                if user_email.endswith(required_domain.lower()):
+                    st.session_state["authenticated"] = True
+                    st.session_state["user_email"] = user_email
+                    st.query_params.clear()
+                    st.toast("⚡ Login Successful!", icon="✅")
+                    st.rerun()
+                else:
+                    st.error(f"⛔ Access Blocked: {user_email} is unauthorized. Access is restricted strictly to {required_domain} organization accounts.")
+                    st.stop()
+        except Exception as exc:
+            st.error(f"🚨 OAuth Token Verification Failed: {exc}")
+            st.stop()
+
+    # Step 2: Render SSO & Password Fallback UI
     st.markdown("<br><br>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2.4, 1])
 
     with col2:
-        with st.form("login_form"):
-            components.html(
-                """
-                <div style="
-                    background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%);
-                    border-radius: 14px;
-                    padding: 24px 10px;
-                    box-shadow: 0 0 25px rgba(236, 72, 153, 0.6);
-                    text-align: center;
-                    font-family: system-ui, -apple-system, sans-serif;
-                ">
-                    <div style="color: #ffffff; font-size: 2.8rem; font-weight: 900; margin-bottom: 6px; text-shadow: 0 3px 12px rgba(0, 0, 0, 0.8); letter-spacing: -0.5px;">
-                        🔒 Pitch to Project
-                    </div>
-                    <div style="color: #ffffff; font-size: 1.35rem; font-weight: 800; letter-spacing: 1px; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);">
-                        ⚡ Scope Intelligence Engine Access
-                    </div>
-                </div>
-                """,
-                height=140,
-                scrolling=False
-            )
+        st.markdown(
+            f"""
+            <div style="background: rgba(15, 23, 42, 0.95); border: 2.5px solid #a855f7; border-radius: 18px; padding: 28px; text-align: center;">
+                <h1 style="color: #ffffff; font-size: 2.2rem; margin: 0;">🔒 Pitch to Project</h1>
+                <p style="color: #38bdf8; font-weight: 800; font-size: 1.1rem; margin-top: 8px;">
+                    Restricted Access to {required_domain} Workspace Organization
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
-            username = st.text_input("Username", placeholder="Enter username")
-            password = st.text_input("Password", type="password", placeholder="Enter password")
-            submit = st.form_submit_button("🔑 LOGIN TO ENGINE")
+        google_auth_url = (
+            "https://accounts.google.com/o/oauth2/v2/auth?"
+            + urllib.parse.urlencode({
+                "client_id": client_id,
+                "redirect_uri": redirect_uri,
+                "response_type": "code",
+                "scope": "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid",
+                "prompt": "select_account",
+            })
+        )
+
+        st.markdown(
+            f"""
+            <a href="{google_auth_url}" target="_self" style="text-decoration: none;">
+                <div style="background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%);
+                            border-radius: 12px; padding: 14px; text-align: center; color: white;
+                            font-weight: 900; font-size: 1.15rem; margin-top: 16px; margin-bottom: 20px;
+                            box-shadow: 0 0 25px rgba(236, 72, 153, 0.5);">
+                    🔑 SIGN IN WITH HURIX WORKSPACE
+                </div>
+            </a>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.markdown("<p style='text-align: center; color: #94a3b8; font-weight: 700;'>— OR SIGN IN WITH CREDENTIALS —</p>", unsafe_allow_html=True)
+
+        with st.form("fallback_login_form"):
+            user_email = st.text_input("Corporate Email", placeholder="name@hurix.com")
+            password = st.text_input("Access Password", type="password", placeholder="Enter password")
+            submit = st.form_submit_button("🔑 LOGIN VIA CREDENTIALS")
 
             if submit:
-                valid_user = st.secrets.get("APP_USER", "admin")
-                valid_password = st.secrets.get("APP_PASSWORD", "project@2026")
+                valid_pass = st.secrets.get("APP_PASSWORD", "project@2026")
+                is_hurix = user_email.lower().endswith(required_domain.lower()) or user_email == "admin"
 
-                if username == valid_user and password == valid_password:
+                if is_hurix and password == valid_pass:
                     st.session_state["authenticated"] = True
+                    st.session_state["user_email"] = user_email
                     st.toast("⚡ Login Successful!", icon="✅")
                     st.rerun()
+                elif not is_hurix:
+                    st.error(f"⛔ Access Restricted: Must use an authorized {required_domain} email address.")
                 else:
-                    st.error("❌ Invalid Username or Password")
+                    st.error("❌ Invalid Password.")
 
     return False
 
 
-if not check_password():
+if not check_authentication():
     st.stop()
 
 # =============================================================================
@@ -337,7 +375,7 @@ if not check_password():
 
 with st.sidebar:
     st.markdown("### 👤 User Session")
-    st.write("Logged in as **Admin**")
+    st.write(f"Logged in as: **{st.session_state.get('user_email', 'Hurix Employee')}**")
     if st.button("🚪 Logout", use_container_width=True):
         st.session_state["authenticated"] = False
         st.rerun()
@@ -964,7 +1002,6 @@ with right_col:
                 with st.container(border=True):
                     st.markdown(f"**{item.get('assumption', '')}**")
                     if item.get("reason"):
-                        # Fixed contrast for assumption reasons
                         st.markdown(f"<span style='color: #38bdf8; font-weight: 700;'>Reason: {item.get('reason')}</span>", unsafe_allow_html=True)
         else:
             st.info("No assumptions identified.")

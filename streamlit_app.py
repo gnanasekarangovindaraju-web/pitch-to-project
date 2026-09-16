@@ -23,7 +23,7 @@ st.set_page_config(
 )
 
 # =============================================================================
-# 2. GLOBAL NEON CSS (HIGH-CONTRAST DARK THEME)
+# 2. GLOBAL NEON CSS (HIGH-CONTRAST DARK THEME + BUTTON FIXES)
 # =============================================================================
 
 css_code = """
@@ -181,8 +181,10 @@ div.stButton > button {
     width: 100%;
 }
 
-div[data-testid="stForm"] button[type="submit"],
-div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] {
+/* Full-width Neon Styling for Login Form Submit Buttons */
+div[data-testid="stFormSubmitButton"] button,
+div[data-testid="stFormSubmitButton"] > button,
+div[data-testid="stForm"] button[type="submit"] {
     background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%) !important;
     border: none !important;
     border-radius: 12px !important;
@@ -192,12 +194,14 @@ div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] {
     margin-top: 15px !important;
 }
 
-div[data-testid="stForm"] button[type="submit"] *,
-div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] * {
+div[data-testid="stFormSubmitButton"] button *,
+div[data-testid="stFormSubmitButton"] p,
+div[data-testid="stFormSubmitButton"] span {
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
     font-weight: 900 !important;
-    font-size: 1.15rem !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 1px !important;
 }
 
 div[data-testid="stDownloadButton"] > button {
@@ -346,7 +350,7 @@ def check_authentication():
             submit = st.form_submit_button("🔑 LOGIN VIA CREDENTIALS")
 
             if submit:
-                valid_pass = st.secrets.get("APP_PASSWORD", "Hurix#999999")
+                valid_pass = st.secrets.get("APP_PASSWORD", "project@2026")
                 is_hurix = user_email.lower().endswith(required_domain.lower()) or user_email == "admin"
 
                 if is_hurix and password == valid_pass:

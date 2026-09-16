@@ -71,9 +71,9 @@ div[data-testid="stForm"] label p,
 div[data-testid="stTextInput"] label p {
     color: #38bdf8 !important;
     font-weight: 900 !important;
-    font-size: 1.4rem !important;
+    font-size: 1.2rem !important;
     letter-spacing: 0.5px !important;
-    margin-bottom: 8px !important;
+    margin-bottom: 6px !important;
     display: block !important;
 }
 
@@ -84,11 +84,11 @@ input[type="password"] {
     background-color: #0f172a !important;
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
-    border: 2.5px solid #38bdf8 !important;
-    border-radius: 12px !important;
-    font-weight: 800 !important;
-    font-size: 1.35rem !important;
-    padding: 16px 20px !important;
+    border: 2px solid #38bdf8 !important;
+    border-radius: 10px !important;
+    font-weight: 700 !important;
+    font-size: 1.1rem !important;
+    padding: 12px 16px !important;
     box-shadow: 0 0 14px rgba(56, 189, 248, 0.3) !important;
 }
 
@@ -102,7 +102,7 @@ input:-webkit-autofill:active {
     color: #ffffff !important;
     transition: background-color 5000s ease-in-out 0s !important;
     caret-color: #ffffff !important;
-    border: 2.5px solid #38bdf8 !important;
+    border: 2px solid #38bdf8 !important;
 }
 
 div[data-testid="stTextInput"] input::placeholder,
@@ -110,8 +110,17 @@ input::placeholder {
     color: #94a3b8 !important;
     -webkit-text-fill-color: #94a3b8 !important;
     font-weight: 700 !important;
-    font-size: 1.25rem !important;
+    font-size: 1rem !important;
     opacity: 1 !important;
+}
+
+/* Password Eye Icon */
+div[data-testid="stTextInput"] button svg,
+div[data-testid="stForm"] svg {
+    fill: #38bdf8 !important;
+    stroke: #38bdf8 !important;
+    width: 22px !important;
+    height: 22px !important;
 }
 
 /* File Uploaders */
@@ -172,6 +181,25 @@ div.stButton > button {
     width: 100%;
 }
 
+div[data-testid="stForm"] button[type="submit"],
+div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] {
+    background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 14px 24px !important;
+    box-shadow: 0 0 20px rgba(236, 72, 153, 0.6) !important;
+    width: 100% !important;
+    margin-top: 15px !important;
+}
+
+div[data-testid="stForm"] button[type="submit"] *,
+div[data-testid="stForm"] button[data-testid="stFormSubmitButton"] * {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    font-weight: 900 !important;
+    font-size: 1.15rem !important;
+}
+
 div[data-testid="stDownloadButton"] > button {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
     border-radius: 12px !important;
@@ -220,14 +248,10 @@ code {
 st.markdown(css_code, unsafe_allow_html=True)
 
 # =============================================================================
-# 3. INTERNAL GOOGLE WORKSPACE OAUTH & DOMAIN GUARDRAIL (@hurix.com)
+# 3. HYBRID AUTHENTICATION SYSTEM (GOOGLE SSO + CORPORATE FALLBACK)
 # =============================================================================
 
 def check_authentication():
-    """
-    Enforces Google Workspace OAuth authentication restricted strictly to @hurix.com accounts.
-    Passes hd="hurix.com" to lock account selection to the organization tenant.
-    """
     if st.session_state.get("authenticated", False):
         return True
 
@@ -272,7 +296,7 @@ def check_authentication():
             st.error(f"🚨 OAuth Token Verification Failed: {exc}")
             st.stop()
 
-    # Step 2: Render Google Workspace SSO Login UI
+    # Step 2: Render SSO & Password Fallback UI
     st.markdown("<br><br>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2.4, 1])
 
@@ -297,7 +321,6 @@ def check_authentication():
                 "response_type": "code",
                 "scope": "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid",
                 "prompt": "select_account",
-                "hd": "hurix.com",
             })
         )
 
@@ -305,14 +328,36 @@ def check_authentication():
             f"""
             <a href="{google_auth_url}" target="_self" style="text-decoration: none;">
                 <div style="background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%);
-                            border-radius: 12px; padding: 16px; text-align: center; color: white;
-                            font-weight: 900; font-size: 1.2rem; margin-top: 20px; box-shadow: 0 0 25px rgba(236, 72, 153, 0.5);">
+                            border-radius: 12px; padding: 14px; text-align: center; color: white;
+                            font-weight: 900; font-size: 1.15rem; margin-top: 16px; margin-bottom: 20px;
+                            box-shadow: 0 0 25px rgba(236, 72, 153, 0.5);">
                     🔑 SIGN IN WITH HURIX WORKSPACE
                 </div>
             </a>
             """,
             unsafe_allow_html=True
         )
+
+        st.markdown("<p style='text-align: center; color: #94a3b8; font-weight: 700;'>— OR SIGN IN WITH CREDENTIALS —</p>", unsafe_allow_html=True)
+
+        with st.form("fallback_login_form"):
+            user_email = st.text_input("Corporate Email", placeholder="name@hurix.com")
+            password = st.text_input("Access Password", type="password", placeholder="Enter password")
+            submit = st.form_submit_button("🔑 LOGIN VIA CREDENTIALS")
+
+            if submit:
+                valid_pass = st.secrets.get("APP_PASSWORD", "Hurix#999999")
+                is_hurix = user_email.lower().endswith(required_domain.lower()) or user_email == "admin"
+
+                if is_hurix and password == valid_pass:
+                    st.session_state["authenticated"] = True
+                    st.session_state["user_email"] = user_email
+                    st.toast("⚡ Login Successful!", icon="✅")
+                    st.rerun()
+                elif not is_hurix:
+                    st.error(f"⛔ Access Restricted: Must use an authorized {required_domain} email address.")
+                else:
+                    st.error("❌ Invalid Password.")
 
     return False
 

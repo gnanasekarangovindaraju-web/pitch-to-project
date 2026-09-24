@@ -372,7 +372,7 @@ if not check_authentication():
     st.stop()
 
 # =============================================================================
-# 4. SIDEBAR SESSION (WITH COMPLETE STATE RESET ON LOGOUT)
+# 4. SIDEBAR SESSION
 # =============================================================================
 
 with st.sidebar:
@@ -573,11 +573,11 @@ def analyze_with_gemini(multimodal_payload):
 
     contents = [SYSTEM_INSTRUCTION_PROMPT] + multimodal_payload
     
-    # Primary model with secondary fallbacks in case 503 capacity issues occur
-    models_to_try = ["gemini-3.6-flash", "gemini-2.5-flash", "gemini-1.5-flash"]
+    # Priority order for models to minimize peak traffic errors
+    models_to_try = ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-3.6-flash"]
     
-    max_retries_per_model = 3
-    base_delay = 3.0  # seconds
+    max_retries_per_model = 2
+    base_delay = 2.0  # seconds
 
     for model_name in models_to_try:
         for attempt in range(1, max_retries_per_model + 1):
@@ -610,11 +610,9 @@ def analyze_with_gemini(multimodal_payload):
                 )
 
                 if is_transient:
-                    # Sleep with progressive backoff before retrying
                     time.sleep(base_delay * attempt)
                     continue
                 else:
-                    # Non-transient error; break loop and try next fallback model
                     break
 
     return None, "All Gemini models are currently experiencing peak traffic. Please try again in 10 seconds or enable 'Demo Mode' for your pitch."
@@ -894,19 +892,20 @@ with left_col:
     generate_btn = st.button("⚡ GENERATE SMART SCOPE")
 
 # =============================================================================
-# 16. RIGHT COLUMN - AI ANALYSIS (WITH DISMISSABLE ERROR BANNER)
+# 16. RIGHT COLUMN - AI ANALYSIS (WITH PROPERLY STYLED CLEAR BUTTON)
 # =============================================================================
 
 with right_col:
     st.header("2. AI Scope & Handover Analysis")
 
-    # Render error with an inline dismiss button
+    # Render error with a properly-spaced dismiss button
     if st.session_state.get("last_error"):
-        err_col1, err_col2 = st.columns([4, 1])
+        err_col1, err_col2 = st.columns([3.5, 1])
         with err_col1:
             st.error(f"🚨 **Previous Request Failed:**\n\n{st.session_state['last_error']}")
         with err_col2:
-            if st.button("✖ Clear Error"):
+            st.markdown("<br>", unsafe_allow_html=True)
+            if st.button("✖ Clear", key="clear_error_btn"):
                 st.session_state["last_error"] = None
                 st.rerun()
 

@@ -564,58 +564,40 @@ JSON SCHEMA:
 """
 
 # =============================================================================
-# 9. GEMINI ANALYSIS (MULTI-MODEL RESILIENCE WITH AUTOMATIC FALLBACKS)
+# 9. GEMINI ANALYSIS (DIAGNOSTIC ERROR CATCHING)
 # =============================================================================
 
 def analyze_with_gemini(multimodal_payload):
     if not client:
-        return None, "GEMINI_API_KEY is missing in Streamlit Secrets."
+        return None, "GEMINI_API_KEY is missing or client failed to initialize in st.secrets."
 
     contents = [SYSTEM_INSTRUCTION_PROMPT] + multimodal_payload
+    models_to_try = ["gemini-2.5-flash", "gemini-1.5-flash"]
     
-    # Priority order for models to minimize peak traffic errors
-    models_to_try = ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-1.5-pro"]
-    
-    max_retries_per_model = 2
-    base_delay = 2.0  # seconds
+    last_error_details = []
 
     for model_name in models_to_try:
-        for attempt in range(1, max_retries_per_model + 1):
-            try:
-                response = client.models.generate_content(
-                    model=model_name,
-                    contents=contents,
-                    config=types.GenerateContentConfig(
-                        response_mime_type="application/json",
-                        temperature=0.15,
-                    )
+        try:
+            response = client.models.generate_content(
+                model=model_name,
+                contents=contents,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    temperature=0.15,
                 )
+            )
 
-                if not response.text:
-                    continue
-
+            if response and response.text:
                 result = json.loads(response.text)
-                return result, None  # Success!
+                return result, None
 
-            except json.JSONDecodeError:
-                continue
+        except Exception as exc:
+            err_msg = str(exc)
+            last_error_details.append(f"Model '{model_name}': {err_msg}")
+            continue
 
-            except Exception as exc:
-                err_msg = str(exc).lower()
-                
-                # Check for transient demand / quota errors
-                is_transient = any(
-                    indicator in err_msg
-                    for indicator in ["503", "unavailable", "high demand", "overloaded", "resource_exhausted", "429"]
-                )
-
-                if is_transient:
-                    time.sleep(base_delay * attempt)
-                    continue
-                else:
-                    break
-
-    return None, "All Gemini models are currently experiencing peak traffic. Please try again in 10 seconds or enable 'Demo Mode' for your pitch."
+    detailed_summary = " | ".join(last_error_details)
+    return None, f"API Error: {detailed_summary}"
 
 # =============================================================================
 # 10. MOCK ANALYSIS
@@ -892,13 +874,12 @@ with left_col:
     generate_btn = st.button("⚡ GENERATE SMART SCOPE")
 
 # =============================================================================
-# 16. RIGHT COLUMN - AI ANALYSIS (WITH PROPERLY STYLED CLEAR BUTTON)
+# 16. RIGHT COLUMN - AI ANALYSIS
 # =============================================================================
 
 with right_col:
     st.header("2. AI Scope & Handover Analysis")
 
-    # Render error with a properly-spaced dismiss button
     if st.session_state.get("last_error"):
         err_col1, err_col2 = st.columns([3.5, 1])
         with err_col1:

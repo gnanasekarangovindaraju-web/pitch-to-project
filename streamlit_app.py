@@ -564,7 +564,7 @@ JSON SCHEMA:
 """
 
 # =============================================================================
-# 9. GEMINI ANALYSIS (DIAGNOSTIC ERROR CATCHING)
+# 9. GEMINI ANALYSIS (AUTOMATIC RETRIES FOR 503 HIGH-DEMAND SPIKES)
 # =============================================================================
 
 def analyze_with_gemini(multimodal_payload):
@@ -572,32 +572,42 @@ def analyze_with_gemini(multimodal_payload):
         return None, "GEMINI_API_KEY is missing or client failed to initialize in st.secrets."
 
     contents = [SYSTEM_INSTRUCTION_PROMPT] + multimodal_payload
-    models_to_try = ["gemini-3.8-flash", "gemini-2.5-flash"]
     
-    last_error_details = []
+    # Official endpoint requested by the Google API error response
+    models_to_try = ["gemini-3.8-flash"]
+    
+    max_retries = 3
+    base_delay = 2.5  # seconds delay between retries
+    last_error = ""
 
     for model_name in models_to_try:
-        try:
-            response = client.models.generate_content(
-                model=model_name,
-                contents=contents,
-                config=types.GenerateContentConfig(
-                    response_mime_type="application/json",
-                    temperature=0.15,
+        for attempt in range(1, max_retries + 1):
+            try:
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=contents,
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                        temperature=0.15,
+                    )
                 )
-            )
 
-            if response and response.text:
-                result = json.loads(response.text)
-                return result, None
+                if response and response.text:
+                    result = json.loads(response.text)
+                    return result, None  # Success!
 
-        except Exception as exc:
-            err_msg = str(exc)
-            last_error_details.append(f"Model '{model_name}': {err_msg}")
-            continue
+            except Exception as exc:
+                err_msg = str(exc)
+                last_error = err_msg
+                
+                # If Google returns a temporary 503 high demand spike, retry automatically
+                if "503" in err_msg or "UNAVAILABLE" in err_msg or "high demand" in err_msg.lower():
+                    time.sleep(base_delay * attempt)
+                    continue
+                else:
+                    break
 
-    detailed_summary = " | ".join(last_error_details)
-    return None, f"API Error: {detailed_summary}"
+    return None, f"API Error ({models_to_try[0]}): {last_error}"
 
 # =============================================================================
 # 10. MOCK ANALYSIS

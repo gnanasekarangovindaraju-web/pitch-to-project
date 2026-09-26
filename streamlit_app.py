@@ -574,7 +574,7 @@ def analyze_with_gemini(multimodal_payload):
     contents = [SYSTEM_INSTRUCTION_PROMPT] + multimodal_payload
     
     # Priority order for models to minimize peak traffic errors
-    models_to_try = ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-3.6-flash"]
+    models_to_try = ["gemini-3.6-flash"]
     
     max_retries_per_model = 2
     base_delay = 2.0  # seconds

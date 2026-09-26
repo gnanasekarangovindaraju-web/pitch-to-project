@@ -572,7 +572,7 @@ def analyze_with_gemini(multimodal_payload):
         return None, "GEMINI_API_KEY is missing or client failed to initialize in st.secrets."
 
     contents = [SYSTEM_INSTRUCTION_PROMPT] + multimodal_payload
-    models_to_try = ["gemini-2.5-flash", "gemini-1.5-flash"]
+    models_to_try = ["gemini-3.8-flash", "gemini-2.5-flash"]
     
     last_error_details = []
 

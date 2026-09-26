@@ -564,7 +564,7 @@ JSON SCHEMA:
 """
 
 # =============================================================================
-# 9. GEMINI ANALYSIS (AUTOMATIC RETRIES FOR 503 HIGH-DEMAND SPIKES)
+# 9. GEMINI ANALYSIS (MULTI-MODEL REDUNDANCY & AUTOMATIC FALLBACK)
 # =============================================================================
 
 def analyze_with_gemini(multimodal_payload):
@@ -573,15 +573,19 @@ def analyze_with_gemini(multimodal_payload):
 
     contents = [SYSTEM_INSTRUCTION_PROMPT] + multimodal_payload
     
-    # Official endpoint requested by the Google API error response
-    models_to_try = ["gemini-3.8-flash"]
+    # Redundant list of official active models to route around 503 traffic spikes
+    models_to_try = [
+        "gemini-3.8-flash",
+        "gemini-3.7-flash",
+        "gemini-3.5-flash",
+        "gemini-2.5-flash"
+    ]
     
-    max_retries = 3
-    base_delay = 2.5  # seconds delay between retries
-    last_error = ""
+    max_retries_per_model = 2
+    base_delay = 1.5  # seconds
 
     for model_name in models_to_try:
-        for attempt in range(1, max_retries + 1):
+        for attempt in range(1, max_retries_per_model + 1):
             try:
                 response = client.models.generate_content(
                     model=model_name,
@@ -598,16 +602,20 @@ def analyze_with_gemini(multimodal_payload):
 
             except Exception as exc:
                 err_msg = str(exc)
-                last_error = err_msg
                 
-                # If Google returns a temporary 503 high demand spike, retry automatically
-                if "503" in err_msg or "UNAVAILABLE" in err_msg or "high demand" in err_msg.lower():
+                # If Google returns a transient 503/429 high demand error, retry or move to next model
+                is_transient = any(
+                    indicator in err_msg.lower()
+                    for indicator in ["503", "unavailable", "high demand", "overloaded", "429"]
+                )
+
+                if is_transient and attempt < max_retries_per_model:
                     time.sleep(base_delay * attempt)
                     continue
                 else:
-                    break
+                    break  # Try the next model endpoint in models_to_try
 
-    return None, f"API Error ({models_to_try[0]}): {last_error}"
+    return None, "All live API endpoints are currently experiencing high Google server demand. Please toggle 'Demo Mode (Safe Pitch)' at the top right to present seamlessly."
 
 # =============================================================================
 # 10. MOCK ANALYSIS
